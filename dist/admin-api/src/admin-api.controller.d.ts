@@ -6,6 +6,6 @@ export declare class AdminApiController {
     constructor(adminApiService: AdminApiService, prisma: PrismaService);
     getHello(): string;
     countAdmins(): Promise<{
-        count: number;
+        count: any;
     }>;
 }

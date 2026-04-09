@@ -6,6 +6,6 @@ export declare class AuthServiceController {
     constructor(authServiceService: AuthServiceService, prisma: PrismaService);
     getHello(): string;
     countUsers(): Promise<{
-        count: number;
+        count: any;
     }>;
 }

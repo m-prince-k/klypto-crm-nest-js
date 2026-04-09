@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
-const auth_1 = require("../../../../node_modules/@prisma/client/auth/index.js");
+const auth_1 = require("@prisma/client/auth");
 let PrismaService = class PrismaService extends auth_1.PrismaClient {
     async onModuleInit() {
         await this.$connect();
