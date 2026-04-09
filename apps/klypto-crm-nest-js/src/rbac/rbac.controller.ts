@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Patch,
   Param,
   Post,
   Req,
@@ -28,7 +30,10 @@ import {
   AssignRoleDto,
   AssignRoleResponseDto,
   CreateRoleDto,
+  MessageResponseDto,
   RoleResponseDto,
+  UpdateRoleDto,
+  UserWithRolesDto,
   UserRolesResponseDto,
 } from './dto/rbac.dto';
 import { RbacService } from './rbac.service';
@@ -67,6 +72,35 @@ export class RbacController {
     return this.rbacService.listRoles();
   }
 
+  @Patch('roles/:roleId')
+  @ApiOperation({ summary: 'Update an existing role (Super Admin only)' })
+  @ApiBody({ type: UpdateRoleDto })
+  @ApiOkResponse({
+    description: 'Role updated successfully',
+    type: RoleResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Role not found' })
+  @ApiConflictResponse({ description: 'Role already exists or immutable' })
+  @ApiForbiddenResponse({ description: 'Forbidden resource' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  updateRole(@Param('roleId') roleId: string, @Body() dto: UpdateRoleDto) {
+    return this.rbacService.updateRole(roleId, dto);
+  }
+
+  @Delete('roles/:roleId')
+  @ApiOperation({ summary: 'Delete a role (Super Admin only)' })
+  @ApiOkResponse({
+    description: 'Role deleted successfully',
+    type: MessageResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Role not found' })
+  @ApiConflictResponse({ description: 'Role cannot be deleted' })
+  @ApiForbiddenResponse({ description: 'Forbidden resource' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  deleteRole(@Param('roleId') roleId: string) {
+    return this.rbacService.deleteRole(roleId);
+  }
+
   @Post('roles/assign')
   @ApiOperation({ summary: 'Assign role to user (Super Admin only)' })
   @ApiBody({ type: AssignRoleDto })
@@ -100,5 +134,19 @@ export class RbacController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   getUserRoles(@Param('userId') userId: string) {
     return this.rbacService.getUserRoles(userId);
+  }
+
+  @Get('users')
+  @ApiOperation({
+    summary: 'List all users with roles and access (Super Admin only)',
+  })
+  @ApiOkResponse({
+    description: 'Users fetched successfully',
+    type: [UserWithRolesDto],
+  })
+  @ApiForbiddenResponse({ description: 'Forbidden resource' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  listUsersWithRoles() {
+    return this.rbacService.listUsersWithRoles();
   }
 }

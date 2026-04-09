@@ -38,6 +38,26 @@ export class AssignRoleDto {
   roleName: string;
 }
 
+export class UpdateRoleDto {
+  @ApiProperty({
+    example: 'SALES_MANAGER',
+    required: false,
+    description: 'Updated role name (stored as uppercase)',
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  name?: string;
+
+  @ApiProperty({
+    example: 'Updated role description',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  description?: string;
+}
+
 export class RoleResponseDto {
   @ApiProperty({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' })
   id: string;
@@ -132,6 +152,11 @@ export class AssignRoleResponseDto {
   assignment: RoleAssignmentDto;
 }
 
+export class MessageResponseDto {
+  @ApiProperty({ example: 'Role deleted successfully' })
+  message: string;
+}
+
 export class UserRoleItemDto {
   @ApiProperty({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' })
   assignmentId: string;
@@ -175,4 +200,47 @@ export class UserRolesResponseDto {
 
   @ApiProperty({ type: [UserRoleItemDto] })
   roles: UserRoleItemDto[];
+}
+
+export class UserAccessDto {
+  @ApiProperty({ example: false })
+  isSuperAdmin: boolean;
+
+  @ApiProperty({ example: true })
+  canManageUsers: boolean;
+
+  @ApiProperty({ example: false })
+  canManageRbac: boolean;
+
+  @ApiProperty({ example: true })
+  canViewDashboard: boolean;
+}
+
+export class UserWithRolesDto {
+  @ApiProperty({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' })
+  id: string;
+
+  @ApiProperty({ example: 'john.doe@company.com' })
+  email: string;
+
+  @ApiProperty({ example: 'John Doe' })
+  fullName: string;
+
+  @ApiProperty({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' })
+  organizationId: string;
+
+  @ApiProperty({ example: 'Klypto Corp' })
+  organizationName: string;
+
+  @ApiProperty({ example: true })
+  isActive: boolean;
+
+  @ApiProperty({ type: [String], example: ['EMPLOYEE'] })
+  roles: string[];
+
+  @ApiProperty({ type: UserAccessDto })
+  access: UserAccessDto;
+
+  @ApiProperty({ example: '2025-01-01T10:00:00.000Z' })
+  createdAt: Date;
 }

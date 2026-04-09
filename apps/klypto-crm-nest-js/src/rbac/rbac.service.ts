@@ -1,10 +1,17 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { SystemRole } from '../auth/roles/system-role.enum';
 import { PrismaService } from '../prisma/prisma.service';
-import { AssignRoleDto, CreateRoleDto } from './dto/rbac.dto';
+import {
+  AssignRoleDto,
+  CreateRoleDto,
+  UpdateRoleDto,
+  UserWithRolesDto,
+} from './dto/rbac.dto';
 
 @Injectable()
 export class RbacService {
@@ -49,6 +56,87 @@ export class RbacService {
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     }));
+  }
+
+  async updateRole(roleId: string, dto: UpdateRoleDto) {
+    const existingRole = await this.prisma.role.findUnique({
+      where: { id: roleId },
+    });
+
+    if (!existingRole) {
+      throw new NotFoundException('Role not found');
+    }
+
+    const hasNameUpdate = typeof dto.name === 'string' && dto.name.trim().length > 0;
+    const hasDescriptionUpdate = typeof dto.description === 'string';
+
+    if (!hasNameUpdate && !hasDescriptionUpdate) {
+      throw new BadRequestException('Provide name or description to update');
+    }
+
+    if (existingRole.isSystem && hasNameUpdate) {
+      throw new ConflictException('System role name cannot be changed');
+    }
+
+    const nextName = hasNameUpdate ? dto.name!.trim().toUpperCase() : existingRole.name;
+
+    if (hasNameUpdate && nextName !== existingRole.name) {
+      const conflictingRole = await this.prisma.role.findUnique({
+        where: { name: nextName },
+      });
+
+      if (conflictingRole && conflictingRole.id !== roleId) {
+        throw new ConflictException('Role already exists');
+      }
+    }
+
+    return this.prisma.role.update({
+      where: { id: roleId },
+      data: {
+        name: nextName,
+        description: hasDescriptionUpdate ? dto.description : existingRole.description,
+      },
+      include: {
+        _count: {
+          select: { assignments: true },
+        },
+      },
+    }).then((role) => ({
+      id: role.id,
+      name: role.name,
+      description: role.description,
+      isSystem: role.isSystem,
+      assignedUsersCount: role._count.assignments,
+      createdAt: role.createdAt,
+      updatedAt: role.updatedAt,
+    }));
+  }
+
+  async deleteRole(roleId: string) {
+    const existingRole = await this.prisma.role.findUnique({
+      where: { id: roleId },
+      include: {
+        _count: {
+          select: { assignments: true },
+        },
+      },
+    });
+
+    if (!existingRole) {
+      throw new NotFoundException('Role not found');
+    }
+
+    if (existingRole.isSystem) {
+      throw new ConflictException('System roles cannot be deleted');
+    }
+
+    if (existingRole._count.assignments > 0) {
+      throw new ConflictException('Role is assigned to users and cannot be deleted');
+    }
+
+    await this.prisma.role.delete({ where: { id: roleId } });
+
+    return { message: 'Role deleted successfully' };
   }
 
   async assignRole(dto: AssignRoleDto, assignedById: string) {
@@ -140,5 +228,54 @@ export class RbacService {
         assignedBy: assignment.assignedBy,
       })),
     };
+  }
+
+  async listUsersWithRoles(): Promise<UserWithRolesDto[]> {
+    const users = await this.prisma.user.findMany({
+      include: {
+        organization: {
+          select: {
+            name: true,
+          },
+        },
+        roleAssignments: {
+          include: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return users.map((user) => {
+      const roles = user.roleAssignments.map(
+        (assignment) => assignment.role.name,
+      );
+      const hasSuperAdmin = roles.includes(SystemRole.SUPER_ADMIN);
+      const hasAdmin = roles.includes(SystemRole.ADMIN);
+
+      return {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        organizationId: user.organizationId,
+        organizationName: user.organization.name,
+        isActive: user.isActive,
+        roles,
+        access: {
+          isSuperAdmin: hasSuperAdmin,
+          canManageUsers: hasSuperAdmin || hasAdmin,
+          canManageRbac: hasSuperAdmin,
+          canViewDashboard: roles.length > 0,
+        },
+        createdAt: user.createdAt,
+      };
+    });
   }
 }

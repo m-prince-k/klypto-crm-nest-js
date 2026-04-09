@@ -1125,9 +1125,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b, _c, _d, _e, _f, _g;
+var _a, _b, _c, _d, _e, _f, _g, _h;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UserRolesResponseDto = exports.UserBasicDto = exports.UserRoleItemDto = exports.AssignRoleResponseDto = exports.RoleAssignmentDto = exports.RoleAssignmentRoleDto = exports.RoleAssignmentUserDto = exports.RoleResponseDto = exports.AssignRoleDto = exports.CreateRoleDto = void 0;
+exports.UserWithRolesDto = exports.UserAccessDto = exports.UserRolesResponseDto = exports.UserBasicDto = exports.UserRoleItemDto = exports.MessageResponseDto = exports.AssignRoleResponseDto = exports.RoleAssignmentDto = exports.RoleAssignmentRoleDto = exports.RoleAssignmentUserDto = exports.RoleResponseDto = exports.UpdateRoleDto = exports.AssignRoleDto = exports.CreateRoleDto = void 0;
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class CreateRoleDto {
@@ -1177,6 +1177,31 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], AssignRoleDto.prototype, "roleName", void 0);
+class UpdateRoleDto {
+    name;
+    description;
+}
+exports.UpdateRoleDto = UpdateRoleDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'SALES_MANAGER',
+        required: false,
+        description: 'Updated role name (stored as uppercase)',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(2),
+    __metadata("design:type", String)
+], UpdateRoleDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Updated role description',
+        required: false,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateRoleDto.prototype, "description", void 0);
 class RoleResponseDto {
     id;
     name;
@@ -1328,6 +1353,14 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: RoleAssignmentDto }),
     __metadata("design:type", RoleAssignmentDto)
 ], AssignRoleResponseDto.prototype, "assignment", void 0);
+class MessageResponseDto {
+    message;
+}
+exports.MessageResponseDto = MessageResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Role deleted successfully' }),
+    __metadata("design:type", String)
+], MessageResponseDto.prototype, "message", void 0);
 class UserRoleItemDto {
     assignmentId;
     roleId;
@@ -1400,6 +1433,77 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: [UserRoleItemDto] }),
     __metadata("design:type", Array)
 ], UserRolesResponseDto.prototype, "roles", void 0);
+class UserAccessDto {
+    isSuperAdmin;
+    canManageUsers;
+    canManageRbac;
+    canViewDashboard;
+}
+exports.UserAccessDto = UserAccessDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
+    __metadata("design:type", Boolean)
+], UserAccessDto.prototype, "isSuperAdmin", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true }),
+    __metadata("design:type", Boolean)
+], UserAccessDto.prototype, "canManageUsers", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
+    __metadata("design:type", Boolean)
+], UserAccessDto.prototype, "canManageRbac", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true }),
+    __metadata("design:type", Boolean)
+], UserAccessDto.prototype, "canViewDashboard", void 0);
+class UserWithRolesDto {
+    id;
+    email;
+    fullName;
+    organizationId;
+    organizationName;
+    isActive;
+    roles;
+    access;
+    createdAt;
+}
+exports.UserWithRolesDto = UserWithRolesDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], UserWithRolesDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'john.doe@company.com' }),
+    __metadata("design:type", String)
+], UserWithRolesDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Doe' }),
+    __metadata("design:type", String)
+], UserWithRolesDto.prototype, "fullName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], UserWithRolesDto.prototype, "organizationId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Klypto Corp' }),
+    __metadata("design:type", String)
+], UserWithRolesDto.prototype, "organizationName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true }),
+    __metadata("design:type", Boolean)
+], UserWithRolesDto.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [String], example: ['EMPLOYEE'] }),
+    __metadata("design:type", Array)
+], UserWithRolesDto.prototype, "roles", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: UserAccessDto }),
+    __metadata("design:type", UserAccessDto)
+], UserWithRolesDto.prototype, "access", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-01T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_h = typeof Date !== "undefined" && Date) === "function" ? _h : Object)
+], UserWithRolesDto.prototype, "createdAt", void 0);
 
 
 /***/ },
@@ -1423,7 +1527,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RbacController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -1445,6 +1549,12 @@ let RbacController = class RbacController {
     listRoles() {
         return this.rbacService.listRoles();
     }
+    updateRole(roleId, dto) {
+        return this.rbacService.updateRole(roleId, dto);
+    }
+    deleteRole(roleId) {
+        return this.rbacService.deleteRole(roleId);
+    }
     assignRole(dto, req) {
         const assignedById = req.user?.sub;
         if (!assignedById) {
@@ -1454,6 +1564,9 @@ let RbacController = class RbacController {
     }
     getUserRoles(userId) {
         return this.rbacService.getUserRoles(userId);
+    }
+    listUsersWithRoles() {
+        return this.rbacService.listUsersWithRoles();
     }
 };
 exports.RbacController = RbacController;
@@ -1487,6 +1600,40 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], RbacController.prototype, "listRoles", null);
 __decorate([
+    (0, common_1.Patch)('roles/:roleId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update an existing role (Super Admin only)' }),
+    (0, swagger_1.ApiBody)({ type: rbac_dto_1.UpdateRoleDto }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Role updated successfully',
+        type: rbac_dto_1.RoleResponseDto,
+    }),
+    (0, swagger_1.ApiNotFoundResponse)({ description: 'Role not found' }),
+    (0, swagger_1.ApiConflictResponse)({ description: 'Role already exists or immutable' }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Unauthorized' }),
+    __param(0, (0, common_1.Param)('roleId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_c = typeof rbac_dto_1.UpdateRoleDto !== "undefined" && rbac_dto_1.UpdateRoleDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "updateRole", null);
+__decorate([
+    (0, common_1.Delete)('roles/:roleId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a role (Super Admin only)' }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Role deleted successfully',
+        type: rbac_dto_1.MessageResponseDto,
+    }),
+    (0, swagger_1.ApiNotFoundResponse)({ description: 'Role not found' }),
+    (0, swagger_1.ApiConflictResponse)({ description: 'Role cannot be deleted' }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Unauthorized' }),
+    __param(0, (0, common_1.Param)('roleId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "deleteRole", null);
+__decorate([
     (0, common_1.Post)('roles/assign'),
     (0, swagger_1.ApiOperation)({ summary: 'Assign role to user (Super Admin only)' }),
     (0, swagger_1.ApiBody)({ type: rbac_dto_1.AssignRoleDto }),
@@ -1500,7 +1647,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof rbac_dto_1.AssignRoleDto !== "undefined" && rbac_dto_1.AssignRoleDto) === "function" ? _c : Object, Object]),
+    __metadata("design:paramtypes", [typeof (_d = typeof rbac_dto_1.AssignRoleDto !== "undefined" && rbac_dto_1.AssignRoleDto) === "function" ? _d : Object, Object]),
     __metadata("design:returntype", void 0)
 ], RbacController.prototype, "assignRole", null);
 __decorate([
@@ -1518,6 +1665,21 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], RbacController.prototype, "getUserRoles", null);
+__decorate([
+    (0, common_1.Get)('users'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'List all users with roles and access (Super Admin only)',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Users fetched successfully',
+        type: [rbac_dto_1.UserWithRolesDto],
+    }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Unauthorized' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "listUsersWithRoles", null);
 exports.RbacController = RbacController = __decorate([
     (0, swagger_1.ApiTags)('RBAC'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
@@ -1584,6 +1746,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RbacService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const system_role_enum_1 = __webpack_require__(/*! ../auth/roles/system-role.enum */ "./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts");
 const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
 let RbacService = class RbacService {
     prisma;
@@ -1624,6 +1787,72 @@ let RbacService = class RbacService {
             createdAt: role.createdAt,
             updatedAt: role.updatedAt,
         }));
+    }
+    async updateRole(roleId, dto) {
+        const existingRole = await this.prisma.role.findUnique({
+            where: { id: roleId },
+        });
+        if (!existingRole) {
+            throw new common_1.NotFoundException('Role not found');
+        }
+        const hasNameUpdate = typeof dto.name === 'string' && dto.name.trim().length > 0;
+        const hasDescriptionUpdate = typeof dto.description === 'string';
+        if (!hasNameUpdate && !hasDescriptionUpdate) {
+            throw new common_1.BadRequestException('Provide name or description to update');
+        }
+        if (existingRole.isSystem && hasNameUpdate) {
+            throw new common_1.ConflictException('System role name cannot be changed');
+        }
+        const nextName = hasNameUpdate ? dto.name.trim().toUpperCase() : existingRole.name;
+        if (hasNameUpdate && nextName !== existingRole.name) {
+            const conflictingRole = await this.prisma.role.findUnique({
+                where: { name: nextName },
+            });
+            if (conflictingRole && conflictingRole.id !== roleId) {
+                throw new common_1.ConflictException('Role already exists');
+            }
+        }
+        return this.prisma.role.update({
+            where: { id: roleId },
+            data: {
+                name: nextName,
+                description: hasDescriptionUpdate ? dto.description : existingRole.description,
+            },
+            include: {
+                _count: {
+                    select: { assignments: true },
+                },
+            },
+        }).then((role) => ({
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            isSystem: role.isSystem,
+            assignedUsersCount: role._count.assignments,
+            createdAt: role.createdAt,
+            updatedAt: role.updatedAt,
+        }));
+    }
+    async deleteRole(roleId) {
+        const existingRole = await this.prisma.role.findUnique({
+            where: { id: roleId },
+            include: {
+                _count: {
+                    select: { assignments: true },
+                },
+            },
+        });
+        if (!existingRole) {
+            throw new common_1.NotFoundException('Role not found');
+        }
+        if (existingRole.isSystem) {
+            throw new common_1.ConflictException('System roles cannot be deleted');
+        }
+        if (existingRole._count.assignments > 0) {
+            throw new common_1.ConflictException('Role is assigned to users and cannot be deleted');
+        }
+        await this.prisma.role.delete({ where: { id: roleId } });
+        return { message: 'Role deleted successfully' };
     }
     async assignRole(dto, assignedById) {
         const roleName = dto.roleName.trim().toUpperCase();
@@ -1707,6 +1936,50 @@ let RbacService = class RbacService {
                 assignedBy: assignment.assignedBy,
             })),
         };
+    }
+    async listUsersWithRoles() {
+        const users = await this.prisma.user.findMany({
+            include: {
+                organization: {
+                    select: {
+                        name: true,
+                    },
+                },
+                roleAssignments: {
+                    include: {
+                        role: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+        return users.map((user) => {
+            const roles = user.roleAssignments.map((assignment) => assignment.role.name);
+            const hasSuperAdmin = roles.includes(system_role_enum_1.SystemRole.SUPER_ADMIN);
+            const hasAdmin = roles.includes(system_role_enum_1.SystemRole.ADMIN);
+            return {
+                id: user.id,
+                email: user.email,
+                fullName: user.fullName,
+                organizationId: user.organizationId,
+                organizationName: user.organization.name,
+                isActive: user.isActive,
+                roles,
+                access: {
+                    isSuperAdmin: hasSuperAdmin,
+                    canManageUsers: hasSuperAdmin || hasAdmin,
+                    canManageRbac: hasSuperAdmin,
+                    canViewDashboard: roles.length > 0,
+                },
+                createdAt: user.createdAt,
+            };
+        });
     }
 };
 exports.RbacService = RbacService;
