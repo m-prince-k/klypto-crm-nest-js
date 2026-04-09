@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const auth_dto_1 = require("./dto/auth.dto");
 const swagger_1 = require("@nestjs/swagger");
+const passport_1 = require("@nestjs/passport");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -28,8 +29,18 @@ let AuthController = class AuthController {
     login(loginDto) {
         return this.authService.login(loginDto);
     }
+    me(req) {
+        const userId = req.user?.sub ?? req.user?.id;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return this.authService.getProfile(userId);
+    }
     logout(req) {
-        const userId = req.user?.sub;
+        const userId = req.user?.sub ?? req.user?.id;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
         return this.authService.logout(userId);
     }
     refresh(req) {
@@ -62,7 +73,20 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, common_1.Get)('me'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get current authenticated user profile' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Current user profile returned' }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "me", null);
+__decorate([
     (0, common_1.Post)('logout'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Logout and invalidate refresh token' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Successfully logged out' }),
@@ -74,6 +98,7 @@ __decorate([
 ], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Post)('refresh'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt-refresh')),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Refresh access token using refresh token' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Tokens successfully refreshed' }),

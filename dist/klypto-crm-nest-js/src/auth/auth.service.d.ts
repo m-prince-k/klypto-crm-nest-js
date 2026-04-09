@@ -15,6 +15,20 @@ export declare class AuthService {
         accessToken: string;
         refreshToken: string;
     }>;
+    getProfile(userId: string): Promise<{
+        id: string;
+        email: string;
+        fullName: string;
+        organization: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+        };
+        roles: any[];
+        isActive: boolean;
+        createdAt: Date;
+    }>;
     logout(userId: string): Promise<void>;
     refreshTokens(userId: string, refreshToken: string): Promise<{
         accessToken: string;

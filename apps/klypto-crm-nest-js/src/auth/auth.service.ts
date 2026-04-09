@@ -1,5 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
-import { Prisma } from '@prisma/client/crm';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,7 +19,9 @@ export class AuthService {
   ) {}
 
   async signup(signupDto: SignupDto) {
-    const existingUser = await this.usersService.findOneByEmail(signupDto.email);
+    const existingUser = await this.usersService.findOneByEmail(
+      signupDto.email,
+    );
     if (existingUser) {
       throw new ConflictException('User already exists');
     }
@@ -49,7 +55,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const passwordMatches = await bcrypt.compare(loginDto.password, user.passwordHash);
+    const passwordMatches = await bcrypt.compare(
+      loginDto.password,
+      user.passwordHash,
+    );
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -58,6 +67,30 @@ export class AuthService {
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return tokens;
+  }
+
+  async getProfile(userId: string) {
+    if (!userId) {
+      throw new UnauthorizedException('Invalid user context');
+    }
+
+    const user = await this.usersService.findOneById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      organization: user.organization,
+      roles:
+        user.roleAssignments?.map(
+          (assignment) => (assignment as any).roleName,
+        ) || [],
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+    };
   }
 
   async logout(userId: string) {
@@ -73,7 +106,10 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied');
     }
 
-    const refreshTokenMatches = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.hashedRefreshToken,
+    );
     if (!refreshTokenMatches) {
       throw new UnauthorizedException('Access Denied');
     }
@@ -85,7 +121,9 @@ export class AuthService {
   }
 
   async updateRefreshToken(userId: string, refreshToken: string | null) {
-    const hashedRefreshToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
+    const hashedRefreshToken = refreshToken
+      ? await bcrypt.hash(refreshToken, 10)
+      : null;
     await this.prisma.user.update({
       where: { id: userId },
       data: { hashedRefreshToken },
@@ -96,11 +134,17 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         { sub: userId, email },
-        { secret: process.env.JWT_ACCESS_SECRET || 'access-secret', expiresIn: '15m' },
+        {
+          secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
+          expiresIn: '15m',
+        },
       ),
       this.jwtService.signAsync(
         { sub: userId, email },
-        { secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret', expiresIn: '7d' },
+        {
+          secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
+          expiresIn: '7d',
+        },
       ),
     ]);
 

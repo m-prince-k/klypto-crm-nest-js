@@ -6,6 +6,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS for the React frontend
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200,
+  });
+
   // Set global prefix for all APIs
   app.setGlobalPrefix('api');
 
@@ -24,7 +33,10 @@ async function bootstrap() {
     .setDescription('The Klypto CRM ERP Portal API documentation')
     .setVersion('1.0')
     .addTag('Klypto')
-    .addServer(`http://localhost:${process.env.PORT || 3000}`, 'Local Environment')
+    .addServer(
+      `http://localhost:${process.env.PORT || 3000}`,
+      'Local Environment',
+    )
     .addServer('https://api.yourdomain.com', 'Production Environment') // Example production server
     .addBearerAuth(
       {

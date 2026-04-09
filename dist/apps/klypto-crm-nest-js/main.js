@@ -161,6 +161,7 @@ const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const auth_service_1 = __webpack_require__(/*! ./auth.service */ "./apps/klypto-crm-nest-js/src/auth/auth.service.ts");
 const auth_dto_1 = __webpack_require__(/*! ./dto/auth.dto */ "./apps/klypto-crm-nest-js/src/auth/dto/auth.dto.ts");
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -172,8 +173,18 @@ let AuthController = class AuthController {
     login(loginDto) {
         return this.authService.login(loginDto);
     }
+    me(req) {
+        const userId = req.user?.sub ?? req.user?.id;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return this.authService.getProfile(userId);
+    }
     logout(req) {
-        const userId = req.user?.sub;
+        const userId = req.user?.sub ?? req.user?.id;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
         return this.authService.logout(userId);
     }
     refresh(req) {
@@ -206,7 +217,20 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, common_1.Get)('me'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get current authenticated user profile' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Current user profile returned' }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "me", null);
+__decorate([
     (0, common_1.Post)('logout'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Logout and invalidate refresh token' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Successfully logged out' }),
@@ -218,6 +242,7 @@ __decorate([
 ], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Post)('refresh'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt-refresh')),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Refresh access token using refresh token' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Tokens successfully refreshed' }),
@@ -376,6 +401,24 @@ let AuthService = class AuthService {
         await this.updateRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
+    async getProfile(userId) {
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        const user = await this.usersService.findOneById(userId);
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        return {
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            organization: user.organization,
+            roles: user.roleAssignments?.map((assignment) => assignment.roleName) || [],
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+        };
+    }
     async logout(userId) {
         await this.prisma.user.update({
             where: { id: userId },
@@ -396,7 +439,9 @@ let AuthService = class AuthService {
         return tokens;
     }
     async updateRefreshToken(userId, refreshToken) {
-        const hashedRefreshToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
+        const hashedRefreshToken = refreshToken
+            ? await bcrypt.hash(refreshToken, 10)
+            : null;
         await this.prisma.user.update({
             where: { id: userId },
             data: { hashedRefreshToken },
@@ -404,8 +449,14 @@ let AuthService = class AuthService {
     }
     async getTokens(userId, email) {
         const [accessToken, refreshToken] = await Promise.all([
-            this.jwtService.signAsync({ sub: userId, email }, { secret: process.env.JWT_ACCESS_SECRET || 'access-secret', expiresIn: '15m' }),
-            this.jwtService.signAsync({ sub: userId, email }, { secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret', expiresIn: '7d' }),
+            this.jwtService.signAsync({ sub: userId, email }, {
+                secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
+                expiresIn: '15m',
+            }),
+            this.jwtService.signAsync({ sub: userId, email }, {
+                secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
+                expiresIn: '7d',
+            }),
         ]);
         return {
             accessToken,
@@ -700,8 +751,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PrismaService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const crm_1 = __webpack_require__(/*! @prisma/client/crm */ "@prisma/client/crm");
-let PrismaService = class PrismaService extends crm_1.PrismaClient {
+const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
+let PrismaService = class PrismaService extends client_1.PrismaClient {
     async onModuleInit() {
         await this.$connect();
     }
@@ -876,13 +927,13 @@ module.exports = require("@nestjs/swagger");
 
 /***/ },
 
-/***/ "@prisma/client/crm"
-/*!*************************************!*\
-  !*** external "@prisma/client/crm" ***!
-  \*************************************/
+/***/ "@prisma/client"
+/*!*********************************!*\
+  !*** external "@prisma/client" ***!
+  \*********************************/
 (module) {
 
-module.exports = require("@prisma/client/crm");
+module.exports = require("@prisma/client");
 
 /***/ },
 
@@ -964,6 +1015,13 @@ const app_module_1 = __webpack_require__(/*! ./app.module */ "./apps/klypto-crm-
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.enableCors({
+        origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        optionsSuccessStatus: 200,
+    });
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,

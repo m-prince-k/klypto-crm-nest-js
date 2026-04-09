@@ -93,6 +93,24 @@ let AuthService = class AuthService {
         await this.updateRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
+    async getProfile(userId) {
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        const user = await this.usersService.findOneById(userId);
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        return {
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            organization: user.organization,
+            roles: user.roleAssignments?.map((assignment) => assignment.roleName) || [],
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+        };
+    }
     async logout(userId) {
         await this.prisma.user.update({
             where: { id: userId },
@@ -113,7 +131,9 @@ let AuthService = class AuthService {
         return tokens;
     }
     async updateRefreshToken(userId, refreshToken) {
-        const hashedRefreshToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
+        const hashedRefreshToken = refreshToken
+            ? await bcrypt.hash(refreshToken, 10)
+            : null;
         await this.prisma.user.update({
             where: { id: userId },
             data: { hashedRefreshToken },
@@ -121,8 +141,14 @@ let AuthService = class AuthService {
     }
     async getTokens(userId, email) {
         const [accessToken, refreshToken] = await Promise.all([
-            this.jwtService.signAsync({ sub: userId, email }, { secret: process.env.JWT_ACCESS_SECRET || 'access-secret', expiresIn: '15m' }),
-            this.jwtService.signAsync({ sub: userId, email }, { secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret', expiresIn: '7d' }),
+            this.jwtService.signAsync({ sub: userId, email }, {
+                secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
+                expiresIn: '15m',
+            }),
+            this.jwtService.signAsync({ sub: userId, email }, {
+                secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
+                expiresIn: '7d',
+            }),
         ]);
         return {
             accessToken,
