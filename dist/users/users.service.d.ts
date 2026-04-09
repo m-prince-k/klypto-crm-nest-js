@@ -10,11 +10,22 @@ export declare class UsersService {
             updatedAt: Date;
             name: string;
         };
-        roleAssignments: {
+        roleAssignments: ({
+            role: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                description: string | null;
+                isSystem: boolean;
+            };
+        } & {
             id: string;
+            createdAt: Date;
             userId: string;
-            roleName: string;
-        }[];
+            roleId: string;
+            assignedById: string | null;
+        })[];
     } & {
         id: string;
         email: string;
@@ -33,11 +44,22 @@ export declare class UsersService {
             updatedAt: Date;
             name: string;
         };
-        roleAssignments: {
+        roleAssignments: ({
+            role: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                description: string | null;
+                isSystem: boolean;
+            };
+        } & {
             id: string;
+            createdAt: Date;
             userId: string;
-            roleName: string;
-        }[];
+            roleId: string;
+            assignedById: string | null;
+        })[];
     } & {
         id: string;
         email: string;

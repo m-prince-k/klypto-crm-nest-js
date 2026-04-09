@@ -22,7 +22,11 @@ let UsersService = class UsersService {
             where: { email },
             include: {
                 organization: true,
-                roleAssignments: true,
+                roleAssignments: {
+                    include: {
+                        role: true,
+                    },
+                },
             },
         });
     }
@@ -31,7 +35,11 @@ let UsersService = class UsersService {
             where: { id },
             include: {
                 organization: true,
-                roleAssignments: true,
+                roleAssignments: {
+                    include: {
+                        role: true,
+                    },
+                },
             },
         });
     }

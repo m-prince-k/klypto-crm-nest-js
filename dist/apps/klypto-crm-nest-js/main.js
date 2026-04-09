@@ -71,6 +71,7 @@ const prisma_module_1 = __webpack_require__(/*! ./prisma/prisma.module */ "./app
 const auth_module_1 = __webpack_require__(/*! ./auth/auth.module */ "./apps/klypto-crm-nest-js/src/auth/auth.module.ts");
 const users_module_1 = __webpack_require__(/*! ./users/users.module */ "./apps/klypto-crm-nest-js/src/users/users.module.ts");
 const mail_module_1 = __webpack_require__(/*! ./mail/mail.module */ "./apps/klypto-crm-nest-js/src/mail/mail.module.ts");
+const rbac_module_1 = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module './rbac/rbac.module'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -82,6 +83,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             prisma_module_1.PrismaModule,
             auth_module_1.AuthModule,
+            rbac_module_1.RbacModule,
             users_module_1.UsersModule,
             mail_module_1.MailModule,
             mailer_1.MailerModule.forRoot({
@@ -161,7 +163,6 @@ const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const auth_service_1 = __webpack_require__(/*! ./auth.service */ "./apps/klypto-crm-nest-js/src/auth/auth.service.ts");
 const auth_dto_1 = __webpack_require__(/*! ./dto/auth.dto */ "./apps/klypto-crm-nest-js/src/auth/dto/auth.dto.ts");
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
-const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -173,18 +174,8 @@ let AuthController = class AuthController {
     login(loginDto) {
         return this.authService.login(loginDto);
     }
-    me(req) {
-        const userId = req.user?.sub ?? req.user?.id;
-        if (!userId) {
-            throw new common_1.UnauthorizedException('Invalid user context');
-        }
-        return this.authService.getProfile(userId);
-    }
     logout(req) {
-        const userId = req.user?.sub ?? req.user?.id;
-        if (!userId) {
-            throw new common_1.UnauthorizedException('Invalid user context');
-        }
+        const userId = req.user?.sub;
         return this.authService.logout(userId);
     }
     refresh(req) {
@@ -217,20 +208,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 __decorate([
-    (0, common_1.Get)('me'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiOperation)({ summary: 'Get current authenticated user profile' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Current user profile returned' }),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    __param(0, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "me", null);
-__decorate([
     (0, common_1.Post)('logout'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Logout and invalidate refresh token' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Successfully logged out' }),
@@ -242,7 +220,6 @@ __decorate([
 ], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Post)('refresh'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt-refresh')),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Refresh access token using refresh token' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Tokens successfully refreshed' }),
@@ -284,6 +261,8 @@ const auth_service_1 = __webpack_require__(/*! ./auth.service */ "./apps/klypto-
 const auth_controller_1 = __webpack_require__(/*! ./auth.controller */ "./apps/klypto-crm-nest-js/src/auth/auth.controller.ts");
 const users_module_1 = __webpack_require__(/*! ../users/users.module */ "./apps/klypto-crm-nest-js/src/users/users.module.ts");
 const jwt_strategy_1 = __webpack_require__(/*! ./strategies/jwt.strategy */ "./apps/klypto-crm-nest-js/src/auth/strategies/jwt.strategy.ts");
+const access_token_guard_1 = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module './guards/access-token.guard'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+const refresh_token_guard_1 = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module './guards/refresh-token.guard'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -291,8 +270,14 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [users_module_1.UsersModule, passport_1.PassportModule, jwt_1.JwtModule.register({})],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.AccessTokenStrategy, jwt_strategy_1.RefreshTokenStrategy],
-        exports: [auth_service_1.AuthService],
+        providers: [
+            auth_service_1.AuthService,
+            jwt_strategy_1.AccessTokenStrategy,
+            jwt_strategy_1.RefreshTokenStrategy,
+            access_token_guard_1.AccessTokenGuard,
+            refresh_token_guard_1.RefreshTokenGuard,
+        ],
+        exports: [auth_service_1.AuthService, access_token_guard_1.AccessTokenGuard, refresh_token_guard_1.RefreshTokenGuard],
     })
 ], AuthModule);
 
@@ -490,7 +475,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LoginDto = exports.SignupDto = void 0;
+exports.ProfileResponseDto = exports.UserOrganizationResponseDto = exports.LogoutResponseDto = exports.AuthTokensResponseDto = exports.LoginDto = exports.SignupDto = void 0;
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class SignupDto {
@@ -559,6 +544,104 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
+class AuthTokensResponseDto {
+    accessToken;
+    refreshToken;
+    roles;
+    role;
+}
+exports.AuthTokensResponseDto = AuthTokensResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access-token',
+        description: 'JWT access token',
+    }),
+    __metadata("design:type", String)
+], AuthTokensResponseDto.prototype, "accessToken", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh-token',
+        description: 'JWT refresh token',
+    }),
+    __metadata("design:type", String)
+], AuthTokensResponseDto.prototype, "refreshToken", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['SUPER_ADMIN'],
+        required: false,
+        description: 'Assigned role names for the user',
+    }),
+    __metadata("design:type", Array)
+], AuthTokensResponseDto.prototype, "roles", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'SUPER_ADMIN',
+        required: false,
+        description: 'Single assigned role at signup bootstrap',
+    }),
+    __metadata("design:type", String)
+], AuthTokensResponseDto.prototype, "role", void 0);
+class LogoutResponseDto {
+    message;
+}
+exports.LogoutResponseDto = LogoutResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Logged out successfully',
+    }),
+    __metadata("design:type", String)
+], LogoutResponseDto.prototype, "message", void 0);
+class UserOrganizationResponseDto {
+    id;
+    name;
+}
+exports.UserOrganizationResponseDto = UserOrganizationResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxabc123org' }),
+    __metadata("design:type", String)
+], UserOrganizationResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Klypto Corp' }),
+    __metadata("design:type", String)
+], UserOrganizationResponseDto.prototype, "name", void 0);
+class ProfileResponseDto {
+    id;
+    email;
+    fullName;
+    organization;
+    roles;
+    isActive;
+    createdAt;
+}
+exports.ProfileResponseDto = ProfileResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxabc123user' }),
+    __metadata("design:type", String)
+], ProfileResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'user@example.com' }),
+    __metadata("design:type", String)
+], ProfileResponseDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Doe' }),
+    __metadata("design:type", String)
+], ProfileResponseDto.prototype, "fullName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: UserOrganizationResponseDto }),
+    __metadata("design:type", UserOrganizationResponseDto)
+], ProfileResponseDto.prototype, "organization", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: ['SUPER_ADMIN'] }),
+    __metadata("design:type", Array)
+], ProfileResponseDto.prototype, "roles", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true }),
+    __metadata("design:type", Boolean)
+], ProfileResponseDto.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2026-04-09T06:30:00.000Z' }),
+    __metadata("design:type", String)
+], ProfileResponseDto.prototype, "createdAt", void 0);
 
 
 /***/ },
@@ -829,7 +912,11 @@ let UsersService = class UsersService {
             where: { email },
             include: {
                 organization: true,
-                roleAssignments: true,
+                roleAssignments: {
+                    include: {
+                        role: true,
+                    },
+                },
             },
         });
     }
@@ -838,7 +925,11 @@ let UsersService = class UsersService {
             where: { id },
             include: {
                 organization: true,
-                roleAssignments: true,
+                roleAssignments: {
+                    include: {
+                        role: true,
+                    },
+                },
             },
         });
     }

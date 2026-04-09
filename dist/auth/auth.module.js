@@ -14,6 +14,8 @@ const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const users_module_1 = require("../users/users.module");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
+const access_token_guard_1 = require("./guards/access-token.guard");
+const refresh_token_guard_1 = require("./guards/refresh-token.guard");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -21,8 +23,14 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [users_module_1.UsersModule, passport_1.PassportModule, jwt_1.JwtModule.register({})],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.AccessTokenStrategy, jwt_strategy_1.RefreshTokenStrategy],
-        exports: [auth_service_1.AuthService],
+        providers: [
+            auth_service_1.AuthService,
+            jwt_strategy_1.AccessTokenStrategy,
+            jwt_strategy_1.RefreshTokenStrategy,
+            access_token_guard_1.AccessTokenGuard,
+            refresh_token_guard_1.RefreshTokenGuard,
+        ],
+        exports: [auth_service_1.AuthService, access_token_guard_1.AccessTokenGuard, refresh_token_guard_1.RefreshTokenGuard],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

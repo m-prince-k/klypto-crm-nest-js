@@ -48,6 +48,7 @@ const jwt_1 = require("@nestjs/jwt");
 const users_service_1 = require("../users/users.service");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = __importStar(require("bcryptjs"));
+const system_role_enum_1 = require("./roles/system-role.enum");
 let AuthService = class AuthService {
     usersService;
     jwtService;
@@ -62,12 +63,20 @@ let AuthService = class AuthService {
         if (existingUser) {
             throw new common_1.ConflictException('User already exists');
         }
+        const usersCount = await this.prisma.user.count();
         const passwordHash = await bcrypt.hash(signupDto.password, 10);
-        const organization = await this.prisma.organization.create({
-            data: {
-                name: signupDto.organizationName,
+        const organizationName = signupDto.organizationName.trim();
+        const existingOrganization = await this.prisma.organization.findFirst({
+            where: {
+                name: organizationName,
             },
         });
+        const organization = existingOrganization ??
+            (await this.prisma.organization.create({
+                data: {
+                    name: organizationName,
+                },
+            }));
         const user = await this.usersService.create({
             email: signupDto.email,
             fullName: signupDto.fullName,
@@ -76,9 +85,18 @@ let AuthService = class AuthService {
                 connect: { id: organization.id },
             },
         });
-        const tokens = await this.getTokens(user.id, user.email);
+        const assignedRoles = [];
+        if (usersCount === 0) {
+            await this.ensureSuperAdminRole();
+            await this.assignRoleToUser(user.id, system_role_enum_1.SystemRole.SUPER_ADMIN, null);
+            assignedRoles.push(system_role_enum_1.SystemRole.SUPER_ADMIN);
+        }
+        const tokens = await this.getTokens(user.id, user.email, assignedRoles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+        return {
+            ...tokens,
+            ...(assignedRoles[0] ? { role: assignedRoles[0] } : {}),
+        };
     }
     async login(loginDto) {
         const user = await this.usersService.findOneByEmail(loginDto.email);
@@ -89,9 +107,13 @@ let AuthService = class AuthService {
         if (!passwordMatches) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
-        const tokens = await this.getTokens(user.id, user.email);
+        const roles = user.roleAssignments.map((assignment) => assignment.role.name);
+        const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+        return {
+            ...tokens,
+            roles,
+        };
     }
     async getProfile(userId) {
         if (!userId) {
@@ -112,10 +134,14 @@ let AuthService = class AuthService {
         };
     }
     async logout(userId) {
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
         await this.prisma.user.update({
             where: { id: userId },
             data: { hashedRefreshToken: null },
         });
+        return { message: 'Logged out successfully' };
     }
     async refreshTokens(userId, refreshToken) {
         const user = await this.usersService.findOneById(userId);
@@ -126,9 +152,31 @@ let AuthService = class AuthService {
         if (!refreshTokenMatches) {
             throw new common_1.UnauthorizedException('Access Denied');
         }
-        const tokens = await this.getTokens(user.id, user.email);
+        const roles = user.roleAssignments.map((assignment) => assignment.role.name);
+        const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+        return {
+            ...tokens,
+            roles,
+        };
+    }
+    async getProfile(userId) {
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        const user = await this.usersService.findOneById(userId);
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        return {
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            organization: user.organization,
+            roles: user.roleAssignments.map((assignment) => assignment.role.name),
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+        };
     }
     async updateRefreshToken(userId, refreshToken) {
         const hashedRefreshToken = refreshToken
@@ -139,7 +187,7 @@ let AuthService = class AuthService {
             data: { hashedRefreshToken },
         });
     }
-    async getTokens(userId, email) {
+    async getTokens(userId, email, roles) {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync({ sub: userId, email }, {
                 secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
@@ -154,6 +202,44 @@ let AuthService = class AuthService {
             accessToken,
             refreshToken,
         };
+    }
+    async ensureSuperAdminRole() {
+        await this.prisma.role.upsert({
+            where: { name: system_role_enum_1.SystemRole.SUPER_ADMIN },
+            update: {
+                description: 'Platform-level super administrator',
+                isSystem: true,
+            },
+            create: {
+                name: system_role_enum_1.SystemRole.SUPER_ADMIN,
+                description: 'Platform-level super administrator',
+                isSystem: true,
+            },
+        });
+    }
+    async assignRoleToUser(userId, roleName, assignedById) {
+        const role = await this.prisma.role.findUnique({
+            where: { name: roleName },
+        });
+        if (!role) {
+            throw new common_1.UnauthorizedException('Role does not exist');
+        }
+        await this.prisma.userRole.upsert({
+            where: {
+                userId_roleId: {
+                    userId,
+                    roleId: role.id,
+                },
+            },
+            update: {
+                assignedById,
+            },
+            create: {
+                userId,
+                roleId: role.id,
+                assignedById,
+            },
+        });
     }
 };
 exports.AuthService = AuthService;

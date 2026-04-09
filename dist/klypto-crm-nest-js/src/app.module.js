@@ -16,6 +16,7 @@ const prisma_module_1 = require("./prisma/prisma.module");
 const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const mail_module_1 = require("./mail/mail.module");
+const rbac_module_1 = require("./rbac/rbac.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,6 +28,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             prisma_module_1.PrismaModule,
             auth_module_1.AuthModule,
+            rbac_module_1.RbacModule,
             users_module_1.UsersModule,
             mail_module_1.MailModule,
             mailer_1.MailerModule.forRoot({

@@ -11,7 +11,11 @@ export class UsersService {
       where: { email },
       include: {
         organization: true,
-        roleAssignments: true,
+        roleAssignments: {
+          include: {
+            role: true,
+          },
+        },
       },
     });
   }
@@ -21,7 +25,11 @@ export class UsersService {
       where: { id },
       include: {
         organization: true,
-        roleAssignments: true,
+        roleAssignments: {
+          include: {
+            role: true,
+          },
+        },
       },
     });
   }

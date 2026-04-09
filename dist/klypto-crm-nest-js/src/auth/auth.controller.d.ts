@@ -4,29 +4,20 @@ export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
     signup(signupDto: SignupDto): Promise<{
+        role?: string | undefined;
         accessToken: string;
         refreshToken: string;
     }>;
     login(loginDto: LoginDto): Promise<{
+        roles: string[];
         accessToken: string;
         refreshToken: string;
     }>;
-    me(req: any): Promise<{
-        id: string;
-        email: string;
-        fullName: string;
-        organization: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-        };
-        roles: any[];
-        isActive: boolean;
-        createdAt: Date;
+    logout(req: any): Promise<{
+        message: string;
     }>;
-    logout(req: any): Promise<void>;
     refresh(req: any): Promise<{
+        roles: string[];
         accessToken: string;
         refreshToken: string;
     }>;
