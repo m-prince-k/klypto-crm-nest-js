@@ -371,6 +371,7 @@ const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
 const users_service_1 = __webpack_require__(/*! ../users/users.service */ "./apps/klypto-crm-nest-js/src/users/users.service.ts");
 const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
 const bcrypt = __importStar(__webpack_require__(/*! bcryptjs */ "bcryptjs"));
+const system_role_enum_1 = __webpack_require__(/*! ./roles/system-role.enum */ "./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts");
 let AuthService = class AuthService {
     usersService;
     jwtService;
@@ -399,9 +400,19 @@ let AuthService = class AuthService {
                 connect: { id: organization.id },
             },
         });
-        const tokens = await this.getTokens(user.id, user.email);
+        const roleToAssign = (await this.prisma.user.count()) === 1
+            ? system_role_enum_1.SystemRole.SUPER_ADMIN
+            : system_role_enum_1.SystemRole.EMPLOYEE;
+        await this.ensureRole(roleToAssign);
+        await this.assignRole(user.id, roleToAssign);
+        const roles = await this.getUserRoleNames(user.id);
+        const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+        return {
+            ...tokens,
+            roles,
+            access: this.buildAccessFromRoles(roles),
+        };
     }
     async login(loginDto) {
         const user = await this.usersService.findOneByEmail(loginDto.email);
@@ -412,9 +423,15 @@ let AuthService = class AuthService {
         if (!passwordMatches) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
-        const tokens = await this.getTokens(user.id, user.email);
+        await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
+        const roles = await this.getUserRoleNames(user.id);
+        const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+        return {
+            ...tokens,
+            roles,
+            access: this.buildAccessFromRoles(roles),
+        };
     }
     async getProfile(userId) {
         if (!userId) {
@@ -424,12 +441,15 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnauthorizedException('User not found');
         }
+        await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
+        const roles = await this.getUserRoleNames(user.id);
         return {
             id: user.id,
             email: user.email,
             fullName: user.fullName,
             organization: user.organization,
-            roles: user.roleAssignments?.map((assignment) => assignment.roleName) || [],
+            roles,
+            access: this.buildAccessFromRoles(roles),
             isActive: user.isActive,
             createdAt: user.createdAt,
         };
@@ -449,9 +469,15 @@ let AuthService = class AuthService {
         if (!refreshTokenMatches) {
             throw new common_1.UnauthorizedException('Access Denied');
         }
-        const tokens = await this.getTokens(user.id, user.email);
+        await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
+        const roles = await this.getUserRoleNames(user.id);
+        const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
-        return tokens;
+        return {
+            ...tokens,
+            roles,
+            access: this.buildAccessFromRoles(roles),
+        };
     }
     async updateRefreshToken(userId, refreshToken) {
         const hashedRefreshToken = refreshToken
@@ -462,13 +488,13 @@ let AuthService = class AuthService {
             data: { hashedRefreshToken },
         });
     }
-    async getTokens(userId, email) {
+    async getTokens(userId, email, roles = []) {
         const [accessToken, refreshToken] = await Promise.all([
-            this.jwtService.signAsync({ sub: userId, email }, {
+            this.jwtService.signAsync({ sub: userId, email, roles }, {
                 secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
                 expiresIn: '15m',
             }),
-            this.jwtService.signAsync({ sub: userId, email }, {
+            this.jwtService.signAsync({ sub: userId, email, roles }, {
                 secret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
                 expiresIn: '7d',
             }),
@@ -477,6 +503,58 @@ let AuthService = class AuthService {
             accessToken,
             refreshToken,
         };
+    }
+    async ensureRole(roleName) {
+        await this.prisma.role.upsert({
+            where: { name: roleName },
+            update: {},
+            create: {
+                name: roleName,
+                description: `${roleName} system role`,
+                isSystem: true,
+            },
+        });
+    }
+    async assignRole(userId, roleName) {
+        const role = await this.prisma.role.findUnique({ where: { name: roleName } });
+        if (!role)
+            return;
+        await this.prisma.userRole.upsert({
+            where: {
+                userId_roleId: {
+                    userId,
+                    roleId: role.id,
+                },
+            },
+            update: {},
+            create: {
+                userId,
+                roleId: role.id,
+            },
+        });
+    }
+    async getUserRoleNames(userId) {
+        const assignments = await this.prisma.userRole.findMany({
+            where: { userId },
+            include: { role: true },
+        });
+        return assignments.map((entry) => entry.role.name);
+    }
+    buildAccessFromRoles(roles) {
+        const roleSet = new Set(roles.map((role) => role.toUpperCase()));
+        return {
+            isSuperAdmin: roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN),
+            canManageUsers: roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN) || roleSet.has(system_role_enum_1.SystemRole.ADMIN),
+            canManageRbac: roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN),
+            canViewDashboard: roles.length > 0,
+        };
+    }
+    async ensureUserHasDefaultRole(userId, existingRoleCount) {
+        if (existingRoleCount > 0) {
+            return;
+        }
+        await this.ensureRole(system_role_enum_1.SystemRole.EMPLOYEE);
+        await this.assignRole(userId, system_role_enum_1.SystemRole.EMPLOYEE);
     }
 };
 exports.AuthService = AuthService;
