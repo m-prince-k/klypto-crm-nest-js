@@ -20,6 +20,13 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@prisma/client/crm": ["node_modules/@prisma/client/crm"],
+      "@prisma/client/admin": ["node_modules/@prisma/client/admin"],
+      "@prisma/client/auth": ["node_modules/@prisma/client/auth"],
+      "@app/common": ["libs/common/src"],
+      "@app/common/*": ["libs/common/src/*"]
+    }
   }
 }
