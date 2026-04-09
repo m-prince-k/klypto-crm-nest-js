@@ -71,7 +71,7 @@ const prisma_module_1 = __webpack_require__(/*! ./prisma/prisma.module */ "./app
 const auth_module_1 = __webpack_require__(/*! ./auth/auth.module */ "./apps/klypto-crm-nest-js/src/auth/auth.module.ts");
 const users_module_1 = __webpack_require__(/*! ./users/users.module */ "./apps/klypto-crm-nest-js/src/users/users.module.ts");
 const mail_module_1 = __webpack_require__(/*! ./mail/mail.module */ "./apps/klypto-crm-nest-js/src/mail/mail.module.ts");
-const rbac_module_1 = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module './rbac/rbac.module'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+const rbac_module_1 = __webpack_require__(/*! ./rbac/rbac.module */ "./apps/klypto-crm-nest-js/src/rbac/rbac.module.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -261,8 +261,8 @@ const auth_service_1 = __webpack_require__(/*! ./auth.service */ "./apps/klypto-
 const auth_controller_1 = __webpack_require__(/*! ./auth.controller */ "./apps/klypto-crm-nest-js/src/auth/auth.controller.ts");
 const users_module_1 = __webpack_require__(/*! ../users/users.module */ "./apps/klypto-crm-nest-js/src/users/users.module.ts");
 const jwt_strategy_1 = __webpack_require__(/*! ./strategies/jwt.strategy */ "./apps/klypto-crm-nest-js/src/auth/strategies/jwt.strategy.ts");
-const access_token_guard_1 = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module './guards/access-token.guard'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
-const refresh_token_guard_1 = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module './guards/refresh-token.guard'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+const access_token_guard_1 = __webpack_require__(/*! ./guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const refresh_token_guard_1 = __webpack_require__(/*! ./guards/refresh-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/refresh-token.guard.ts");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -646,6 +646,156 @@ __decorate([
 
 /***/ },
 
+/***/ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts"
+/*!***********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts ***!
+  \***********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AccessTokenGuard = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
+let AccessTokenGuard = class AccessTokenGuard extends (0, passport_1.AuthGuard)('jwt') {
+};
+exports.AccessTokenGuard = AccessTokenGuard;
+exports.AccessTokenGuard = AccessTokenGuard = __decorate([
+    (0, common_1.Injectable)()
+], AccessTokenGuard);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/auth/guards/refresh-token.guard.ts"
+/*!************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/auth/guards/refresh-token.guard.ts ***!
+  \************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RefreshTokenGuard = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
+let RefreshTokenGuard = class RefreshTokenGuard extends (0, passport_1.AuthGuard)('jwt-refresh') {
+};
+exports.RefreshTokenGuard = RefreshTokenGuard;
+exports.RefreshTokenGuard = RefreshTokenGuard = __decorate([
+    (0, common_1.Injectable)()
+], RefreshTokenGuard);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/auth/roles/roles.decorator.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/auth/roles/roles.decorator.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Roles = exports.ROLES_KEY = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+exports.ROLES_KEY = 'roles';
+const Roles = (...roles) => (0, common_1.SetMetadata)(exports.ROLES_KEY, roles);
+exports.Roles = Roles;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts"
+/*!***************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts ***!
+  \***************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RolesGuard = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
+const prisma_service_1 = __webpack_require__(/*! ../../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+const roles_decorator_1 = __webpack_require__(/*! ./roles.decorator */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.decorator.ts");
+let RolesGuard = class RolesGuard {
+    reflector;
+    prisma;
+    constructor(reflector, prisma) {
+        this.reflector = reflector;
+        this.prisma = prisma;
+    }
+    async canActivate(context) {
+        const requiredRoles = this.reflector.getAllAndOverride(roles_decorator_1.ROLES_KEY, [context.getHandler(), context.getClass()]);
+        if (!requiredRoles || requiredRoles.length === 0) {
+            return true;
+        }
+        const request = context.switchToHttp().getRequest();
+        const userId = request.user?.sub;
+        if (!userId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        const assignedRoles = await this.prisma.userRole.findMany({
+            where: { userId },
+            include: {
+                role: true,
+            },
+        });
+        const roleSet = new Set(assignedRoles.map((entry) => entry.role.name.toUpperCase()));
+        return requiredRoles.some((role) => roleSet.has(role.toUpperCase()));
+    }
+};
+exports.RolesGuard = RolesGuard;
+exports.RolesGuard = RolesGuard = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof core_1.Reflector !== "undefined" && core_1.Reflector) === "function" ? _a : Object, typeof (_b = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _b : Object])
+], RolesGuard);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts"
+/*!********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts ***!
+  \********************************************************************/
+(__unused_webpack_module, exports) {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SystemRole = void 0;
+var SystemRole;
+(function (SystemRole) {
+    SystemRole["SUPER_ADMIN"] = "SUPER_ADMIN";
+    SystemRole["ADMIN"] = "ADMIN";
+    SystemRole["MANAGER"] = "MANAGER";
+    SystemRole["EMPLOYEE"] = "EMPLOYEE";
+})(SystemRole || (exports.SystemRole = SystemRole = {}));
+
+
+/***/ },
+
 /***/ "./apps/klypto-crm-nest-js/src/auth/strategies/jwt.strategy.ts"
 /*!*********************************************************************!*\
   !*** ./apps/klypto-crm-nest-js/src/auth/strategies/jwt.strategy.ts ***!
@@ -847,6 +997,615 @@ exports.PrismaService = PrismaService;
 exports.PrismaService = PrismaService = __decorate([
     (0, common_1.Injectable)()
 ], PrismaService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/rbac/dto/rbac.dto.ts"
+/*!**********************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/rbac/dto/rbac.dto.ts ***!
+  \**********************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d, _e, _f, _g;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UserRolesResponseDto = exports.UserBasicDto = exports.UserRoleItemDto = exports.AssignRoleResponseDto = exports.RoleAssignmentDto = exports.RoleAssignmentRoleDto = exports.RoleAssignmentUserDto = exports.RoleResponseDto = exports.AssignRoleDto = exports.CreateRoleDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateRoleDto {
+    name;
+    description;
+}
+exports.CreateRoleDto = CreateRoleDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'SALES_MANAGER',
+        description: 'Unique role name (stored as uppercase)',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinLength)(2),
+    __metadata("design:type", String)
+], CreateRoleDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Role for managing sales operations',
+        required: false,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateRoleDto.prototype, "description", void 0);
+class AssignRoleDto {
+    userId;
+    roleName;
+}
+exports.AssignRoleDto = AssignRoleDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'ckxxxxxxxxxxxxxxxxxxxxxxx',
+        description: 'User ID receiving the role',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], AssignRoleDto.prototype, "userId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'SALES_MANAGER',
+        description: 'Role name to assign',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], AssignRoleDto.prototype, "roleName", void 0);
+class RoleResponseDto {
+    id;
+    name;
+    description;
+    isSystem;
+    assignedUsersCount;
+    createdAt;
+    updatedAt;
+}
+exports.RoleResponseDto = RoleResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], RoleResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'SALES_MANAGER' }),
+    __metadata("design:type", String)
+], RoleResponseDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Role for managing sales operations',
+        nullable: true,
+    }),
+    __metadata("design:type", Object)
+], RoleResponseDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
+    __metadata("design:type", Boolean)
+], RoleResponseDto.prototype, "isSystem", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 12 }),
+    __metadata("design:type", Number)
+], RoleResponseDto.prototype, "assignedUsersCount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-01T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], RoleResponseDto.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-02T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], RoleResponseDto.prototype, "updatedAt", void 0);
+class RoleAssignmentUserDto {
+    id;
+    email;
+    fullName;
+}
+exports.RoleAssignmentUserDto = RoleAssignmentUserDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], RoleAssignmentUserDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'john.doe@company.com' }),
+    __metadata("design:type", String)
+], RoleAssignmentUserDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Doe' }),
+    __metadata("design:type", String)
+], RoleAssignmentUserDto.prototype, "fullName", void 0);
+class RoleAssignmentRoleDto {
+    id;
+    name;
+    description;
+    isSystem;
+    createdAt;
+    updatedAt;
+}
+exports.RoleAssignmentRoleDto = RoleAssignmentRoleDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], RoleAssignmentRoleDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'SALES_MANAGER' }),
+    __metadata("design:type", String)
+], RoleAssignmentRoleDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Role for managing sales operations',
+        nullable: true,
+    }),
+    __metadata("design:type", Object)
+], RoleAssignmentRoleDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
+    __metadata("design:type", Boolean)
+], RoleAssignmentRoleDto.prototype, "isSystem", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-01T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], RoleAssignmentRoleDto.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-02T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], RoleAssignmentRoleDto.prototype, "updatedAt", void 0);
+class RoleAssignmentDto {
+    id;
+    userId;
+    roleId;
+    assignedById;
+    createdAt;
+    updatedAt;
+    user;
+    role;
+}
+exports.RoleAssignmentDto = RoleAssignmentDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], RoleAssignmentDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], RoleAssignmentDto.prototype, "userId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], RoleAssignmentDto.prototype, "roleId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], RoleAssignmentDto.prototype, "assignedById", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-01T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_e = typeof Date !== "undefined" && Date) === "function" ? _e : Object)
+], RoleAssignmentDto.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-02T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_f = typeof Date !== "undefined" && Date) === "function" ? _f : Object)
+], RoleAssignmentDto.prototype, "updatedAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: RoleAssignmentUserDto }),
+    __metadata("design:type", RoleAssignmentUserDto)
+], RoleAssignmentDto.prototype, "user", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: RoleAssignmentRoleDto }),
+    __metadata("design:type", RoleAssignmentRoleDto)
+], RoleAssignmentDto.prototype, "role", void 0);
+class AssignRoleResponseDto {
+    message;
+    assignment;
+}
+exports.AssignRoleResponseDto = AssignRoleResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Role assigned successfully' }),
+    __metadata("design:type", String)
+], AssignRoleResponseDto.prototype, "message", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: RoleAssignmentDto }),
+    __metadata("design:type", RoleAssignmentDto)
+], AssignRoleResponseDto.prototype, "assignment", void 0);
+class UserRoleItemDto {
+    assignmentId;
+    roleId;
+    roleName;
+    description;
+    isSystem;
+    assignedAt;
+    assignedBy;
+}
+exports.UserRoleItemDto = UserRoleItemDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], UserRoleItemDto.prototype, "assignmentId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], UserRoleItemDto.prototype, "roleId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'SALES_MANAGER' }),
+    __metadata("design:type", String)
+], UserRoleItemDto.prototype, "roleName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Role for managing sales operations',
+        nullable: true,
+    }),
+    __metadata("design:type", Object)
+], UserRoleItemDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
+    __metadata("design:type", Boolean)
+], UserRoleItemDto.prototype, "isSystem", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-01T10:00:00.000Z' }),
+    __metadata("design:type", typeof (_g = typeof Date !== "undefined" && Date) === "function" ? _g : Object)
+], UserRoleItemDto.prototype, "assignedAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: RoleAssignmentUserDto, nullable: true }),
+    __metadata("design:type", Object)
+], UserRoleItemDto.prototype, "assignedBy", void 0);
+class UserBasicDto {
+    id;
+    email;
+    fullName;
+}
+exports.UserBasicDto = UserBasicDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ckxxxxxxxxxxxxxxxxxxxxxxx' }),
+    __metadata("design:type", String)
+], UserBasicDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'john.doe@company.com' }),
+    __metadata("design:type", String)
+], UserBasicDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Doe' }),
+    __metadata("design:type", String)
+], UserBasicDto.prototype, "fullName", void 0);
+class UserRolesResponseDto {
+    user;
+    roles;
+}
+exports.UserRolesResponseDto = UserRolesResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: UserBasicDto }),
+    __metadata("design:type", UserBasicDto)
+], UserRolesResponseDto.prototype, "user", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [UserRoleItemDto] }),
+    __metadata("design:type", Array)
+], UserRolesResponseDto.prototype, "roles", void 0);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/rbac/rbac.controller.ts"
+/*!*************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/rbac/rbac.controller.ts ***!
+  \*************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RbacController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+const roles_decorator_1 = __webpack_require__(/*! ../auth/roles/roles.decorator */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.decorator.ts");
+const system_role_enum_1 = __webpack_require__(/*! ../auth/roles/system-role.enum */ "./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts");
+const rbac_dto_1 = __webpack_require__(/*! ./dto/rbac.dto */ "./apps/klypto-crm-nest-js/src/rbac/dto/rbac.dto.ts");
+const rbac_service_1 = __webpack_require__(/*! ./rbac.service */ "./apps/klypto-crm-nest-js/src/rbac/rbac.service.ts");
+let RbacController = class RbacController {
+    rbacService;
+    constructor(rbacService) {
+        this.rbacService = rbacService;
+    }
+    createRole(dto) {
+        return this.rbacService.createRole(dto);
+    }
+    listRoles() {
+        return this.rbacService.listRoles();
+    }
+    assignRole(dto, req) {
+        const assignedById = req.user?.sub;
+        if (!assignedById) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return this.rbacService.assignRole(dto, assignedById);
+    }
+    getUserRoles(userId) {
+        return this.rbacService.getUserRoles(userId);
+    }
+};
+exports.RbacController = RbacController;
+__decorate([
+    (0, common_1.Post)('roles'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new role (Super Admin only)' }),
+    (0, swagger_1.ApiBody)({ type: rbac_dto_1.CreateRoleDto }),
+    (0, swagger_1.ApiCreatedResponse)({
+        description: 'Role created successfully',
+        type: rbac_dto_1.RoleResponseDto,
+    }),
+    (0, swagger_1.ApiConflictResponse)({ description: 'Role already exists' }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Unauthorized' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof rbac_dto_1.CreateRoleDto !== "undefined" && rbac_dto_1.CreateRoleDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "createRole", null);
+__decorate([
+    (0, common_1.Get)('roles'),
+    (0, swagger_1.ApiOperation)({ summary: 'List all roles (Super Admin only)' }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Roles fetched successfully',
+        type: [rbac_dto_1.RoleResponseDto],
+    }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Unauthorized' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "listRoles", null);
+__decorate([
+    (0, common_1.Post)('roles/assign'),
+    (0, swagger_1.ApiOperation)({ summary: 'Assign role to user (Super Admin only)' }),
+    (0, swagger_1.ApiBody)({ type: rbac_dto_1.AssignRoleDto }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Role assigned successfully',
+        type: rbac_dto_1.AssignRoleResponseDto,
+    }),
+    (0, swagger_1.ApiNotFoundResponse)({ description: 'User or role not found' }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Invalid user context' }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof rbac_dto_1.AssignRoleDto !== "undefined" && rbac_dto_1.AssignRoleDto) === "function" ? _c : Object, Object]),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "assignRole", null);
+__decorate([
+    (0, common_1.Get)('users/:userId/roles'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all roles for a user (Super Admin only)' }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'User roles fetched successfully',
+        type: rbac_dto_1.UserRolesResponseDto,
+    }),
+    (0, swagger_1.ApiNotFoundResponse)({ description: 'User not found' }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Unauthorized' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "getUserRoles", null);
+exports.RbacController = RbacController = __decorate([
+    (0, swagger_1.ApiTags)('RBAC'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(system_role_enum_1.SystemRole.SUPER_ADMIN),
+    (0, common_1.Controller)('rbac'),
+    __metadata("design:paramtypes", [typeof (_a = typeof rbac_service_1.RbacService !== "undefined" && rbac_service_1.RbacService) === "function" ? _a : Object])
+], RbacController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/rbac/rbac.module.ts"
+/*!*********************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/rbac/rbac.module.ts ***!
+  \*********************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RbacModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const auth_module_1 = __webpack_require__(/*! ../auth/auth.module */ "./apps/klypto-crm-nest-js/src/auth/auth.module.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+const rbac_controller_1 = __webpack_require__(/*! ./rbac.controller */ "./apps/klypto-crm-nest-js/src/rbac/rbac.controller.ts");
+const rbac_service_1 = __webpack_require__(/*! ./rbac.service */ "./apps/klypto-crm-nest-js/src/rbac/rbac.service.ts");
+let RbacModule = class RbacModule {
+};
+exports.RbacModule = RbacModule;
+exports.RbacModule = RbacModule = __decorate([
+    (0, common_1.Module)({
+        imports: [auth_module_1.AuthModule],
+        controllers: [rbac_controller_1.RbacController],
+        providers: [rbac_service_1.RbacService, roles_guard_1.RolesGuard],
+    })
+], RbacModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/rbac/rbac.service.ts"
+/*!**********************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/rbac/rbac.service.ts ***!
+  \**********************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RbacService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let RbacService = class RbacService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async createRole(dto) {
+        const roleName = dto.name.trim().toUpperCase();
+        const existingRole = await this.prisma.role.findUnique({
+            where: { name: roleName },
+        });
+        if (existingRole) {
+            throw new common_1.ConflictException('Role already exists');
+        }
+        return this.prisma.role.create({
+            data: {
+                name: roleName,
+                description: dto.description,
+                isSystem: false,
+            },
+        });
+    }
+    async listRoles() {
+        const roles = await this.prisma.role.findMany({
+            orderBy: { createdAt: 'asc' },
+            include: {
+                _count: {
+                    select: { assignments: true },
+                },
+            },
+        });
+        return roles.map((role) => ({
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            isSystem: role.isSystem,
+            assignedUsersCount: role._count.assignments,
+            createdAt: role.createdAt,
+            updatedAt: role.updatedAt,
+        }));
+    }
+    async assignRole(dto, assignedById) {
+        const roleName = dto.roleName.trim().toUpperCase();
+        const user = await this.prisma.user.findUnique({
+            where: { id: dto.userId },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const role = await this.prisma.role.findUnique({
+            where: { name: roleName },
+        });
+        if (!role) {
+            throw new common_1.NotFoundException('Role not found');
+        }
+        const assignment = await this.prisma.userRole.upsert({
+            where: {
+                userId_roleId: {
+                    userId: user.id,
+                    roleId: role.id,
+                },
+            },
+            update: {
+                assignedById,
+            },
+            create: {
+                userId: user.id,
+                roleId: role.id,
+                assignedById,
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        fullName: true,
+                    },
+                },
+                role: true,
+            },
+        });
+        return {
+            message: 'Role assigned successfully',
+            assignment,
+        };
+    }
+    async getUserRoles(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                roleAssignments: {
+                    include: {
+                        role: true,
+                        assignedBy: {
+                            select: {
+                                id: true,
+                                email: true,
+                                fullName: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return {
+            user: {
+                id: user.id,
+                email: user.email,
+                fullName: user.fullName,
+            },
+            roles: user.roleAssignments.map((assignment) => ({
+                assignmentId: assignment.id,
+                roleId: assignment.role.id,
+                roleName: assignment.role.name,
+                description: assignment.role.description,
+                isSystem: assignment.role.isSystem,
+                assignedAt: assignment.createdAt,
+                assignedBy: assignment.assignedBy,
+            })),
+        };
+    }
+};
+exports.RbacService = RbacService;
+exports.RbacService = RbacService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], RbacService);
 
 
 /***/ },
