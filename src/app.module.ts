@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
+import { RbacModule } from './rbac/rbac.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MailModule } from './mail/mail.module';
     }),
     PrismaModule,
     AuthModule,
+    RbacModule,
     UsersModule,
     MailModule,
     MailerModule.forRoot({

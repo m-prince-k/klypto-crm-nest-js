@@ -8,11 +8,19 @@ import {
   AccessTokenStrategy,
   RefreshTokenStrategy,
 } from './strategies/jwt.strategy';
+import { AccessTokenGuard } from './guards/access-token.guard';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
 
 @Module({
   imports: [UsersModule, PassportModule, JwtModule.register({})],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    AccessTokenGuard,
+    RefreshTokenGuard,
+  ],
+  exports: [AuthService, AccessTokenGuard, RefreshTokenGuard],
 })
 export class AuthModule {}

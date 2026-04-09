@@ -16,22 +16,39 @@ model Organization {
 }
 
 model User {
-  id             String       @id @default(cuid())
-  email          String       @unique
-  passwordHash   String
+  id                 String       @id @default(cuid())
+  email              String       @unique
+  passwordHash       String
   hashedRefreshToken String?
-  fullName       String
-  isActive       Boolean      @default(true)
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  roleAssignments UserRole[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  fullName           String
+  isActive           Boolean      @default(true)
+  organizationId     String
+  organization       Organization @relation(fields: [organizationId], references: [id])
+  roleAssignments    UserRole[]   @relation("UserRoleAssignee")
+  roleAssignedBy     UserRole[]   @relation("UserRoleAssigner")
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+}
+
+model Role {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  isSystem    Boolean    @default(false)
+  assignments UserRole[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model UserRole {
-  id       String @id @default(cuid())
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
-  roleName String
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation("UserRoleAssignee", fields: [userId], references: [id])
+  roleId       String
+  role         Role     @relation(fields: [roleId], references: [id])
+  assignedById String?
+  assignedBy   User?    @relation("UserRoleAssigner", fields: [assignedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, roleId])
 }
