@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UseGuards,
   Req,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, SignupDto } from './dto/auth.dto';
@@ -16,6 +18,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { AccessTokenGuard } from './guards/access-token.guard';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -41,24 +45,49 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Logout and invalidate refresh token' })
   @ApiResponse({ status: 200, description: 'Successfully logged out' })
   @HttpCode(HttpStatus.OK)
-  logout(@Req() req: any) {
+  logout(@Req() req: Request & { user?: { sub?: string } }) {
     const userId = req.user?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Invalid user context');
+    }
     return this.authService.logout(userId);
   }
 
   @Post('refresh')
+  @UseGuards(RefreshTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Refresh access token using refresh token' })
   @ApiResponse({ status: 200, description: 'Tokens successfully refreshed' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @HttpCode(HttpStatus.OK)
-  refresh(@Req() req: any) {
+  refresh(
+    @Req() req: Request & { user?: { sub?: string; refreshToken?: string } },
+  ) {
     const userId = req.user?.sub;
     const refreshToken = req.user?.refreshToken;
+    if (!userId || !refreshToken) {
+      throw new UnauthorizedException('Invalid user context');
+    }
     return this.authService.refreshTokens(userId, refreshToken);
+  }
+
+  @Get('me')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get authenticated user profile' })
+  @ApiResponse({ status: 200, description: 'Profile fetched successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @HttpCode(HttpStatus.OK)
+  me(@Req() req: Request & { user?: { sub?: string } }) {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Invalid user context');
+    }
+    return this.authService.getProfile(userId);
   }
 }
