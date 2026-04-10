@@ -18,6 +18,15 @@ export class CreateRoleDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiProperty({
+    example: ['dashboard', 'hrms', 'leave'],
+    required: false,
+    description: 'Dashboard modules assigned to the role',
+    type: [String],
+  })
+  @IsOptional()
+  dashboardModules?: string[];
 }
 
 export class AssignRoleDto {
@@ -56,6 +65,15 @@ export class UpdateRoleDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiProperty({
+    example: ['dashboard', 'hrms', 'leave'],
+    required: false,
+    description: 'Updated dashboard modules assigned to the role',
+    type: [String],
+  })
+  @IsOptional()
+  dashboardModules?: string[];
 }
 
 export class RoleResponseDto {
@@ -76,6 +94,12 @@ export class RoleResponseDto {
 
   @ApiProperty({ example: 12 })
   assignedUsersCount: number;
+
+  @ApiProperty({
+    example: ['dashboard', 'hrms', 'leave'],
+    type: [String],
+  })
+  dashboardModules: string[];
 
   @ApiProperty({ example: '2025-01-01T10:00:00.000Z' })
   createdAt: Date;
@@ -176,6 +200,12 @@ export class UserRoleItemDto {
   @ApiProperty({ example: false })
   isSystem: boolean;
 
+  @ApiProperty({
+    example: ['dashboard', 'hrms', 'leave'],
+    type: [String],
+  })
+  dashboardModules: string[];
+
   @ApiProperty({ example: '2025-01-01T10:00:00.000Z' })
   assignedAt: Date;
 
@@ -214,6 +244,12 @@ export class UserAccessDto {
 
   @ApiProperty({ example: true })
   canViewDashboard: boolean;
+
+  @ApiProperty({
+    example: ['dashboard', 'hrms', 'leave'],
+    type: [String],
+  })
+  dashboardModules: string[];
 }
 
 export class UserWithRolesDto {
@@ -237,6 +273,9 @@ export class UserWithRolesDto {
 
   @ApiProperty({ type: [String], example: ['EMPLOYEE'] })
   roles: string[];
+
+  @ApiProperty({ type: [String], example: ['dashboard', 'hrms', 'leave'] })
+  dashboardModules: string[];
 
   @ApiProperty({ type: UserAccessDto })
   access: UserAccessDto;

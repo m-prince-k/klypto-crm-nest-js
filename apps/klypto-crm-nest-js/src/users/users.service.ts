@@ -14,6 +14,7 @@ export class UsersService {
         roleAssignments: {
           include: {
             role: true,
+            assignedBy: true,
           },
         },
       },
@@ -28,6 +29,7 @@ export class UsersService {
         roleAssignments: {
           include: {
             role: true,
+            assignedBy: true,
           },
         },
       },

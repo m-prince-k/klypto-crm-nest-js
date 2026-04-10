@@ -72,6 +72,20 @@ export class RbacController {
     return this.rbacService.listRoles();
   }
 
+  @Get('dashboard-modules')
+  @ApiOperation({
+    summary: 'List available dashboard modules (Super Admin only)',
+  })
+  @ApiOkResponse({
+    description: 'Dashboard modules fetched successfully',
+    type: [String],
+  })
+  @ApiForbiddenResponse({ description: 'Forbidden resource' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  listDashboardModules() {
+    return this.rbacService.listDashboardModules();
+  }
+
   @Patch('roles/:roleId')
   @ApiOperation({ summary: 'Update an existing role (Super Admin only)' })
   @ApiBody({ type: UpdateRoleDto })

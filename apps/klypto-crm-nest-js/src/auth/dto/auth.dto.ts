@@ -79,6 +79,31 @@ export class AuthTokensResponseDto {
     description: 'Single assigned role at signup bootstrap',
   })
   role?: string;
+
+  @ApiProperty({
+    example: ['dashboard', 'hrms', 'leave'],
+    required: false,
+    description: 'Dashboard modules assigned through role access',
+  })
+  dashboardModules?: string[];
+
+  @ApiProperty({
+    example: {
+      isSuperAdmin: false,
+      canManageUsers: true,
+      canManageRbac: false,
+      canViewDashboard: true,
+      dashboardModules: ['dashboard', 'hrms', 'leave'],
+    },
+    required: false,
+  })
+  access?: {
+    isSuperAdmin: boolean;
+    canManageUsers: boolean;
+    canManageRbac: boolean;
+    canViewDashboard: boolean;
+    dashboardModules: string[];
+  };
 }
 
 export class LogoutResponseDto {
@@ -111,6 +136,29 @@ export class ProfileResponseDto {
 
   @ApiProperty({ example: ['SUPER_ADMIN'] })
   roles: string[];
+
+  @ApiProperty({
+    example: ['dashboard', 'hrms', 'leave'],
+    description: 'Dashboard modules assigned through role access',
+  })
+  dashboardModules: string[];
+
+  @ApiProperty({
+    example: {
+      isSuperAdmin: false,
+      canManageUsers: true,
+      canManageRbac: false,
+      canViewDashboard: true,
+      dashboardModules: ['dashboard', 'hrms', 'leave'],
+    },
+  })
+  access: {
+    isSuperAdmin: boolean;
+    canManageUsers: boolean;
+    canManageRbac: boolean;
+    canViewDashboard: boolean;
+    dashboardModules: string[];
+  };
 
   @ApiProperty({ example: true })
   isActive: boolean;

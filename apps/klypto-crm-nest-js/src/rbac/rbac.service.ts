@@ -13,12 +13,45 @@ import {
   UserWithRolesDto,
 } from './dto/rbac.dto';
 
+const DEFAULT_DASHBOARD_MODULES = [
+  'dashboard',
+  'leads',
+  'pipeline',
+  'erp',
+  'recruitment',
+  'grievances',
+  'payroll',
+  'hrms',
+  'leave',
+  'employees',
+  'settings',
+  'roles-access',
+];
+
+const DASHBOARD_MODULE_LABELS: Record<string, string> = {
+  dashboard: 'Dashboard',
+  leads: 'Leads',
+  pipeline: 'Pipeline',
+  erp: 'ERP Portal',
+  recruitment: 'Recruitment',
+  grievances: 'Grievances',
+  payroll: 'Payroll',
+  hrms: 'HRMS',
+  leave: 'Leave',
+  employees: 'Employees',
+  settings: 'Settings',
+  'roles-access': 'Roles & Access',
+};
+
 @Injectable()
 export class RbacService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createRole(dto: CreateRoleDto) {
     const roleName = dto.name.trim().toUpperCase();
+    const dashboardModules = this.normalizeDashboardModules(
+      dto.dashboardModules,
+    );
 
     const existingRole = await this.prisma.role.findUnique({
       where: { name: roleName },
@@ -33,6 +66,7 @@ export class RbacService {
         name: roleName,
         description: dto.description,
         isSystem: false,
+        dashboardModules,
       },
     });
   }
@@ -53,8 +87,17 @@ export class RbacService {
       description: role.description,
       isSystem: role.isSystem,
       assignedUsersCount: role._count.assignments,
+      dashboardModules: role.dashboardModules,
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
+    }));
+  }
+
+  listDashboardModules() {
+    return DEFAULT_DASHBOARD_MODULES.map((key) => ({
+      key,
+      label: DASHBOARD_MODULE_LABELS[key] ?? key,
+      description: this.getDashboardModuleDescription(key),
     }));
   }
 
@@ -67,18 +110,27 @@ export class RbacService {
       throw new NotFoundException('Role not found');
     }
 
-    const hasNameUpdate = typeof dto.name === 'string' && dto.name.trim().length > 0;
+    const hasNameUpdate =
+      typeof dto.name === 'string' && dto.name.trim().length > 0;
     const hasDescriptionUpdate = typeof dto.description === 'string';
+    const hasModulesUpdate = Array.isArray(dto.dashboardModules);
 
-    if (!hasNameUpdate && !hasDescriptionUpdate) {
-      throw new BadRequestException('Provide name or description to update');
+    if (!hasNameUpdate && !hasDescriptionUpdate && !hasModulesUpdate) {
+      throw new BadRequestException(
+        'Provide name, description or dashboard modules to update',
+      );
     }
 
     if (existingRole.isSystem && hasNameUpdate) {
       throw new ConflictException('System role name cannot be changed');
     }
 
-    const nextName = hasNameUpdate ? dto.name!.trim().toUpperCase() : existingRole.name;
+    const nextName = hasNameUpdate
+      ? dto.name!.trim().toUpperCase()
+      : existingRole.name;
+    const dashboardModules = hasModulesUpdate
+      ? this.normalizeDashboardModules(dto.dashboardModules)
+      : existingRole.dashboardModules;
 
     if (hasNameUpdate && nextName !== existingRole.name) {
       const conflictingRole = await this.prisma.role.findUnique({
@@ -90,26 +142,32 @@ export class RbacService {
       }
     }
 
-    return this.prisma.role.update({
-      where: { id: roleId },
-      data: {
-        name: nextName,
-        description: hasDescriptionUpdate ? dto.description : existingRole.description,
-      },
-      include: {
-        _count: {
-          select: { assignments: true },
+    return this.prisma.role
+      .update({
+        where: { id: roleId },
+        data: {
+          name: nextName,
+          description: hasDescriptionUpdate
+            ? dto.description
+            : existingRole.description,
+          dashboardModules,
         },
-      },
-    }).then((role) => ({
-      id: role.id,
-      name: role.name,
-      description: role.description,
-      isSystem: role.isSystem,
-      assignedUsersCount: role._count.assignments,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
-    }));
+        include: {
+          _count: {
+            select: { assignments: true },
+          },
+        },
+      })
+      .then((role) => ({
+        id: role.id,
+        name: role.name,
+        description: role.description,
+        isSystem: role.isSystem,
+        assignedUsersCount: role._count.assignments,
+        dashboardModules: role.dashboardModules,
+        createdAt: role.createdAt,
+        updatedAt: role.updatedAt,
+      }));
   }
 
   async deleteRole(roleId: string) {
@@ -131,7 +189,9 @@ export class RbacService {
     }
 
     if (existingRole._count.assignments > 0) {
-      throw new ConflictException('Role is assigned to users and cannot be deleted');
+      throw new ConflictException(
+        'Role is assigned to users and cannot be deleted',
+      );
     }
 
     await this.prisma.role.delete({ where: { id: roleId } });
@@ -224,6 +284,7 @@ export class RbacService {
         roleName: assignment.role.name,
         description: assignment.role.description,
         isSystem: assignment.role.isSystem,
+        dashboardModules: assignment.role.dashboardModules,
         assignedAt: assignment.createdAt,
         assignedBy: assignment.assignedBy,
       })),
@@ -243,6 +304,7 @@ export class RbacService {
             role: {
               select: {
                 name: true,
+                dashboardModules: true,
               },
             },
           },
@@ -268,14 +330,73 @@ export class RbacService {
         organizationName: user.organization.name,
         isActive: user.isActive,
         roles,
+        dashboardModules: [
+          ...new Set(
+            user.roleAssignments.flatMap(
+              (assignment) => assignment.role.dashboardModules || [],
+            ),
+          ),
+        ],
         access: {
           isSuperAdmin: hasSuperAdmin,
           canManageUsers: hasSuperAdmin || hasAdmin,
           canManageRbac: hasSuperAdmin,
-          canViewDashboard: roles.length > 0,
+          canViewDashboard: hasSuperAdmin || roles.length > 0,
+          dashboardModules: [
+            ...new Set(
+              user.roleAssignments.flatMap(
+                (assignment) => assignment.role.dashboardModules || [],
+              ),
+            ),
+          ],
         },
         createdAt: user.createdAt,
       };
     });
+  }
+
+  private getDashboardModuleDescription(key: string) {
+    switch (key) {
+      case 'dashboard':
+        return 'Executive summary cards and insights';
+      case 'leads':
+        return 'Lead and pipeline tracking';
+      case 'pipeline':
+        return 'Sales pipeline overview';
+      case 'erp':
+        return 'Finance, procurement, and ERP workflows';
+      case 'recruitment':
+        return 'Hiring and assessment workflows';
+      case 'grievances':
+        return 'Employee grievance management';
+      case 'payroll':
+        return 'Salary and compensation management';
+      case 'hrms':
+        return 'HRMS overview and operations';
+      case 'leave':
+        return 'Leave requests and approvals';
+      case 'employees':
+        return 'Employee master and directory';
+      case 'settings':
+        return 'Personal account and preferences';
+      case 'roles-access':
+        return 'Role and access administration';
+      default:
+        return 'Dashboard module';
+    }
+  }
+
+  private normalizeDashboardModules(modules?: string[]) {
+    const normalized = [
+      ...new Set(
+        (modules ?? []).map((module) => module.trim()).filter(Boolean),
+      ),
+    ];
+
+    if (!normalized.includes('dashboard')) {
+      normalized.unshift('dashboard');
+    }
+
+    return normalized;
   }
 }

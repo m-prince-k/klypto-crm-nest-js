@@ -11,6 +11,21 @@ import { LoginDto, SignupDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
 import { SystemRole } from './roles/system-role.enum';
 
+const DEFAULT_DASHBOARD_MODULES = [
+  'dashboard',
+  'leads',
+  'pipeline',
+  'erp',
+  'recruitment',
+  'grievances',
+  'payroll',
+  'hrms',
+  'leave',
+  'employees',
+  'settings',
+  'roles-access',
+];
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -52,14 +67,15 @@ export class AuthService {
     await this.ensureRole(roleToAssign);
     await this.assignRole(user.id, roleToAssign);
 
-    const roles = await this.getUserRoleNames(user.id);
+    const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
     const tokens = await this.getTokens(user.id, user.email, roles);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
       ...tokens,
       roles,
-      access: this.buildAccessFromRoles(roles),
+      dashboardModules,
+      access: this.buildAccessFromRoles(roles, dashboardModules),
     };
   }
 
@@ -78,14 +94,15 @@ export class AuthService {
     }
 
     await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
-    const roles = await this.getUserRoleNames(user.id);
+    const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
     const tokens = await this.getTokens(user.id, user.email, roles);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
       ...tokens,
       roles,
-      access: this.buildAccessFromRoles(roles),
+      dashboardModules,
+      access: this.buildAccessFromRoles(roles, dashboardModules),
     };
   }
 
@@ -100,7 +117,7 @@ export class AuthService {
     }
 
     await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
-    const roles = await this.getUserRoleNames(user.id);
+    const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
 
     return {
       id: user.id,
@@ -108,7 +125,8 @@ export class AuthService {
       fullName: user.fullName,
       organization: user.organization,
       roles,
-      access: this.buildAccessFromRoles(roles),
+      dashboardModules,
+      access: this.buildAccessFromRoles(roles, dashboardModules),
       isActive: user.isActive,
       createdAt: user.createdAt,
     };
@@ -136,14 +154,15 @@ export class AuthService {
     }
 
     await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
-    const roles = await this.getUserRoleNames(user.id);
+    const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
     const tokens = await this.getTokens(user.id, user.email, roles);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
       ...tokens,
       roles,
-      access: this.buildAccessFromRoles(roles),
+      dashboardModules,
+      access: this.buildAccessFromRoles(roles, dashboardModules),
     };
   }
 
@@ -189,12 +208,16 @@ export class AuthService {
         name: roleName,
         description: `${roleName} system role`,
         isSystem: true,
+        dashboardModules:
+          roleName === SystemRole.SUPER_ADMIN ? DEFAULT_DASHBOARD_MODULES : [],
       },
     });
   }
 
   private async assignRole(userId: string, roleName: string) {
-    const role = await this.prisma.role.findUnique({ where: { name: roleName } });
+    const role = await this.prisma.role.findUnique({
+      where: { name: roleName },
+    });
     if (!role) return;
 
     await this.prisma.userRole.upsert({
@@ -212,24 +235,35 @@ export class AuthService {
     });
   }
 
-  private async getUserRoleNames(userId: string) {
+  private async getUserRoleAccess(userId: string) {
     const assignments = await this.prisma.userRole.findMany({
       where: { userId },
       include: { role: true },
     });
 
-    return assignments.map((entry) => entry.role.name);
+    const roles = assignments.map((entry) => entry.role.name);
+    const dashboardModules = [
+      ...new Set(
+        assignments.flatMap((entry) => entry.role.dashboardModules || []),
+      ),
+    ];
+
+    return { roles, dashboardModules };
   }
 
-  private buildAccessFromRoles(roles: string[]) {
+  private buildAccessFromRoles(roles: string[], dashboardModules: string[]) {
     const roleSet = new Set(roles.map((role) => role.toUpperCase()));
+    const hasSuperAdmin = roleSet.has(SystemRole.SUPER_ADMIN);
+    const effectiveModules = hasSuperAdmin
+      ? DEFAULT_DASHBOARD_MODULES
+      : dashboardModules;
 
     return {
-      isSuperAdmin: roleSet.has(SystemRole.SUPER_ADMIN),
-      canManageUsers:
-        roleSet.has(SystemRole.SUPER_ADMIN) || roleSet.has(SystemRole.ADMIN),
-      canManageRbac: roleSet.has(SystemRole.SUPER_ADMIN),
-      canViewDashboard: roles.length > 0,
+      isSuperAdmin: hasSuperAdmin,
+      canManageUsers: hasSuperAdmin || roleSet.has(SystemRole.ADMIN),
+      canManageRbac: hasSuperAdmin,
+      canViewDashboard: hasSuperAdmin || effectiveModules.length > 0,
+      dashboardModules: effectiveModules,
     };
   }
 

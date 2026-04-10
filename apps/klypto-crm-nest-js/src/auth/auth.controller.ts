@@ -10,7 +10,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, SignupDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  SignupDto,
+  AuthTokensResponseDto,
+  LogoutResponseDto,
+  ProfileResponseDto,
+} from './dto/auth.dto';
 import { Request } from 'express';
 import {
   ApiBearerAuth,
@@ -28,7 +34,11 @@ export class AuthController {
 
   @Post('signup')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully created' })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully created',
+    type: AuthTokensResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Email already exists' })
   @HttpCode(HttpStatus.CREATED)
   signup(@Body() signupDto: SignupDto) {
@@ -37,7 +47,11 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Login with email and password' })
-  @ApiResponse({ status: 200, description: 'Successfully logged in' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully logged in',
+    type: AuthTokensResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @HttpCode(HttpStatus.OK)
   login(@Body() loginDto: LoginDto) {
@@ -48,7 +62,11 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Logout and invalidate refresh token' })
-  @ApiResponse({ status: 200, description: 'Successfully logged out' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully logged out',
+    type: LogoutResponseDto,
+  })
   @HttpCode(HttpStatus.OK)
   logout(@Req() req: Request & { user?: { sub?: string } }) {
     const userId = req.user?.sub;
@@ -62,7 +80,11 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Refresh access token using refresh token' })
-  @ApiResponse({ status: 200, description: 'Tokens successfully refreshed' })
+  @ApiResponse({
+    status: 200,
+    description: 'Tokens successfully refreshed',
+    type: AuthTokensResponseDto,
+  })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @HttpCode(HttpStatus.OK)
   refresh(
@@ -80,7 +102,11 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get authenticated user profile' })
-  @ApiResponse({ status: 200, description: 'Profile fetched successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile fetched successfully',
+    type: ProfileResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   me(@Req() req: Request & { user?: { sub?: string } }) {

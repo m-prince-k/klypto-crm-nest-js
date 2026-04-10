@@ -203,7 +203,11 @@ exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('signup'),
     (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'User successfully created' }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'User successfully created',
+        type: auth_dto_1.AuthTokensResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Email already exists' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
@@ -214,7 +218,11 @@ __decorate([
 __decorate([
     (0, common_1.Post)('login'),
     (0, swagger_1.ApiOperation)({ summary: 'Login with email and password' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Successfully logged in' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Successfully logged in',
+        type: auth_dto_1.AuthTokensResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Invalid credentials' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
@@ -227,7 +235,11 @@ __decorate([
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Logout and invalidate refresh token' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Successfully logged out' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Successfully logged out',
+        type: auth_dto_1.LogoutResponseDto,
+    }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -239,7 +251,11 @@ __decorate([
     (0, common_1.UseGuards)(refresh_token_guard_1.RefreshTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Refresh access token using refresh token' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Tokens successfully refreshed' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Tokens successfully refreshed',
+        type: auth_dto_1.AuthTokensResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
@@ -252,7 +268,11 @@ __decorate([
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Get authenticated user profile' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Profile fetched successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Profile fetched successfully',
+        type: auth_dto_1.ProfileResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
@@ -372,6 +392,20 @@ const users_service_1 = __webpack_require__(/*! ../users/users.service */ "./app
 const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
 const bcrypt = __importStar(__webpack_require__(/*! bcryptjs */ "bcryptjs"));
 const system_role_enum_1 = __webpack_require__(/*! ./roles/system-role.enum */ "./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts");
+const DEFAULT_DASHBOARD_MODULES = [
+    'dashboard',
+    'leads',
+    'pipeline',
+    'erp',
+    'recruitment',
+    'grievances',
+    'payroll',
+    'hrms',
+    'leave',
+    'employees',
+    'settings',
+    'roles-access',
+];
 let AuthService = class AuthService {
     usersService;
     jwtService;
@@ -405,13 +439,14 @@ let AuthService = class AuthService {
             : system_role_enum_1.SystemRole.EMPLOYEE;
         await this.ensureRole(roleToAssign);
         await this.assignRole(user.id, roleToAssign);
-        const roles = await this.getUserRoleNames(user.id);
+        const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
         return {
             ...tokens,
             roles,
-            access: this.buildAccessFromRoles(roles),
+            dashboardModules,
+            access: this.buildAccessFromRoles(roles, dashboardModules),
         };
     }
     async login(loginDto) {
@@ -424,13 +459,14 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
         await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
-        const roles = await this.getUserRoleNames(user.id);
+        const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
         return {
             ...tokens,
             roles,
-            access: this.buildAccessFromRoles(roles),
+            dashboardModules,
+            access: this.buildAccessFromRoles(roles, dashboardModules),
         };
     }
     async getProfile(userId) {
@@ -442,14 +478,15 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('User not found');
         }
         await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
-        const roles = await this.getUserRoleNames(user.id);
+        const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         return {
             id: user.id,
             email: user.email,
             fullName: user.fullName,
             organization: user.organization,
             roles,
-            access: this.buildAccessFromRoles(roles),
+            dashboardModules,
+            access: this.buildAccessFromRoles(roles, dashboardModules),
             isActive: user.isActive,
             createdAt: user.createdAt,
         };
@@ -470,13 +507,14 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Access Denied');
         }
         await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
-        const roles = await this.getUserRoleNames(user.id);
+        const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
         return {
             ...tokens,
             roles,
-            access: this.buildAccessFromRoles(roles),
+            dashboardModules,
+            access: this.buildAccessFromRoles(roles, dashboardModules),
         };
     }
     async updateRefreshToken(userId, refreshToken) {
@@ -512,11 +550,14 @@ let AuthService = class AuthService {
                 name: roleName,
                 description: `${roleName} system role`,
                 isSystem: true,
+                dashboardModules: roleName === system_role_enum_1.SystemRole.SUPER_ADMIN ? DEFAULT_DASHBOARD_MODULES : [],
             },
         });
     }
     async assignRole(userId, roleName) {
-        const role = await this.prisma.role.findUnique({ where: { name: roleName } });
+        const role = await this.prisma.role.findUnique({
+            where: { name: roleName },
+        });
         if (!role)
             return;
         await this.prisma.userRole.upsert({
@@ -533,20 +574,29 @@ let AuthService = class AuthService {
             },
         });
     }
-    async getUserRoleNames(userId) {
+    async getUserRoleAccess(userId) {
         const assignments = await this.prisma.userRole.findMany({
             where: { userId },
             include: { role: true },
         });
-        return assignments.map((entry) => entry.role.name);
+        const roles = assignments.map((entry) => entry.role.name);
+        const dashboardModules = [
+            ...new Set(assignments.flatMap((entry) => entry.role.dashboardModules || [])),
+        ];
+        return { roles, dashboardModules };
     }
-    buildAccessFromRoles(roles) {
+    buildAccessFromRoles(roles, dashboardModules) {
         const roleSet = new Set(roles.map((role) => role.toUpperCase()));
+        const hasSuperAdmin = roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN);
+        const effectiveModules = hasSuperAdmin
+            ? DEFAULT_DASHBOARD_MODULES
+            : dashboardModules;
         return {
-            isSuperAdmin: roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN),
-            canManageUsers: roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN) || roleSet.has(system_role_enum_1.SystemRole.ADMIN),
-            canManageRbac: roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN),
-            canViewDashboard: roles.length > 0,
+            isSuperAdmin: hasSuperAdmin,
+            canManageUsers: hasSuperAdmin || roleSet.has(system_role_enum_1.SystemRole.ADMIN),
+            canManageRbac: hasSuperAdmin,
+            canViewDashboard: hasSuperAdmin || effectiveModules.length > 0,
+            dashboardModules: effectiveModules,
         };
     }
     async ensureUserHasDefaultRole(userId, existingRoleCount) {
@@ -657,6 +707,8 @@ class AuthTokensResponseDto {
     refreshToken;
     roles;
     role;
+    dashboardModules;
+    access;
 }
 exports.AuthTokensResponseDto = AuthTokensResponseDto;
 __decorate([
@@ -689,6 +741,27 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], AuthTokensResponseDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['dashboard', 'hrms', 'leave'],
+        required: false,
+        description: 'Dashboard modules assigned through role access',
+    }),
+    __metadata("design:type", Array)
+], AuthTokensResponseDto.prototype, "dashboardModules", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: {
+            isSuperAdmin: false,
+            canManageUsers: true,
+            canManageRbac: false,
+            canViewDashboard: true,
+            dashboardModules: ['dashboard', 'hrms', 'leave'],
+        },
+        required: false,
+    }),
+    __metadata("design:type", Object)
+], AuthTokensResponseDto.prototype, "access", void 0);
 class LogoutResponseDto {
     message;
 }
@@ -718,6 +791,8 @@ class ProfileResponseDto {
     fullName;
     organization;
     roles;
+    dashboardModules;
+    access;
     isActive;
     createdAt;
 }
@@ -742,6 +817,25 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: ['SUPER_ADMIN'] }),
     __metadata("design:type", Array)
 ], ProfileResponseDto.prototype, "roles", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['dashboard', 'hrms', 'leave'],
+        description: 'Dashboard modules assigned through role access',
+    }),
+    __metadata("design:type", Array)
+], ProfileResponseDto.prototype, "dashboardModules", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: {
+            isSuperAdmin: false,
+            canManageUsers: true,
+            canManageRbac: false,
+            canViewDashboard: true,
+            dashboardModules: ['dashboard', 'hrms', 'leave'],
+        },
+    }),
+    __metadata("design:type", Object)
+], ProfileResponseDto.prototype, "access", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: true }),
     __metadata("design:type", Boolean)
@@ -1133,6 +1227,7 @@ const class_validator_1 = __webpack_require__(/*! class-validator */ "class-vali
 class CreateRoleDto {
     name;
     description;
+    dashboardModules;
 }
 exports.CreateRoleDto = CreateRoleDto;
 __decorate([
@@ -1154,6 +1249,16 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateRoleDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['dashboard', 'hrms', 'leave'],
+        required: false,
+        description: 'Dashboard modules assigned to the role',
+        type: [String],
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRoleDto.prototype, "dashboardModules", void 0);
 class AssignRoleDto {
     userId;
     roleName;
@@ -1180,6 +1285,7 @@ __decorate([
 class UpdateRoleDto {
     name;
     description;
+    dashboardModules;
 }
 exports.UpdateRoleDto = UpdateRoleDto;
 __decorate([
@@ -1202,12 +1308,23 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateRoleDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['dashboard', 'hrms', 'leave'],
+        required: false,
+        description: 'Updated dashboard modules assigned to the role',
+        type: [String],
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], UpdateRoleDto.prototype, "dashboardModules", void 0);
 class RoleResponseDto {
     id;
     name;
     description;
     isSystem;
     assignedUsersCount;
+    dashboardModules;
     createdAt;
     updatedAt;
 }
@@ -1235,6 +1352,13 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 12 }),
     __metadata("design:type", Number)
 ], RoleResponseDto.prototype, "assignedUsersCount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['dashboard', 'hrms', 'leave'],
+        type: [String],
+    }),
+    __metadata("design:type", Array)
+], RoleResponseDto.prototype, "dashboardModules", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2025-01-01T10:00:00.000Z' }),
     __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
@@ -1367,6 +1491,7 @@ class UserRoleItemDto {
     roleName;
     description;
     isSystem;
+    dashboardModules;
     assignedAt;
     assignedBy;
 }
@@ -1394,6 +1519,13 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: false }),
     __metadata("design:type", Boolean)
 ], UserRoleItemDto.prototype, "isSystem", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['dashboard', 'hrms', 'leave'],
+        type: [String],
+    }),
+    __metadata("design:type", Array)
+], UserRoleItemDto.prototype, "dashboardModules", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2025-01-01T10:00:00.000Z' }),
     __metadata("design:type", typeof (_g = typeof Date !== "undefined" && Date) === "function" ? _g : Object)
@@ -1438,6 +1570,7 @@ class UserAccessDto {
     canManageUsers;
     canManageRbac;
     canViewDashboard;
+    dashboardModules;
 }
 exports.UserAccessDto = UserAccessDto;
 __decorate([
@@ -1456,6 +1589,13 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: true }),
     __metadata("design:type", Boolean)
 ], UserAccessDto.prototype, "canViewDashboard", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: ['dashboard', 'hrms', 'leave'],
+        type: [String],
+    }),
+    __metadata("design:type", Array)
+], UserAccessDto.prototype, "dashboardModules", void 0);
 class UserWithRolesDto {
     id;
     email;
@@ -1464,6 +1604,7 @@ class UserWithRolesDto {
     organizationName;
     isActive;
     roles;
+    dashboardModules;
     access;
     createdAt;
 }
@@ -1496,6 +1637,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: [String], example: ['EMPLOYEE'] }),
     __metadata("design:type", Array)
 ], UserWithRolesDto.prototype, "roles", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [String], example: ['dashboard', 'hrms', 'leave'] }),
+    __metadata("design:type", Array)
+], UserWithRolesDto.prototype, "dashboardModules", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: UserAccessDto }),
     __metadata("design:type", UserAccessDto)
@@ -1549,6 +1694,9 @@ let RbacController = class RbacController {
     listRoles() {
         return this.rbacService.listRoles();
     }
+    listDashboardModules() {
+        return this.rbacService.listDashboardModules();
+    }
     updateRole(roleId, dto) {
         return this.rbacService.updateRole(roleId, dto);
     }
@@ -1599,6 +1747,21 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], RbacController.prototype, "listRoles", null);
+__decorate([
+    (0, common_1.Get)('dashboard-modules'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'List available dashboard modules (Super Admin only)',
+    }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Dashboard modules fetched successfully',
+        type: [String],
+    }),
+    (0, swagger_1.ApiForbiddenResponse)({ description: 'Forbidden resource' }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: 'Unauthorized' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], RbacController.prototype, "listDashboardModules", null);
 __decorate([
     (0, common_1.Patch)('roles/:roleId'),
     (0, swagger_1.ApiOperation)({ summary: 'Update an existing role (Super Admin only)' }),
@@ -1748,6 +1911,34 @@ exports.RbacService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const system_role_enum_1 = __webpack_require__(/*! ../auth/roles/system-role.enum */ "./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts");
 const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+const DEFAULT_DASHBOARD_MODULES = [
+    'dashboard',
+    'leads',
+    'pipeline',
+    'erp',
+    'recruitment',
+    'grievances',
+    'payroll',
+    'hrms',
+    'leave',
+    'employees',
+    'settings',
+    'roles-access',
+];
+const DASHBOARD_MODULE_LABELS = {
+    dashboard: 'Dashboard',
+    leads: 'Leads',
+    pipeline: 'Pipeline',
+    erp: 'ERP Portal',
+    recruitment: 'Recruitment',
+    grievances: 'Grievances',
+    payroll: 'Payroll',
+    hrms: 'HRMS',
+    leave: 'Leave',
+    employees: 'Employees',
+    settings: 'Settings',
+    'roles-access': 'Roles & Access',
+};
 let RbacService = class RbacService {
     prisma;
     constructor(prisma) {
@@ -1755,6 +1946,7 @@ let RbacService = class RbacService {
     }
     async createRole(dto) {
         const roleName = dto.name.trim().toUpperCase();
+        const dashboardModules = this.normalizeDashboardModules(dto.dashboardModules);
         const existingRole = await this.prisma.role.findUnique({
             where: { name: roleName },
         });
@@ -1766,6 +1958,7 @@ let RbacService = class RbacService {
                 name: roleName,
                 description: dto.description,
                 isSystem: false,
+                dashboardModules,
             },
         });
     }
@@ -1784,8 +1977,16 @@ let RbacService = class RbacService {
             description: role.description,
             isSystem: role.isSystem,
             assignedUsersCount: role._count.assignments,
+            dashboardModules: role.dashboardModules,
             createdAt: role.createdAt,
             updatedAt: role.updatedAt,
+        }));
+    }
+    listDashboardModules() {
+        return DEFAULT_DASHBOARD_MODULES.map((key) => ({
+            key,
+            label: DASHBOARD_MODULE_LABELS[key] ?? key,
+            description: this.getDashboardModuleDescription(key),
         }));
     }
     async updateRole(roleId, dto) {
@@ -1797,13 +1998,19 @@ let RbacService = class RbacService {
         }
         const hasNameUpdate = typeof dto.name === 'string' && dto.name.trim().length > 0;
         const hasDescriptionUpdate = typeof dto.description === 'string';
-        if (!hasNameUpdate && !hasDescriptionUpdate) {
-            throw new common_1.BadRequestException('Provide name or description to update');
+        const hasModulesUpdate = Array.isArray(dto.dashboardModules);
+        if (!hasNameUpdate && !hasDescriptionUpdate && !hasModulesUpdate) {
+            throw new common_1.BadRequestException('Provide name, description or dashboard modules to update');
         }
         if (existingRole.isSystem && hasNameUpdate) {
             throw new common_1.ConflictException('System role name cannot be changed');
         }
-        const nextName = hasNameUpdate ? dto.name.trim().toUpperCase() : existingRole.name;
+        const nextName = hasNameUpdate
+            ? dto.name.trim().toUpperCase()
+            : existingRole.name;
+        const dashboardModules = hasModulesUpdate
+            ? this.normalizeDashboardModules(dto.dashboardModules)
+            : existingRole.dashboardModules;
         if (hasNameUpdate && nextName !== existingRole.name) {
             const conflictingRole = await this.prisma.role.findUnique({
                 where: { name: nextName },
@@ -1812,23 +2019,29 @@ let RbacService = class RbacService {
                 throw new common_1.ConflictException('Role already exists');
             }
         }
-        return this.prisma.role.update({
+        return this.prisma.role
+            .update({
             where: { id: roleId },
             data: {
                 name: nextName,
-                description: hasDescriptionUpdate ? dto.description : existingRole.description,
+                description: hasDescriptionUpdate
+                    ? dto.description
+                    : existingRole.description,
+                dashboardModules,
             },
             include: {
                 _count: {
                     select: { assignments: true },
                 },
             },
-        }).then((role) => ({
+        })
+            .then((role) => ({
             id: role.id,
             name: role.name,
             description: role.description,
             isSystem: role.isSystem,
             assignedUsersCount: role._count.assignments,
+            dashboardModules: role.dashboardModules,
             createdAt: role.createdAt,
             updatedAt: role.updatedAt,
         }));
@@ -1932,6 +2145,7 @@ let RbacService = class RbacService {
                 roleName: assignment.role.name,
                 description: assignment.role.description,
                 isSystem: assignment.role.isSystem,
+                dashboardModules: assignment.role.dashboardModules,
                 assignedAt: assignment.createdAt,
                 assignedBy: assignment.assignedBy,
             })),
@@ -1950,6 +2164,7 @@ let RbacService = class RbacService {
                         role: {
                             select: {
                                 name: true,
+                                dashboardModules: true,
                             },
                         },
                     },
@@ -1971,15 +2186,60 @@ let RbacService = class RbacService {
                 organizationName: user.organization.name,
                 isActive: user.isActive,
                 roles,
+                dashboardModules: [
+                    ...new Set(user.roleAssignments.flatMap((assignment) => assignment.role.dashboardModules || [])),
+                ],
                 access: {
                     isSuperAdmin: hasSuperAdmin,
                     canManageUsers: hasSuperAdmin || hasAdmin,
                     canManageRbac: hasSuperAdmin,
-                    canViewDashboard: roles.length > 0,
+                    canViewDashboard: hasSuperAdmin || roles.length > 0,
+                    dashboardModules: [
+                        ...new Set(user.roleAssignments.flatMap((assignment) => assignment.role.dashboardModules || [])),
+                    ],
                 },
                 createdAt: user.createdAt,
             };
         });
+    }
+    getDashboardModuleDescription(key) {
+        switch (key) {
+            case 'dashboard':
+                return 'Executive summary cards and insights';
+            case 'leads':
+                return 'Lead and pipeline tracking';
+            case 'pipeline':
+                return 'Sales pipeline overview';
+            case 'erp':
+                return 'Finance, procurement, and ERP workflows';
+            case 'recruitment':
+                return 'Hiring and assessment workflows';
+            case 'grievances':
+                return 'Employee grievance management';
+            case 'payroll':
+                return 'Salary and compensation management';
+            case 'hrms':
+                return 'HRMS overview and operations';
+            case 'leave':
+                return 'Leave requests and approvals';
+            case 'employees':
+                return 'Employee master and directory';
+            case 'settings':
+                return 'Personal account and preferences';
+            case 'roles-access':
+                return 'Role and access administration';
+            default:
+                return 'Dashboard module';
+        }
+    }
+    normalizeDashboardModules(modules) {
+        const normalized = [
+            ...new Set((modules ?? []).map((module) => module.trim()).filter(Boolean)),
+        ];
+        if (!normalized.includes('dashboard')) {
+            normalized.unshift('dashboard');
+        }
+        return normalized;
     }
 };
 exports.RbacService = RbacService;
@@ -2055,6 +2315,7 @@ let UsersService = class UsersService {
                 roleAssignments: {
                     include: {
                         role: true,
+                        assignedBy: true,
                     },
                 },
             },
@@ -2068,6 +2329,7 @@ let UsersService = class UsersService {
                 roleAssignments: {
                     include: {
                         role: true,
+                        assignedBy: true,
                     },
                 },
             },
