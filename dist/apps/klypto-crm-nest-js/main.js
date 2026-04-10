@@ -1077,7 +1077,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -1091,76 +1091,139 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
+    orgExists() {
+        return this.authService.checkOrgExists();
+    }
     signup(signupDto) {
         return this.authService.signup(signupDto);
     }
     login(loginDto) {
         return this.authService.login(loginDto);
     }
+    inviteUser(req, dto) {
+        const adminId = req.user?.sub;
+        if (!adminId)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        return this.authService.createUser(adminId, dto);
+    }
+    listUsers(req) {
+        const adminId = req.user?.sub;
+        if (!adminId)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        return this.authService.listOrgUsers(adminId);
+    }
+    toggleUserStatus(req, targetId) {
+        const adminId = req.user?.sub;
+        if (!adminId)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        return this.authService.toggleUserStatus(adminId, targetId);
+    }
     logout(req) {
         const userId = req.user?.sub;
-        if (!userId) {
+        if (!userId)
             throw new common_1.UnauthorizedException('Invalid user context');
-        }
         return this.authService.logout(userId);
     }
     refresh(req) {
         const userId = req.user?.sub;
         const refreshToken = req.user?.refreshToken;
-        if (!userId || !refreshToken) {
+        if (!userId || !refreshToken)
             throw new common_1.UnauthorizedException('Invalid user context');
-        }
         return this.authService.refreshTokens(userId, refreshToken);
     }
     me(req) {
         const userId = req.user?.sub;
-        if (!userId) {
+        if (!userId)
             throw new common_1.UnauthorizedException('Invalid user context');
-        }
         return this.authService.getProfile(userId);
     }
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, common_1.Get)('org-exists'),
+    (0, swagger_1.ApiOperation)({ summary: 'Check whether an organization has been set up' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: auth_dto_1.OrgExistsResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+], AuthController.prototype, "orgExists", null);
+__decorate([
     (0, common_1.Post)('signup'),
-    (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Bootstrap organization with first SuperAdmin account' }),
     (0, swagger_1.ApiResponse)({
         status: 201,
-        description: 'User successfully created',
+        description: 'Organization and SuperAdmin created',
         type: auth_dto_1.AuthTokensResponseDto,
     }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Email already exists' }),
+    (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already exists' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof auth_dto_1.SignupDto !== "undefined" && auth_dto_1.SignupDto) === "function" ? _b : Object]),
+    __metadata("design:paramtypes", [typeof (_c = typeof auth_dto_1.SignupDto !== "undefined" && auth_dto_1.SignupDto) === "function" ? _c : Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "signup", null);
 __decorate([
     (0, common_1.Post)('login'),
-    (0, swagger_1.ApiOperation)({ summary: 'Login with email and password' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Sign in with email and password' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'Successfully logged in',
+        description: 'Successfully signed in',
         type: auth_dto_1.AuthTokensResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Invalid credentials' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof auth_dto_1.LoginDto !== "undefined" && auth_dto_1.LoginDto) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [typeof (_d = typeof auth_dto_1.LoginDto !== "undefined" && auth_dto_1.LoginDto) === "function" ? _d : Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('invite-user'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({ summary: 'SuperAdmin / Admin: create an employee user account' }),
+    (0, swagger_1.ApiResponse)({ status: 201, type: auth_dto_1.CreatedUserResponseDto }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden — admin only' }),
+    (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already exists' }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_f = typeof auth_dto_1.CreateUserDto !== "undefined" && auth_dto_1.CreateUserDto) === "function" ? _f : Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "inviteUser", null);
+__decorate([
+    (0, common_1.Get)('users'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({ summary: 'SuperAdmin / Admin: list all users in the organization' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User list returned' }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "listUsers", null);
+__decorate([
+    (0, common_1.Patch)('users/:id/toggle-status'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiOperation)({ summary: 'SuperAdmin / Admin: toggle a user active/inactive' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Status toggled' }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "toggleUserStatus", null);
 __decorate([
     (0, common_1.Post)('logout'),
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Logout and invalidate refresh token' }),
-    (0, swagger_1.ApiResponse)({
-        status: 200,
-        description: 'Successfully logged out',
-        type: auth_dto_1.LogoutResponseDto,
-    }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: auth_dto_1.LogoutResponseDto }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -1172,11 +1235,7 @@ __decorate([
     (0, common_1.UseGuards)(refresh_token_guard_1.RefreshTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Refresh access token using refresh token' }),
-    (0, swagger_1.ApiResponse)({
-        status: 200,
-        description: 'Tokens successfully refreshed',
-        type: auth_dto_1.AuthTokensResponseDto,
-    }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: auth_dto_1.AuthTokensResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
@@ -1189,11 +1248,7 @@ __decorate([
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Get authenticated user profile' }),
-    (0, swagger_1.ApiResponse)({
-        status: 200,
-        description: 'Profile fetched successfully',
-        type: auth_dto_1.ProfileResponseDto,
-    }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: auth_dto_1.ProfileResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
@@ -1325,7 +1380,27 @@ const DEFAULT_DASHBOARD_MODULES = [
     'employees',
     'settings',
     'roles-access',
+    'users',
 ];
+const ROLE_MODULES = {
+    SUPER_ADMIN: DEFAULT_DASHBOARD_MODULES,
+    ADMIN: [
+        'dashboard',
+        'leads',
+        'erp',
+        'recruitment',
+        'grievances',
+        'payroll',
+        'hrms',
+        'leave',
+        'employees',
+        'settings',
+        'users',
+    ],
+    MANAGER: ['dashboard', 'leads', 'recruitment', 'grievances', 'leave', 'settings'],
+    HR: ['dashboard', 'hrms', 'employees', 'leave', 'settings'],
+    EMPLOYEE: ['dashboard', 'hrms', 'leave', 'settings'],
+};
 let AuthService = class AuthService {
     usersService;
     jwtService;
@@ -1342,23 +1417,16 @@ let AuthService = class AuthService {
         }
         const passwordHash = await bcrypt.hash(signupDto.password, 10);
         const organization = await this.prisma.organization.create({
-            data: {
-                name: signupDto.organizationName,
-            },
+            data: { name: signupDto.organizationName },
         });
         const user = await this.usersService.create({
             email: signupDto.email,
             fullName: signupDto.fullName,
             passwordHash,
-            organization: {
-                connect: { id: organization.id },
-            },
+            organization: { connect: { id: organization.id } },
         });
-        const roleToAssign = (await this.prisma.user.count()) === 1
-            ? system_role_enum_1.SystemRole.SUPER_ADMIN
-            : system_role_enum_1.SystemRole.EMPLOYEE;
-        await this.ensureRole(roleToAssign);
-        await this.assignRole(user.id, roleToAssign);
+        await this.ensureRole(system_role_enum_1.SystemRole.SUPER_ADMIN, DEFAULT_DASHBOARD_MODULES);
+        await this.assignRole(user.id, system_role_enum_1.SystemRole.SUPER_ADMIN);
         const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         const tokens = await this.getTokens(user.id, user.email, roles);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
@@ -1369,10 +1437,105 @@ let AuthService = class AuthService {
             access: this.buildAccessFromRoles(roles, dashboardModules),
         };
     }
+    async createUser(adminUserId, dto) {
+        const adminUser = await this.usersService.findOneById(adminUserId);
+        if (!adminUser)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const adminRoles = adminUser.roleAssignments.map((r) => r.role.name.toUpperCase());
+        const canCreate = adminRoles.includes(system_role_enum_1.SystemRole.SUPER_ADMIN) ||
+            adminRoles.includes(system_role_enum_1.SystemRole.ADMIN);
+        if (!canCreate)
+            throw new common_1.ForbiddenException('Only admins can create user accounts');
+        const existing = await this.usersService.findOneByEmail(dto.email);
+        if (existing)
+            throw new common_1.ConflictException('A user with this email already exists');
+        const passwordHash = await bcrypt.hash(dto.password, 10);
+        const newUser = await this.usersService.create({
+            email: dto.email,
+            fullName: dto.fullName,
+            passwordHash,
+            organization: { connect: { id: adminUser.organizationId } },
+        });
+        const roleKey = dto.role.toUpperCase();
+        const roleModules = ROLE_MODULES[roleKey] ?? ROLE_MODULES.EMPLOYEE;
+        await this.ensureRole(roleKey, roleModules);
+        await this.assignRole(newUser.id, roleKey);
+        const code = dto.employeeCode || `EMP-${Date.now().toString(36).toUpperCase()}`;
+        const employee = await this.prisma.employee.create({
+            data: {
+                name: dto.fullName,
+                code,
+                role: dto.jobTitle || dto.role,
+                department: dto.department || 'General',
+                status: 'Active',
+                organization: { connect: { id: adminUser.organizationId } },
+                user: { connect: { id: newUser.id } },
+            },
+        });
+        return {
+            id: newUser.id,
+            email: newUser.email,
+            fullName: newUser.fullName,
+            role: roleKey,
+            isActive: newUser.isActive,
+            employeeCode: employee.code,
+        };
+    }
+    async checkOrgExists() {
+        const count = await this.prisma.organization.count();
+        return { exists: count > 0 };
+    }
+    async listOrgUsers(adminUserId) {
+        const adminUser = await this.usersService.findOneById(adminUserId);
+        if (!adminUser)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const users = await this.prisma.user.findMany({
+            where: { organizationId: adminUser.organizationId },
+            include: {
+                roleAssignments: { include: { role: true } },
+                employee: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        return users.map((u) => ({
+            id: u.id,
+            email: u.email,
+            fullName: u.fullName,
+            isActive: u.isActive,
+            roles: u.roleAssignments.map((ra) => ra.role.name),
+            employeeCode: u.employee?.code ?? null,
+            department: u.employee?.department ?? null,
+            jobTitle: u.employee?.role ?? null,
+            createdAt: u.createdAt,
+        }));
+    }
+    async toggleUserStatus(adminUserId, targetUserId) {
+        const adminUser = await this.usersService.findOneById(adminUserId);
+        if (!adminUser)
+            throw new common_1.UnauthorizedException();
+        const adminRoles = adminUser.roleAssignments.map((r) => r.role.name.toUpperCase());
+        if (!adminRoles.includes(system_role_enum_1.SystemRole.SUPER_ADMIN) &&
+            !adminRoles.includes(system_role_enum_1.SystemRole.ADMIN)) {
+            throw new common_1.ForbiddenException('Only admins can modify user status');
+        }
+        const target = await this.prisma.user.findUnique({
+            where: { id: targetUserId },
+        });
+        if (!target)
+            throw new common_1.UnauthorizedException('Target user not found');
+        const updated = await this.prisma.user.update({
+            where: { id: targetUserId },
+            data: { isActive: !target.isActive },
+        });
+        return { id: updated.id, isActive: updated.isActive };
+    }
     async login(loginDto) {
         const user = await this.usersService.findOneByEmail(loginDto.email);
         if (!user) {
             throw new common_1.UnauthorizedException('Invalid credentials');
+        }
+        if (!user.isActive) {
+            throw new common_1.UnauthorizedException('Your account has been deactivated. Contact your administrator.');
         }
         const passwordMatches = await bcrypt.compare(loginDto.password, user.passwordHash);
         if (!passwordMatches) {
@@ -1457,41 +1620,29 @@ let AuthService = class AuthService {
                 expiresIn: '7d',
             }),
         ]);
-        return {
-            accessToken,
-            refreshToken,
-        };
+        return { accessToken, refreshToken };
     }
-    async ensureRole(roleName) {
+    async ensureRole(roleName, modules) {
+        const dashboardModules = modules ?? ROLE_MODULES[roleName.toUpperCase()] ?? [];
         await this.prisma.role.upsert({
             where: { name: roleName },
-            update: {},
+            update: { dashboardModules },
             create: {
                 name: roleName,
                 description: `${roleName} system role`,
                 isSystem: true,
-                dashboardModules: roleName === system_role_enum_1.SystemRole.SUPER_ADMIN ? DEFAULT_DASHBOARD_MODULES : [],
+                dashboardModules,
             },
         });
     }
     async assignRole(userId, roleName) {
-        const role = await this.prisma.role.findUnique({
-            where: { name: roleName },
-        });
+        const role = await this.prisma.role.findUnique({ where: { name: roleName } });
         if (!role)
             return;
         await this.prisma.userRole.upsert({
-            where: {
-                userId_roleId: {
-                    userId,
-                    roleId: role.id,
-                },
-            },
+            where: { userId_roleId: { userId, roleId: role.id } },
             update: {},
-            create: {
-                userId,
-                roleId: role.id,
-            },
+            create: { userId, roleId: role.id },
         });
     }
     async getUserRoleAccess(userId) {
@@ -1508,22 +1659,22 @@ let AuthService = class AuthService {
     buildAccessFromRoles(roles, dashboardModules) {
         const roleSet = new Set(roles.map((role) => role.toUpperCase()));
         const hasSuperAdmin = roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN);
+        const hasAdmin = roleSet.has(system_role_enum_1.SystemRole.ADMIN);
         const effectiveModules = hasSuperAdmin
             ? DEFAULT_DASHBOARD_MODULES
             : dashboardModules;
         return {
             isSuperAdmin: hasSuperAdmin,
-            canManageUsers: hasSuperAdmin || roleSet.has(system_role_enum_1.SystemRole.ADMIN),
+            canManageUsers: hasSuperAdmin || hasAdmin,
             canManageRbac: hasSuperAdmin,
             canViewDashboard: hasSuperAdmin || effectiveModules.length > 0,
             dashboardModules: effectiveModules,
         };
     }
     async ensureUserHasDefaultRole(userId, existingRoleCount) {
-        if (existingRoleCount > 0) {
+        if (existingRoleCount > 0)
             return;
-        }
-        await this.ensureRole(system_role_enum_1.SystemRole.EMPLOYEE);
+        await this.ensureRole(system_role_enum_1.SystemRole.EMPLOYEE, ROLE_MODULES.EMPLOYEE);
         await this.assignRole(userId, system_role_enum_1.SystemRole.EMPLOYEE);
     }
 };
@@ -1553,7 +1704,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ProfileResponseDto = exports.UserOrganizationResponseDto = exports.LogoutResponseDto = exports.AuthTokensResponseDto = exports.LoginDto = exports.SignupDto = void 0;
+exports.CreatedUserResponseDto = exports.OrgExistsResponseDto = exports.CreateUserDto = exports.ProfileResponseDto = exports.UserOrganizationResponseDto = exports.LogoutResponseDto = exports.AuthTokensResponseDto = exports.LoginDto = exports.SignupDto = void 0;
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class SignupDto {
@@ -1764,6 +1915,99 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: '2026-04-09T06:30:00.000Z' }),
     __metadata("design:type", String)
 ], ProfileResponseDto.prototype, "createdAt", void 0);
+class CreateUserDto {
+    email;
+    password;
+    fullName;
+    role;
+    employeeCode;
+    department;
+    jobTitle;
+}
+exports.CreateUserDto = CreateUserDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'jane.doe@company.com' }),
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'SecurePass123', minLength: 6 }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinLength)(6),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Jane Doe' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "fullName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'HR', enum: ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR', 'EMPLOYEE'] }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'EMP-042' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "employeeCode", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Human Resources' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "department", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'HR Manager' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "jobTitle", void 0);
+class OrgExistsResponseDto {
+    exists;
+}
+exports.OrgExistsResponseDto = OrgExistsResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true }),
+    __metadata("design:type", Boolean)
+], OrgExistsResponseDto.prototype, "exists", void 0);
+class CreatedUserResponseDto {
+    id;
+    email;
+    fullName;
+    role;
+    isActive;
+    employeeCode;
+}
+exports.CreatedUserResponseDto = CreatedUserResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxabc123user' }),
+    __metadata("design:type", String)
+], CreatedUserResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'jane.doe@company.com' }),
+    __metadata("design:type", String)
+], CreatedUserResponseDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Jane Doe' }),
+    __metadata("design:type", String)
+], CreatedUserResponseDto.prototype, "fullName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'HR' }),
+    __metadata("design:type", String)
+], CreatedUserResponseDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true }),
+    __metadata("design:type", Boolean)
+], CreatedUserResponseDto.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'EMP-042' }),
+    __metadata("design:type", String)
+], CreatedUserResponseDto.prototype, "employeeCode", void 0);
 
 
 /***/ },

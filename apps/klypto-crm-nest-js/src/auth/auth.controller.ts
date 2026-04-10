@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Param,
   UseGuards,
   Req,
   HttpCode,
@@ -13,9 +15,12 @@ import { AuthService } from './auth.service';
 import {
   LoginDto,
   SignupDto,
+  CreateUserDto,
   AuthTokensResponseDto,
   LogoutResponseDto,
   ProfileResponseDto,
+  OrgExistsResponseDto,
+  CreatedUserResponseDto,
 } from './dto/auth.dto';
 import { Request } from 'express';
 import {
@@ -32,24 +37,35 @@ import { RefreshTokenGuard } from './guards/refresh-token.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // ── Public: first-time setup check ─────────────────────────────────────────
+  @Get('org-exists')
+  @ApiOperation({ summary: 'Check whether an organization has been set up' })
+  @ApiResponse({ status: 200, type: OrgExistsResponseDto })
+  @HttpCode(HttpStatus.OK)
+  orgExists(): Promise<OrgExistsResponseDto> {
+    return this.authService.checkOrgExists();
+  }
+
+  // ── Public: one-time organization bootstrap ────────────────────────────────
   @Post('signup')
-  @ApiOperation({ summary: 'Register a new user' })
+  @ApiOperation({ summary: 'Bootstrap organization with first SuperAdmin account' })
   @ApiResponse({
     status: 201,
-    description: 'User successfully created',
+    description: 'Organization and SuperAdmin created',
     type: AuthTokensResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Email already exists' })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
   @HttpCode(HttpStatus.CREATED)
   signup(@Body() signupDto: SignupDto) {
     return this.authService.signup(signupDto);
   }
 
+  // ── Public: employee sign-in ───────────────────────────────────────────────
   @Post('login')
-  @ApiOperation({ summary: 'Login with email and password' })
+  @ApiOperation({ summary: 'Sign in with email and password' })
   @ApiResponse({
     status: 200,
-    description: 'Successfully logged in',
+    description: 'Successfully signed in',
     type: AuthTokensResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
@@ -58,21 +74,63 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  // ── Protected: SuperAdmin / Admin operations ────────────────────────────────
+
+  @Post('invite-user')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'SuperAdmin / Admin: create an employee user account' })
+  @ApiResponse({ status: 201, type: CreatedUserResponseDto })
+  @ApiResponse({ status: 403, description: 'Forbidden — admin only' })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
+  @HttpCode(HttpStatus.CREATED)
+  inviteUser(
+    @Req() req: Request & { user?: { sub?: string } },
+    @Body() dto: CreateUserDto,
+  ) {
+    const adminId = req.user?.sub;
+    if (!adminId) throw new UnauthorizedException('Invalid user context');
+    return this.authService.createUser(adminId, dto);
+  }
+
+  @Get('users')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'SuperAdmin / Admin: list all users in the organization' })
+  @ApiResponse({ status: 200, description: 'User list returned' })
+  @HttpCode(HttpStatus.OK)
+  listUsers(@Req() req: Request & { user?: { sub?: string } }) {
+    const adminId = req.user?.sub;
+    if (!adminId) throw new UnauthorizedException('Invalid user context');
+    return this.authService.listOrgUsers(adminId);
+  }
+
+  @Patch('users/:id/toggle-status')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'SuperAdmin / Admin: toggle a user active/inactive' })
+  @ApiResponse({ status: 200, description: 'Status toggled' })
+  @HttpCode(HttpStatus.OK)
+  toggleUserStatus(
+    @Req() req: Request & { user?: { sub?: string } },
+    @Param('id') targetId: string,
+  ) {
+    const adminId = req.user?.sub;
+    if (!adminId) throw new UnauthorizedException('Invalid user context');
+    return this.authService.toggleUserStatus(adminId, targetId);
+  }
+
+  // ── Standard protected endpoints ──────────────────────────────────────────
+
   @Post('logout')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Logout and invalidate refresh token' })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully logged out',
-    type: LogoutResponseDto,
-  })
+  @ApiResponse({ status: 200, type: LogoutResponseDto })
   @HttpCode(HttpStatus.OK)
   logout(@Req() req: Request & { user?: { sub?: string } }) {
     const userId = req.user?.sub;
-    if (!userId) {
-      throw new UnauthorizedException('Invalid user context');
-    }
+    if (!userId) throw new UnauthorizedException('Invalid user context');
     return this.authService.logout(userId);
   }
 
@@ -80,11 +138,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Refresh access token using refresh token' })
-  @ApiResponse({
-    status: 200,
-    description: 'Tokens successfully refreshed',
-    type: AuthTokensResponseDto,
-  })
+  @ApiResponse({ status: 200, type: AuthTokensResponseDto })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @HttpCode(HttpStatus.OK)
   refresh(
@@ -92,9 +146,8 @@ export class AuthController {
   ) {
     const userId = req.user?.sub;
     const refreshToken = req.user?.refreshToken;
-    if (!userId || !refreshToken) {
+    if (!userId || !refreshToken)
       throw new UnauthorizedException('Invalid user context');
-    }
     return this.authService.refreshTokens(userId, refreshToken);
   }
 
@@ -102,18 +155,12 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get authenticated user profile' })
-  @ApiResponse({
-    status: 200,
-    description: 'Profile fetched successfully',
-    type: ProfileResponseDto,
-  })
+  @ApiResponse({ status: 200, type: ProfileResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   me(@Req() req: Request & { user?: { sub?: string } }) {
     const userId = req.user?.sub;
-    if (!userId) {
-      throw new UnauthorizedException('Invalid user context');
-    }
+    if (!userId) throw new UnauthorizedException('Invalid user context');
     return this.authService.getProfile(userId);
   }
 }
