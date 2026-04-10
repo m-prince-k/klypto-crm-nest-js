@@ -42,9 +42,16 @@ const ROLE_MODULES: Record<string, string[]> = {
     'settings',
     'users',
   ],
-  MANAGER: ['dashboard', 'leads', 'recruitment', 'grievances', 'leave', 'settings'],
+  MANAGER: [
+    'dashboard',
+    'leads',
+    'recruitment',
+    'grievances',
+    'leave',
+    'settings',
+  ],
   HR: ['dashboard', 'hrms', 'employees', 'leave', 'settings'],
-  EMPLOYEE: ['dashboard', 'hrms', 'leave', 'settings'],
+  EMPLOYEE: ['dashboard', 'employees', 'leave', 'grievances', 'settings'],
 };
 
 @Injectable()
@@ -57,7 +64,9 @@ export class AuthService {
 
   /** One-time org bootstrap — only called from the /signup page */
   async signup(signupDto: SignupDto) {
-    const existingUser = await this.usersService.findOneByEmail(signupDto.email);
+    const existingUser = await this.usersService.findOneByEmail(
+      signupDto.email,
+    );
     if (existingUser) {
       throw new ConflictException('User already exists');
     }
@@ -353,7 +362,9 @@ export class AuthService {
   }
 
   private async assignRole(userId: string, roleName: string) {
-    const role = await this.prisma.role.findUnique({ where: { name: roleName } });
+    const role = await this.prisma.role.findUnique({
+      where: { name: roleName },
+    });
     if (!role) return;
 
     await this.prisma.userRole.upsert({

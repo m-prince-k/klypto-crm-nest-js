@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLeaveDto, UpdateLeaveStatusDto } from './dto/leave.dto';
 
@@ -17,12 +21,21 @@ export class LeavesService {
     return user.organizationId;
   }
 
-  async findAll(organizationId: string) {
+  async findAll(organizationId: string, employeeId?: string) {
     return this.prisma.leaveRequest.findMany({
-      where: { organizationId },
+      where: {
+        organizationId,
+        ...(employeeId ? { employeeId } : {}),
+      },
       include: {
         employee: {
-          select: { id: true, name: true, code: true, role: true, department: true },
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            role: true,
+            department: true,
+          },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -42,13 +55,23 @@ export class LeavesService {
       },
       include: {
         employee: {
-          select: { id: true, name: true, code: true, role: true, department: true },
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            role: true,
+            department: true,
+          },
         },
       },
     });
   }
 
-  async updateStatus(organizationId: string, id: string, dto: UpdateLeaveStatusDto) {
+  async updateStatus(
+    organizationId: string,
+    id: string,
+    dto: UpdateLeaveStatusDto,
+  ) {
     const leave = await this.prisma.leaveRequest.findFirst({
       where: { id, organizationId },
     });
@@ -59,7 +82,13 @@ export class LeavesService {
       data: { status: dto.status },
       include: {
         employee: {
-          select: { id: true, name: true, code: true, role: true, department: true },
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            role: true,
+            department: true,
+          },
         },
       },
     });
@@ -71,7 +100,9 @@ export class LeavesService {
 
     const [total, pending, approvedThisMonth, rejected] = await Promise.all([
       this.prisma.leaveRequest.count({ where: { organizationId } }),
-      this.prisma.leaveRequest.count({ where: { organizationId, status: 'Pending' } }),
+      this.prisma.leaveRequest.count({
+        where: { organizationId, status: 'Pending' },
+      }),
       this.prisma.leaveRequest.count({
         where: {
           organizationId,
@@ -79,7 +110,9 @@ export class LeavesService {
           updatedAt: { gte: startOfMonth },
         },
       }),
-      this.prisma.leaveRequest.count({ where: { organizationId, status: 'Rejected' } }),
+      this.prisma.leaveRequest.count({
+        where: { organizationId, status: 'Rejected' },
+      }),
     ]);
 
     // Leave type breakdown

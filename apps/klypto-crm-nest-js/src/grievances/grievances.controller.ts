@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { GrievancesService } from './grievances.service';
 import { CreateGrievanceDto, UpdateGrievanceDto } from './dto/grievance.dto';
@@ -12,17 +23,42 @@ import { RolesGuard } from '../auth/roles/roles.guard';
 export class GrievancesController {
   constructor(private readonly grievancesService: GrievancesService) {}
 
+  private getNormalizedRoles(roles: string[] = []) {
+    return roles.map((role) => String(role).toUpperCase());
+  }
+
+  private hasPrivilegedGrievanceAccess(roles: string[]) {
+    return ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR'].some((role) =>
+      roles.includes(role),
+    );
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all grievances' })
-  async findAll(@Req() req: { user?: { sub?: string } }) {
+  async findAll(@Req() req: { user?: { sub?: string; roles?: string[] } }) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+    const roles = this.getNormalizedRoles(req.user.roles || []);
+    const isEmployeeOnly =
+      roles.includes('EMPLOYEE') && !this.hasPrivilegedGrievanceAccess(roles);
+
+    if (isEmployeeOnly) {
+      const employeeId = await this.grievancesService.getEmployeeId(
+        req.user.sub,
+      );
+      if (!employeeId) return [];
+      return this.grievancesService.findAll(orgId, employeeId);
+    }
+
     return this.grievancesService.findAll(orgId);
   }
 
   @Post()
   @ApiOperation({ summary: 'Submit a new grievance' })
-  async create(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateGrievanceDto) {
+  async create(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreateGrievanceDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
     return this.grievancesService.create(orgId, dto);
@@ -31,11 +67,19 @@ export class GrievancesController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a grievance' })
   async update(
-    @Req() req: { user?: { sub?: string } },
+    @Req() req: { user?: { sub?: string; roles?: string[] } },
     @Param('id') id: string,
     @Body() dto: UpdateGrievanceDto,
   ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+
+    const roles = this.getNormalizedRoles(req.user.roles || []);
+    if (!this.hasPrivilegedGrievanceAccess(roles)) {
+      throw new ForbiddenException(
+        'You do not have permission to update grievance status',
+      );
+    }
+
     const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
     return this.grievancesService.update(orgId, id, dto);
   }

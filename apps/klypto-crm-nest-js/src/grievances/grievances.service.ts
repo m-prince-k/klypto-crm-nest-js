@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGrievanceDto, UpdateGrievanceDto } from './dto/grievance.dto';
 
@@ -17,19 +21,22 @@ export class GrievancesService {
     return user.organizationId;
   }
 
-  async findAll(organizationId: string) {
+  async findAll(organizationId: string, employeeId?: string) {
     const grievances = await this.prisma.grievance.findMany({
-      where: { organizationId },
+      where: {
+        organizationId,
+        ...(employeeId ? { employeeId } : {}),
+      },
       include: {
         employee: {
-          select: { id: true, name: true, department: true }
-        }
+          select: { id: true, name: true, department: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
 
     // Mask employee info if anonymous (unless context is super-admin/HR)
-    return grievances.map(g => {
+    return grievances.map((g) => {
       if (g.isAnonymous) {
         return { ...g, employee: null };
       }
@@ -44,7 +51,9 @@ export class GrievancesService {
   }
 
   async update(organizationId: string, id: string, dto: UpdateGrievanceDto) {
-    const grievance = await this.prisma.grievance.findFirst({ where: { id, organizationId } });
+    const grievance = await this.prisma.grievance.findFirst({
+      where: { id, organizationId },
+    });
     if (!grievance) throw new NotFoundException('Grievance not found');
 
     return this.prisma.grievance.update({
@@ -56,14 +65,24 @@ export class GrievancesService {
   async getStats(organizationId: string) {
     const [total, unresolved, critical, resolved] = await Promise.all([
       this.prisma.grievance.count({ where: { organizationId } }),
-      this.prisma.grievance.count({ where: { organizationId, status: { not: 'Resolved' } } }),
-      this.prisma.grievance.count({ where: { organizationId, severity: { in: ['High', 'Critical'] }, status: { not: 'Resolved' } } }),
-      this.prisma.grievance.count({ 
-        where: { 
-          organizationId, 
+      this.prisma.grievance.count({
+        where: { organizationId, status: { not: 'Resolved' } },
+      }),
+      this.prisma.grievance.count({
+        where: {
+          organizationId,
+          severity: { in: ['High', 'Critical'] },
+          status: { not: 'Resolved' },
+        },
+      }),
+      this.prisma.grievance.count({
+        where: {
+          organizationId,
           status: 'Resolved',
-          updatedAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } // MTD (Month to Date)
-        } 
+          updatedAt: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          }, // MTD (Month to Date)
+        },
       }),
     ]);
 
@@ -76,5 +95,13 @@ export class GrievancesService {
       take: 5,
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  async getEmployeeId(userId: string): Promise<string | null> {
+    const employee = await this.prisma.employee.findFirst({
+      where: { userId },
+      select: { id: true },
+    });
+    return employee?.id ?? null;
   }
 }

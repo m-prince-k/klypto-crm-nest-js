@@ -8,52 +8,52 @@ datasource db {
 }
 
 model Organization {
-  id        String     @id @default(cuid())
-  name      String
-  users     User[]
-  employees         Employee[]
-  attendanceRecords AttendanceRecord[]
-  leaveRequests     LeaveRequest[]
-  salaryStructures  SalaryStructure[]
-  payrollRecords    PayrollRecord[]
+  id                 String                 @id @default(cuid())
+  name               String
+  users              User[]
+  employees          Employee[]
+  attendanceRecords  AttendanceRecord[]
+  leaveRequests      LeaveRequest[]
+  salaryStructures   SalaryStructure[]
+  payrollRecords     PayrollRecord[]
   performanceReviews PerformanceReview[]
-  leads             Lead[]
-  jobPostings       JobPosting[]
-  candidates        Candidate[]
-  grievances        Grievance[]
-  projects          Project[]
-  projectTasks      ProjectTask[]
-  assets            Asset[]
-  partners          Partner[]
-  branches          Branch[]
-  departments       Department[]
-  transactions      FinancialTransaction[]
+  leads              Lead[]
+  jobPostings        JobPosting[]
+  candidates         Candidate[]
+  grievances         Grievance[]
+  projects           Project[]
+  projectTasks       ProjectTask[]
+  assets             Asset[]
+  partners           Partner[]
+  branches           Branch[]
+  departments        Department[]
+  transactions       FinancialTransaction[]
   registrationNumber String?
-  website           String?
-  primaryEmail      String?
-  phoneNumber       String?
-  taxId             String?
-  address           String?
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
+  website            String?
+  primaryEmail       String?
+  phoneNumber        String?
+  taxId              String?
+  address            String?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
 }
 
 model User {
-  id                      String       @id @default(cuid())
-  email                   String       @unique
+  id                      String        @id @default(cuid())
+  email                   String        @unique
   passwordHash            String
   hashedRefreshToken      String?
   fullName                String
-  isActive                Boolean      @default(true)
+  isActive                Boolean       @default(true)
   organizationId          String
-  organization            Organization @relation(fields: [organizationId], references: [id])
-  roleAssignments         UserRole[]   @relation("UserRoleAssignments")
-  assignedRoleAssignments UserRole[]   @relation("RoleAssignedBy")
+  organization            Organization  @relation(fields: [organizationId], references: [id])
+  roleAssignments         UserRole[]    @relation("UserRoleAssignments")
+  assignedRoleAssignments UserRole[]    @relation("RoleAssignedBy")
   employee                Employee?
-  assignedLeads           Lead[]       @relation("LeadAssignee")
+  assignedLeads           Lead[]        @relation("LeadAssignee")
   assignedTasks           ProjectTask[]
-  createdAt               DateTime     @default(now())
-  updatedAt               DateTime     @updatedAt
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
 }
 
 model Role {
@@ -82,31 +82,31 @@ model UserRole {
 }
 
 model Employee {
-  id             String       @id @default(cuid())
-  name           String
-  code           String       @unique
-  role           String
-  department     String
-  departmentId   String?
-  dept           Department?  @relation(fields: [departmentId], references: [id])
-  branchId       String?
-  branch         Branch?      @relation(fields: [branchId], references: [id])
-  status         String       @default("Active")
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  userId         String?      @unique
-  user           User?        @relation(fields: [userId], references: [id])
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  attendanceRecords AttendanceRecord[]
-  leaveRequests     LeaveRequest[]
-  salaryStructure   SalaryStructure?
-  payrollRecords    PayrollRecord[]
+  id                 String              @id @default(cuid())
+  name               String
+  code               String              @unique
+  role               String
+  department         String
+  departmentId       String?
+  dept               Department?         @relation(fields: [departmentId], references: [id])
+  branchId           String?
+  branch             Branch?             @relation(fields: [branchId], references: [id])
+  status             String              @default("Active")
+  organizationId     String
+  organization       Organization        @relation(fields: [organizationId], references: [id])
+  userId             String?             @unique
+  user               User?               @relation(fields: [userId], references: [id])
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  attendanceRecords  AttendanceRecord[]
+  leaveRequests      LeaveRequest[]
+  salaryStructure    SalaryStructure?
+  payrollRecords     PayrollRecord[]
   performanceReviews PerformanceReview[]
   grievances         Grievance[]
   assignedAssets     Asset[]
-  managedBranches    Branch[]           @relation("BranchHead")
-  managedDepartments Department[]       @relation("DeptHead")
+  managedBranches    Branch[]            @relation("BranchHead")
+  managedDepartments Department[]        @relation("DeptHead")
 }
 
 model AttendanceRecord {
@@ -127,7 +127,7 @@ model AttendanceRecord {
 
 model LeaveRequest {
   id             String       @id @default(cuid())
-  type           String       // Annual, Sick, Casual, etc.
+  type           String // Annual, Sick, Casual, etc.
   startDate      DateTime
   endDate        DateTime
   status         String       @default("Pending") // Pending, Approved, Rejected
@@ -174,7 +174,7 @@ model PerformanceReview {
   id             String       @id @default(cuid())
   employeeId     String
   employee       Employee     @relation(fields: [employeeId], references: [id])
-  cycle          String       // e.g., Q1 2026
+  cycle          String // e.g., Q1 2026
   rating         Float
   feedback       String?
   status         String       @default("Complete") // In review, Complete
@@ -191,7 +191,7 @@ model Lead {
   phone          String?
   company        String?
   priority       String       @default("Medium") // High, Medium, Low
-  status         String       @default("New")    // New, Discovery, Proposal, Negotiation, Won, Lost
+  status         String       @default("New") // New, Discovery, Proposal, Negotiation, Won, Lost
   value          Float?       @default(0)
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
@@ -203,12 +203,12 @@ model Lead {
 }
 
 model LeadNote {
-  id             String       @id @default(cuid())
-  content        String
-  leadId         String
-  lead           Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id        String   @id @default(cuid())
+  content   String
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model JobPosting {
@@ -228,7 +228,7 @@ model Candidate {
   name           String
   email          String?
   phone          String?
-  role           String       // Job Title
+  role           String // Job Title
   stage          String       @default("Applied") // Applied, Screening, Technical, Interview, Offered, Hired, Rejected
   score          Int          @default(0)
   jobId          String?
@@ -245,7 +245,7 @@ model Grievance {
   category       String
   description    String
   severity       String       @default("Medium") // Low, Medium, High, Critical
-  status         String       @default("Open")   // Open, In Review, Escalated, Resolved
+  status         String       @default("Open") // Open, In Review, Escalated, Resolved
   isAnonymous    Boolean      @default(false)
   employeeId     String?
   employee       Employee?    @relation(fields: [employeeId], references: [id])
@@ -272,7 +272,7 @@ model ProjectTask {
   title          String
   description    String?
   priority       String       @default("Medium") // Low, Medium, High, Critical
-  status         String       @default("todo")   // todo, inprogress, review, done
+  status         String       @default("todo") // todo, inprogress, review, done
   dueDate        DateTime?
   assigneeId     String?
   assignee       User?        @relation(fields: [assigneeId], references: [id])
@@ -300,26 +300,26 @@ model Asset {
 }
 
 model Partner {
-  id             String       @id @default(cuid())
+  id             String                 @id @default(cuid())
   name           String
-  type           String       @default("CUSTOMER") // CUSTOMER, VENDOR
+  type           String                 @default("CUSTOMER") // CUSTOMER, VENDOR
   contactPerson  String
   email          String
   phone          String
-  status         String       @default("Active")   // Active, Inactive, Blocked
-  category       String       @default("General")
-  creditLimit    Float        @default(0)
+  status         String                 @default("Active") // Active, Inactive, Blocked
+  category       String                 @default("General")
+  creditLimit    Float                  @default(0)
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization           @relation(fields: [organizationId], references: [id])
   transactions   FinancialTransaction[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
 }
 
 model FinancialTransaction {
   id              String       @id @default(cuid())
   referenceNumber String
-  type            String       // INVOICE, PURCHASE_ORDER
+  type            String // INVOICE, PURCHASE_ORDER
   amount          Float        @default(0)
   date            DateTime     @default(now())
   status          String       @default("Pending") // Draft, Approved, Paid, Overdue, Fulfilled
