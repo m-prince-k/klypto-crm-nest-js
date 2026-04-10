@@ -25,6 +25,7 @@ import { FinanceModule } from './finance/finance.module';
 import { EntitiesModule } from './entities/entities.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { ApprovalsModule } from './approvals/approvals.module';
+import { ErpOverviewModule } from './erp-overview/erp-overview.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ApprovalsModule } from './approvals/approvals.module';
     EntitiesModule,
     OrganizationsModule,
     ApprovalsModule,
+    ErpOverviewModule,
     MailModule,
     MailerModule.forRoot({
       transport: {

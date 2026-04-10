@@ -89,6 +89,7 @@ const finance_module_1 = __webpack_require__(/*! ./finance/finance.module */ "./
 const entities_module_1 = __webpack_require__(/*! ./entities/entities.module */ "./apps/klypto-crm-nest-js/src/entities/entities.module.ts");
 const organizations_module_1 = __webpack_require__(/*! ./organizations/organizations.module */ "./apps/klypto-crm-nest-js/src/organizations/organizations.module.ts");
 const approvals_module_1 = __webpack_require__(/*! ./approvals/approvals.module */ "./apps/klypto-crm-nest-js/src/approvals/approvals.module.ts");
+const erp_overview_module_1 = __webpack_require__(/*! ./erp-overview/erp-overview.module */ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.module.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -119,6 +120,7 @@ exports.AppModule = AppModule = __decorate([
             entities_module_1.EntitiesModule,
             organizations_module_1.OrganizationsModule,
             approvals_module_1.ApprovalsModule,
+            erp_overview_module_1.ErpOverviewModule,
             mail_module_1.MailModule,
             mailer_1.MailerModule.forRoot({
                 transport: {
@@ -3160,6 +3162,213 @@ exports.EntitiesService = EntitiesService = __decorate([
 
 /***/ },
 
+/***/ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.controller.ts"
+/*!*****************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.controller.ts ***!
+  \*****************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ErpOverviewController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const erp_overview_service_1 = __webpack_require__(/*! ./erp-overview.service */ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.service.ts");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+let ErpOverviewController = class ErpOverviewController {
+    erpOverviewService;
+    constructor(erpOverviewService) {
+        this.erpOverviewService = erpOverviewService;
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.erpOverviewService.getOrganizationId(req.user.sub);
+        return this.erpOverviewService.getStats(orgId);
+    }
+};
+exports.ErpOverviewController = ErpOverviewController;
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get aggregated ERP analytics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ErpOverviewController.prototype, "getStats", null);
+exports.ErpOverviewController = ErpOverviewController = __decorate([
+    (0, swagger_1.ApiTags)('ERP Overview'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
+    (0, common_1.Controller)('erp-overview'),
+    __metadata("design:paramtypes", [typeof (_a = typeof erp_overview_service_1.ErpOverviewService !== "undefined" && erp_overview_service_1.ErpOverviewService) === "function" ? _a : Object])
+], ErpOverviewController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.module.ts"
+/*!*************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.module.ts ***!
+  \*************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ErpOverviewModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const erp_overview_service_1 = __webpack_require__(/*! ./erp-overview.service */ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.service.ts");
+const erp_overview_controller_1 = __webpack_require__(/*! ./erp-overview.controller */ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let ErpOverviewModule = class ErpOverviewModule {
+};
+exports.ErpOverviewModule = ErpOverviewModule;
+exports.ErpOverviewModule = ErpOverviewModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [erp_overview_controller_1.ErpOverviewController],
+        providers: [erp_overview_service_1.ErpOverviewService],
+    })
+], ErpOverviewModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.service.ts"
+/*!**************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.service.ts ***!
+  \**************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ErpOverviewService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let ErpOverviewService = class ErpOverviewService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async getStats(organizationId) {
+        const now = new Date();
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(now.getMonth() - 5);
+        sixMonthsAgo.setDate(1);
+        const [invoices, purchases, payrolls, assets] = await Promise.all([
+            this.prisma.financialTransaction.findMany({
+                where: { organizationId, type: 'INVOICE', date: { gte: sixMonthsAgo } },
+            }),
+            this.prisma.financialTransaction.findMany({
+                where: { organizationId, type: 'PURCHASE_ORDER', date: { gte: sixMonthsAgo } },
+            }),
+            this.prisma.payrollRecord.findMany({
+                where: { organizationId, createdAt: { gte: sixMonthsAgo } },
+            }),
+            this.prisma.asset.findMany({
+                where: { organizationId },
+            }),
+        ]);
+        const totalSales = invoices.reduce((sum, i) => sum + i.amount, 0);
+        const operationalCost = purchases.reduce((sum, p) => sum + p.amount, 0) + payrolls.reduce((sum, pay) => sum + pay.netPay, 0);
+        const netProfit = totalSales - operationalCost;
+        const assetValuation = assets.reduce((sum, a) => sum + (a.value || 0), 0);
+        const months = [];
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(now.getMonth() - i);
+            const mLabel = d.toLocaleString('default', { month: 'short' });
+            const mYear = d.getFullYear();
+            const mMonth = d.getMonth();
+            const mSales = invoices
+                .filter(inv => {
+                const idate = new Date(inv.date);
+                return idate.getMonth() === mMonth && idate.getFullYear() === mYear;
+            })
+                .reduce((sum, inv) => sum + inv.amount, 0);
+            const mCost = purchases
+                .filter(p => {
+                const pdate = new Date(p.date);
+                return pdate.getMonth() === mMonth && pdate.getFullYear() === mYear;
+            })
+                .reduce((sum, p) => sum + p.amount, 0) +
+                payrolls
+                    .filter(pay => {
+                    return pay.month === mMonth + 1 && pay.year === mYear;
+                })
+                    .reduce((sum, pay) => sum + pay.netPay, 0);
+            months.push({ label: mLabel, sales: mSales, cost: mCost, profit: mSales - mCost });
+        }
+        const breakdown = [
+            { label: 'Procurement', val: purchases.length },
+            { label: 'Payroll', val: payrolls.length },
+            { label: 'Fixed Assets', val: assets.length },
+            { label: 'Invoices', val: invoices.length },
+        ];
+        const totalCount = breakdown.reduce((sum, b) => sum + b.val, 0) || 1;
+        const normalizedBreakdown = breakdown.map(b => ({
+            label: b.label,
+            val: Math.round((b.val / totalCount) * 100),
+            count: b.val
+        }));
+        return {
+            totalSales,
+            operationalCost,
+            netProfit,
+            assetValuation,
+            performance: months,
+            breakdown: normalizedBreakdown,
+        };
+    }
+};
+exports.ErpOverviewService = ErpOverviewService;
+exports.ErpOverviewService = ErpOverviewService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], ErpOverviewService);
+
+
+/***/ },
+
 /***/ "./apps/klypto-crm-nest-js/src/finance/dto/finance.dto.ts"
 /*!****************************************************************!*\
   !*** ./apps/klypto-crm-nest-js/src/finance/dto/finance.dto.ts ***!
@@ -5037,12 +5246,22 @@ let OrganizationsService = class OrganizationsService {
         });
     }
     async getDetailedStats(organizationId) {
-        const [employees, departments, branches] = await Promise.all([
+        const [employees, departments, branches, assets, projects] = await Promise.all([
             this.prisma.employee.count({ where: { organizationId } }),
             this.prisma.department.count({ where: { organizationId } }),
             this.prisma.branch.count({ where: { organizationId } }),
+            this.prisma.asset.count({ where: { organizationId } }),
+            this.prisma.project.count({ where: { organizationId } }),
         ]);
-        return { employees, departments, branches };
+        return {
+            employees,
+            departments,
+            branches,
+            totalAssets: assets,
+            totalProjects: projects,
+            systemHealth: '100%',
+            securityIndex: '98.5%'
+        };
     }
 };
 exports.OrganizationsService = OrganizationsService;
