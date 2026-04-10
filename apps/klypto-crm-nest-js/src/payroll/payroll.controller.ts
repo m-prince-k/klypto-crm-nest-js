@@ -12,6 +12,14 @@ import { RolesGuard } from '../auth/roles/roles.guard';
 export class PayrollController {
   constructor(private readonly payrollService: PayrollService) {}
 
+  @Get('stats')
+  @ApiOperation({ summary: 'Get payroll statistics for the current month' })
+  async getStats(@Req() req: { user?: { sub?: string } }) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+    const orgId = await this.payrollService.getOrganizationId(req.user.sub);
+    return this.payrollService.getStats(orgId);
+  }
+
   @Get('structures')
   @ApiOperation({ summary: 'Get all salary structures' })
   async findStructures(@Req() req: { user?: { sub?: string } }) {
@@ -21,7 +29,7 @@ export class PayrollController {
   }
 
   @Post('structures')
-  @ApiOperation({ summary: 'Create or update salary structure' })
+  @ApiOperation({ summary: 'Create or update a salary structure for an employee' })
   async upsertStructure(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateSalaryStructureDto) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.payrollService.getOrganizationId(req.user.sub);
@@ -37,7 +45,7 @@ export class PayrollController {
   }
 
   @Post('process')
-  @ApiOperation({ summary: 'Process payroll for a month' })
+  @ApiOperation({ summary: 'Process payroll for a given month and year' })
   async processPayroll(@Req() req: { user?: { sub?: string } }, @Body() dto: ProcessPayrollDto) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.payrollService.getOrganizationId(req.user.sub);

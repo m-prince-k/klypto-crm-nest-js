@@ -20,13 +20,16 @@ export class LeavesService {
   async findAll(organizationId: string) {
     return this.prisma.leaveRequest.findMany({
       where: { organizationId },
-      include: { employee: true },
+      include: {
+        employee: {
+          select: { id: true, name: true, code: true, role: true, department: true },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async create(organizationId: string, dto: CreateLeaveDto) {
-    console.log('Creating leave request:', { organizationId, dto });
     return this.prisma.leaveRequest.create({
       data: {
         type: dto.type,
@@ -37,7 +40,11 @@ export class LeavesService {
         employee: { connect: { id: dto.employeeId } },
         organization: { connect: { id: organizationId } },
       },
-      include: { employee: true },
+      include: {
+        employee: {
+          select: { id: true, name: true, code: true, role: true, department: true },
+        },
+      },
     });
   }
 
@@ -50,7 +57,52 @@ export class LeavesService {
     return this.prisma.leaveRequest.update({
       where: { id },
       data: { status: dto.status },
-      include: { employee: true },
+      include: {
+        employee: {
+          select: { id: true, name: true, code: true, role: true, department: true },
+        },
+      },
     });
+  }
+
+  async getStats(organizationId: string) {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const [total, pending, approvedThisMonth, rejected] = await Promise.all([
+      this.prisma.leaveRequest.count({ where: { organizationId } }),
+      this.prisma.leaveRequest.count({ where: { organizationId, status: 'Pending' } }),
+      this.prisma.leaveRequest.count({
+        where: {
+          organizationId,
+          status: 'Approved',
+          updatedAt: { gte: startOfMonth },
+        },
+      }),
+      this.prisma.leaveRequest.count({ where: { organizationId, status: 'Rejected' } }),
+    ]);
+
+    // Leave type breakdown
+    const byType = await this.prisma.leaveRequest.groupBy({
+      by: ['type'],
+      where: { organizationId },
+      _count: { _all: true },
+    });
+
+    return {
+      total,
+      pending,
+      approvedThisMonth,
+      rejected,
+      byType: byType.map((b) => ({ type: b.type, count: b._count._all })),
+    };
+  }
+
+  async getEmployeeId(userId: string): Promise<string | null> {
+    const employee = await this.prisma.employee.findFirst({
+      where: { userId },
+      select: { id: true },
+    });
+    return employee?.id ?? null;
   }
 }

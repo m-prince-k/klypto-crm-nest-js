@@ -4459,6 +4459,18 @@ let LeavesController = class LeavesController {
     constructor(leavesService) {
         this.leavesService = leavesService;
     }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leavesService.getOrganizationId(req.user.sub);
+        return this.leavesService.getStats(orgId);
+    }
+    async getMyEmployeeId(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const employeeId = await this.leavesService.getEmployeeId(req.user.sub);
+        return { employeeId };
+    }
     async findAll(req) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -4479,6 +4491,22 @@ let LeavesController = class LeavesController {
     }
 };
 exports.LeavesController = LeavesController;
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get leave request statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], LeavesController.prototype, "getStats", null);
+__decorate([
+    (0, common_1.Get)('my-employee-id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get the employee ID linked to the current user' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], LeavesController.prototype, "getMyEmployeeId", null);
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all leave requests' }),
@@ -4590,12 +4618,15 @@ let LeavesService = class LeavesService {
     async findAll(organizationId) {
         return this.prisma.leaveRequest.findMany({
             where: { organizationId },
-            include: { employee: true },
+            include: {
+                employee: {
+                    select: { id: true, name: true, code: true, role: true, department: true },
+                },
+            },
             orderBy: { createdAt: 'desc' },
         });
     }
     async create(organizationId, dto) {
-        console.log('Creating leave request:', { organizationId, dto });
         return this.prisma.leaveRequest.create({
             data: {
                 type: dto.type,
@@ -4606,7 +4637,11 @@ let LeavesService = class LeavesService {
                 employee: { connect: { id: dto.employeeId } },
                 organization: { connect: { id: organizationId } },
             },
-            include: { employee: true },
+            include: {
+                employee: {
+                    select: { id: true, name: true, code: true, role: true, department: true },
+                },
+            },
         });
     }
     async updateStatus(organizationId, id, dto) {
@@ -4618,8 +4653,47 @@ let LeavesService = class LeavesService {
         return this.prisma.leaveRequest.update({
             where: { id },
             data: { status: dto.status },
-            include: { employee: true },
+            include: {
+                employee: {
+                    select: { id: true, name: true, code: true, role: true, department: true },
+                },
+            },
         });
+    }
+    async getStats(organizationId) {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const [total, pending, approvedThisMonth, rejected] = await Promise.all([
+            this.prisma.leaveRequest.count({ where: { organizationId } }),
+            this.prisma.leaveRequest.count({ where: { organizationId, status: 'Pending' } }),
+            this.prisma.leaveRequest.count({
+                where: {
+                    organizationId,
+                    status: 'Approved',
+                    updatedAt: { gte: startOfMonth },
+                },
+            }),
+            this.prisma.leaveRequest.count({ where: { organizationId, status: 'Rejected' } }),
+        ]);
+        const byType = await this.prisma.leaveRequest.groupBy({
+            by: ['type'],
+            where: { organizationId },
+            _count: { _all: true },
+        });
+        return {
+            total,
+            pending,
+            approvedThisMonth,
+            rejected,
+            byType: byType.map((b) => ({ type: b.type, count: b._count._all })),
+        };
+    }
+    async getEmployeeId(userId) {
+        const employee = await this.prisma.employee.findFirst({
+            where: { userId },
+            select: { id: true },
+        });
+        return employee?.id ?? null;
     }
 };
 exports.LeavesService = LeavesService;
@@ -5395,6 +5469,12 @@ let PayrollController = class PayrollController {
     constructor(payrollService) {
         this.payrollService = payrollService;
     }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.payrollService.getOrganizationId(req.user.sub);
+        return this.payrollService.getStats(orgId);
+    }
     async findStructures(req) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -5422,6 +5502,14 @@ let PayrollController = class PayrollController {
 };
 exports.PayrollController = PayrollController;
 __decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get payroll statistics for the current month' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PayrollController.prototype, "getStats", null);
+__decorate([
     (0, common_1.Get)('structures'),
     (0, swagger_1.ApiOperation)({ summary: 'Get all salary structures' }),
     __param(0, (0, common_1.Req)()),
@@ -5431,7 +5519,7 @@ __decorate([
 ], PayrollController.prototype, "findStructures", null);
 __decorate([
     (0, common_1.Post)('structures'),
-    (0, swagger_1.ApiOperation)({ summary: 'Create or update salary structure' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Create or update a salary structure for an employee' }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -5448,7 +5536,7 @@ __decorate([
 ], PayrollController.prototype, "findAllRecords", null);
 __decorate([
     (0, common_1.Post)('process'),
-    (0, swagger_1.ApiOperation)({ summary: 'Process payroll for a month' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Process payroll for a given month and year' }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -5536,18 +5624,49 @@ let PayrollService = class PayrollService {
         }
         return user.organizationId;
     }
+    async getStats(organizationId) {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        const [structures, records, recordsThisMonth] = await Promise.all([
+            this.prisma.salaryStructure.count({ where: { organizationId } }),
+            this.prisma.payrollRecord.findMany({
+                where: { organizationId, month, year },
+                include: { employee: { select: { name: true } } },
+            }),
+            this.prisma.payrollRecord.findMany({
+                where: { organizationId, month, year },
+            }),
+        ]);
+        const totalNetPay = recordsThisMonth.reduce((sum, r) => sum + r.netPay, 0);
+        const paidCount = recordsThisMonth.filter((r) => r.status === 'Paid').length;
+        return {
+            employeesOnPayroll: structures,
+            totalNetPayThisMonth: totalNetPay,
+            processedRecords: paidCount,
+            pendingRecords: structures - paidCount,
+            currentMonth: month,
+            currentYear: year,
+            recentRecords: records.slice(0, 5),
+        };
+    }
     async findStructures(organizationId) {
         return this.prisma.salaryStructure.findMany({
             where: { organizationId },
-            include: { employee: true },
+            include: { employee: { select: { id: true, name: true, code: true, department: true, role: true } } },
+            orderBy: { createdAt: 'desc' },
         });
     }
     async upsertStructure(organizationId, dto) {
         return this.prisma.salaryStructure.upsert({
             where: { employeeId: dto.employeeId },
             create: {
-                ...dto,
-                organizationId,
+                basicSalary: dto.basicSalary,
+                hra: dto.hra,
+                allowances: dto.allowances,
+                deductions: dto.deductions,
+                employee: { connect: { id: dto.employeeId } },
+                organization: { connect: { id: organizationId } },
             },
             update: {
                 basicSalary: dto.basicSalary,
@@ -5555,20 +5674,24 @@ let PayrollService = class PayrollService {
                 allowances: dto.allowances,
                 deductions: dto.deductions,
             },
-            include: { employee: true },
+            include: { employee: { select: { id: true, name: true, code: true, department: true, role: true } } },
         });
     }
     async findAllRecords(organizationId) {
         return this.prisma.payrollRecord.findMany({
             where: { organizationId },
-            include: { employee: true },
+            include: { employee: { select: { id: true, name: true, code: true, department: true } } },
             orderBy: [{ year: 'desc' }, { month: 'desc' }],
         });
     }
     async processPayroll(organizationId, dto) {
         const structures = await this.prisma.salaryStructure.findMany({
             where: { organizationId },
+            include: { employee: { select: { id: true, name: true } } },
         });
+        if (structures.length === 0) {
+            return [];
+        }
         const records = [];
         for (const struct of structures) {
             const netPay = struct.basicSalary + struct.hra + struct.allowances - struct.deductions;
@@ -5588,10 +5711,8 @@ let PayrollService = class PayrollService {
                     status: 'Paid',
                     organizationId,
                 },
-                update: {
-                    netPay,
-                    status: 'Paid',
-                },
+                update: { netPay, status: 'Paid' },
+                include: { employee: { select: { id: true, name: true } } },
             });
             records.push(record);
         }

@@ -12,6 +12,22 @@ import { RolesGuard } from '../auth/roles/roles.guard';
 export class LeavesController {
   constructor(private readonly leavesService: LeavesService) {}
 
+  @Get('stats')
+  @ApiOperation({ summary: 'Get leave request statistics' })
+  async getStats(@Req() req: { user?: { sub?: string } }) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+    const orgId = await this.leavesService.getOrganizationId(req.user.sub);
+    return this.leavesService.getStats(orgId);
+  }
+
+  @Get('my-employee-id')
+  @ApiOperation({ summary: 'Get the employee ID linked to the current user' })
+  async getMyEmployeeId(@Req() req: { user?: { sub?: string } }) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+    const employeeId = await this.leavesService.getEmployeeId(req.user.sub);
+    return { employeeId };
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all leave requests' })
   async findAll(@Req() req: { user?: { sub?: string } }) {
