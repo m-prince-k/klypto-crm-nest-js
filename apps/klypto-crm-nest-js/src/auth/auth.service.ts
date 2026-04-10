@@ -14,7 +14,6 @@ import { SystemRole } from './roles/system-role.enum';
 const DEFAULT_DASHBOARD_MODULES = [
   'dashboard',
   'leads',
-  'pipeline',
   'erp',
   'recruitment',
   'grievances',

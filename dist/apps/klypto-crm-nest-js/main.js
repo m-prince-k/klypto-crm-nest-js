@@ -72,6 +72,23 @@ const auth_module_1 = __webpack_require__(/*! ./auth/auth.module */ "./apps/klyp
 const users_module_1 = __webpack_require__(/*! ./users/users.module */ "./apps/klypto-crm-nest-js/src/users/users.module.ts");
 const mail_module_1 = __webpack_require__(/*! ./mail/mail.module */ "./apps/klypto-crm-nest-js/src/mail/mail.module.ts");
 const rbac_module_1 = __webpack_require__(/*! ./rbac/rbac.module */ "./apps/klypto-crm-nest-js/src/rbac/rbac.module.ts");
+const employees_module_1 = __webpack_require__(/*! ./employees/employees.module */ "./apps/klypto-crm-nest-js/src/employees/employees.module.ts");
+const attendance_module_1 = __webpack_require__(/*! ./attendance/attendance.module */ "./apps/klypto-crm-nest-js/src/attendance/attendance.module.ts");
+const leaves_module_1 = __webpack_require__(/*! ./leaves/leaves.module */ "./apps/klypto-crm-nest-js/src/leaves/leaves.module.ts");
+const payroll_module_1 = __webpack_require__(/*! ./payroll/payroll.module */ "./apps/klypto-crm-nest-js/src/payroll/payroll.module.ts");
+const performance_module_1 = __webpack_require__(/*! ./performance/performance.module */ "./apps/klypto-crm-nest-js/src/performance/performance.module.ts");
+const hrms_overview_module_1 = __webpack_require__(/*! ./hrms-overview/hrms-overview.module */ "./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.module.ts");
+const leads_module_1 = __webpack_require__(/*! ./leads/leads.module */ "./apps/klypto-crm-nest-js/src/leads/leads.module.ts");
+const crm_overview_module_1 = __webpack_require__(/*! ./crm-overview/crm-overview.module */ "./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.module.ts");
+const recruitment_module_1 = __webpack_require__(/*! ./recruitment/recruitment.module */ "./apps/klypto-crm-nest-js/src/recruitment/recruitment.module.ts");
+const grievances_module_1 = __webpack_require__(/*! ./grievances/grievances.module */ "./apps/klypto-crm-nest-js/src/grievances/grievances.module.ts");
+const projects_module_1 = __webpack_require__(/*! ./projects/projects.module */ "./apps/klypto-crm-nest-js/src/projects/projects.module.ts");
+const assets_module_1 = __webpack_require__(/*! ./assets/assets.module */ "./apps/klypto-crm-nest-js/src/assets/assets.module.ts");
+const partners_module_1 = __webpack_require__(/*! ./partners/partners.module */ "./apps/klypto-crm-nest-js/src/partners/partners.module.ts");
+const finance_module_1 = __webpack_require__(/*! ./finance/finance.module */ "./apps/klypto-crm-nest-js/src/finance/finance.module.ts");
+const entities_module_1 = __webpack_require__(/*! ./entities/entities.module */ "./apps/klypto-crm-nest-js/src/entities/entities.module.ts");
+const organizations_module_1 = __webpack_require__(/*! ./organizations/organizations.module */ "./apps/klypto-crm-nest-js/src/organizations/organizations.module.ts");
+const approvals_module_1 = __webpack_require__(/*! ./approvals/approvals.module */ "./apps/klypto-crm-nest-js/src/approvals/approvals.module.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -85,6 +102,23 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             rbac_module_1.RbacModule,
             users_module_1.UsersModule,
+            employees_module_1.EmployeesModule,
+            attendance_module_1.AttendanceModule,
+            leaves_module_1.LeavesModule,
+            payroll_module_1.PayrollModule,
+            performance_module_1.PerformanceModule,
+            hrms_overview_module_1.HrmsOverviewModule,
+            leads_module_1.LeadsModule,
+            crm_overview_module_1.CrmOverviewModule,
+            recruitment_module_1.RecruitmentModule,
+            grievances_module_1.GrievancesModule,
+            projects_module_1.ProjectsModule,
+            assets_module_1.AssetsModule,
+            partners_module_1.PartnersModule,
+            finance_module_1.FinanceModule,
+            entities_module_1.EntitiesModule,
+            organizations_module_1.OrganizationsModule,
+            approvals_module_1.ApprovalsModule,
             mail_module_1.MailModule,
             mailer_1.MailerModule.forRoot({
                 transport: {
@@ -133,6 +167,893 @@ exports.AppService = AppService;
 exports.AppService = AppService = __decorate([
     (0, common_1.Injectable)()
 ], AppService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/approvals/approvals.controller.ts"
+/*!***********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/approvals/approvals.controller.ts ***!
+  \***********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ApprovalsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const approvals_service_1 = __webpack_require__(/*! ./approvals.service */ "./apps/klypto-crm-nest-js/src/approvals/approvals.service.ts");
+const approval_dto_1 = __webpack_require__(/*! ./dto/approval.dto */ "./apps/klypto-crm-nest-js/src/approvals/dto/approval.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let ApprovalsController = class ApprovalsController {
+    approvalsService;
+    constructor(approvalsService) {
+        this.approvalsService = approvalsService;
+    }
+    async findPending(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.approvalsService.getOrganizationId(req.user.sub);
+        return this.approvalsService.findPending(orgId);
+    }
+    async processAction(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.approvalsService.getOrganizationId(req.user.sub);
+        return this.approvalsService.processAction(orgId, dto);
+    }
+};
+exports.ApprovalsController = ApprovalsController;
+__decorate([
+    (0, common_1.Get)('pending'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all pending approvals across the platform' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ApprovalsController.prototype, "findPending", null);
+__decorate([
+    (0, common_1.Post)('action'),
+    (0, swagger_1.ApiOperation)({ summary: 'Process an approval action (Approve/Reject)' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof approval_dto_1.ApprovalActionDto !== "undefined" && approval_dto_1.ApprovalActionDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], ApprovalsController.prototype, "processAction", null);
+exports.ApprovalsController = ApprovalsController = __decorate([
+    (0, swagger_1.ApiTags)('Approvals'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('approvals'),
+    __metadata("design:paramtypes", [typeof (_a = typeof approvals_service_1.ApprovalsService !== "undefined" && approvals_service_1.ApprovalsService) === "function" ? _a : Object])
+], ApprovalsController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/approvals/approvals.module.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/approvals/approvals.module.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ApprovalsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const approvals_service_1 = __webpack_require__(/*! ./approvals.service */ "./apps/klypto-crm-nest-js/src/approvals/approvals.service.ts");
+const approvals_controller_1 = __webpack_require__(/*! ./approvals.controller */ "./apps/klypto-crm-nest-js/src/approvals/approvals.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let ApprovalsModule = class ApprovalsModule {
+};
+exports.ApprovalsModule = ApprovalsModule;
+exports.ApprovalsModule = ApprovalsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [approvals_controller_1.ApprovalsController],
+        providers: [approvals_service_1.ApprovalsService],
+        exports: [approvals_service_1.ApprovalsService],
+    })
+], ApprovalsModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/approvals/approvals.service.ts"
+/*!********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/approvals/approvals.service.ts ***!
+  \********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ApprovalsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let ApprovalsService = class ApprovalsService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findPending(organizationId) {
+        const [leaves, finances] = await Promise.all([
+            this.prisma.leaveRequest.findMany({
+                where: { organizationId, status: 'Pending' },
+                include: { employee: { select: { name: true } } },
+                orderBy: { createdAt: 'desc' },
+            }),
+            this.prisma.financialTransaction.findMany({
+                where: {
+                    organizationId,
+                    status: { in: ['Pending', 'Draft'] }
+                },
+                include: { partner: { select: { name: true } } },
+                orderBy: { date: 'desc' },
+            })
+        ]);
+        const unified = [
+            ...leaves.map(l => ({
+                id: l.id,
+                type: 'LEAVE',
+                title: `${l.type} Leave Request`,
+                requester: l.employee?.name || 'Unknown',
+                amount: null,
+                date: l.createdAt,
+                priority: 'Medium',
+                description: `${l.reason || 'No reason provided'}. (From ${new Date(l.startDate).toLocaleDateString()} to ${new Date(l.endDate).toLocaleDateString()})`,
+                metadata: { startDate: l.startDate, endDate: l.endDate }
+            })),
+            ...finances.map(f => ({
+                id: f.id,
+                type: 'FINANCE',
+                title: f.type === 'PURCHASE_ORDER' ? 'Purchase Order' : 'Sales Invoice',
+                requester: f.partner?.name || 'Unknown',
+                amount: `$${f.amount.toLocaleString()}`,
+                date: f.date,
+                priority: f.amount > 5000 ? 'High' : 'Medium',
+                description: `Reference: ${f.referenceNumber}. Transaction amount: $${f.amount.toLocaleString()}.`,
+                metadata: { reference: f.referenceNumber }
+            }))
+        ];
+        return unified.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+    async processAction(organizationId, dto) {
+        const { type, id, action } = dto;
+        const status = action === 'APPROVE' ? (type === 'FINANCE' ? 'Approved' : 'Approved') : 'Rejected';
+        if (type === 'LEAVE') {
+            const record = await this.prisma.leaveRequest.findFirst({ where: { id, organizationId } });
+            if (!record)
+                throw new common_1.NotFoundException('Leave request not found');
+            return this.prisma.leaveRequest.update({ where: { id }, data: { status } });
+        }
+        if (type === 'FINANCE') {
+            const record = await this.prisma.financialTransaction.findFirst({ where: { id, organizationId } });
+            if (!record)
+                throw new common_1.NotFoundException('Financial transaction not found');
+            return this.prisma.financialTransaction.update({ where: { id }, data: { status } });
+        }
+        throw new common_1.BadRequestException('Invalid approval type');
+    }
+};
+exports.ApprovalsService = ApprovalsService;
+exports.ApprovalsService = ApprovalsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], ApprovalsService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/approvals/dto/approval.dto.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/approvals/dto/approval.dto.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ApprovalActionDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class ApprovalActionDto {
+    type;
+    id;
+    action;
+}
+exports.ApprovalActionDto = ApprovalActionDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'LEAVE', enum: ['LEAVE', 'FINANCE'] }),
+    (0, class_validator_1.IsEnum)(['LEAVE', 'FINANCE']),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], ApprovalActionDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...id' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], ApprovalActionDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'APPROVE', enum: ['APPROVE', 'REJECT'] }),
+    (0, class_validator_1.IsEnum)(['APPROVE', 'REJECT']),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], ApprovalActionDto.prototype, "action", void 0);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/assets/assets.controller.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/assets/assets.controller.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AssetsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const assets_service_1 = __webpack_require__(/*! ./assets.service */ "./apps/klypto-crm-nest-js/src/assets/assets.service.ts");
+const asset_dto_1 = __webpack_require__(/*! ./dto/asset.dto */ "./apps/klypto-crm-nest-js/src/assets/dto/asset.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let AssetsController = class AssetsController {
+    assetsService;
+    constructor(assetsService) {
+        this.assetsService = assetsService;
+    }
+    async findAll(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.assetsService.getOrganizationId(req.user.sub);
+        return this.assetsService.findAll(orgId);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.assetsService.getOrganizationId(req.user.sub);
+        return this.assetsService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.assetsService.getOrganizationId(req.user.sub);
+        return this.assetsService.update(orgId, id, dto);
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.assetsService.getOrganizationId(req.user.sub);
+        return this.assetsService.getStats(orgId);
+    }
+};
+exports.AssetsController = AssetsController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all assets' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Add a new asset' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof asset_dto_1.CreateAssetDto !== "undefined" && asset_dto_1.CreateAssetDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update an asset' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof asset_dto_1.UpdateAssetDto !== "undefined" && asset_dto_1.UpdateAssetDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get asset statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "getStats", null);
+exports.AssetsController = AssetsController = __decorate([
+    (0, swagger_1.ApiTags)('Assets'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('assets'),
+    __metadata("design:paramtypes", [typeof (_a = typeof assets_service_1.AssetsService !== "undefined" && assets_service_1.AssetsService) === "function" ? _a : Object])
+], AssetsController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/assets/assets.module.ts"
+/*!*************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/assets/assets.module.ts ***!
+  \*************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AssetsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const assets_service_1 = __webpack_require__(/*! ./assets.service */ "./apps/klypto-crm-nest-js/src/assets/assets.service.ts");
+const assets_controller_1 = __webpack_require__(/*! ./assets.controller */ "./apps/klypto-crm-nest-js/src/assets/assets.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let AssetsModule = class AssetsModule {
+};
+exports.AssetsModule = AssetsModule;
+exports.AssetsModule = AssetsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [assets_controller_1.AssetsController],
+        providers: [assets_service_1.AssetsService],
+        exports: [assets_service_1.AssetsService],
+    })
+], AssetsModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/assets/assets.service.ts"
+/*!**************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/assets/assets.service.ts ***!
+  \**************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AssetsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let AssetsService = class AssetsService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId) {
+        return this.prisma.asset.findMany({
+            where: { organizationId },
+            include: {
+                employee: { select: { id: true, name: true } }
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async create(organizationId, dto) {
+        return this.prisma.asset.create({
+            data: { ...dto, organizationId },
+        });
+    }
+    async update(organizationId, id, dto) {
+        const asset = await this.prisma.asset.findFirst({ where: { id, organizationId } });
+        if (!asset)
+            throw new common_1.NotFoundException('Asset not found');
+        return this.prisma.asset.update({
+            where: { id },
+            data: dto,
+        });
+    }
+    async getStats(organizationId) {
+        const assets = await this.prisma.asset.findMany({ where: { organizationId } });
+        const totalValuation = assets.reduce((sum, a) => sum + (a.value || 0), 0);
+        const inUse = assets.filter(a => a.status === 'In Use').length;
+        const maintenance = assets.filter(a => a.status === 'Maintenance').length;
+        return { total: assets.length, totalValuation, inUse, maintenance };
+    }
+};
+exports.AssetsService = AssetsService;
+exports.AssetsService = AssetsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], AssetsService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/assets/dto/asset.dto.ts"
+/*!*************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/assets/dto/asset.dto.ts ***!
+  \*************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateAssetDto = exports.CreateAssetDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateAssetDto {
+    name;
+    category;
+    location;
+    value;
+    status;
+    employeeId;
+}
+exports.CreateAssetDto = CreateAssetDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'MacBook Pro M3 Max' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateAssetDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'IT Electronics' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateAssetDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'HQ - San Francisco' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateAssetDto.prototype, "location", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 3500 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateAssetDto.prototype, "value", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'In Storage', enum: ['In Use', 'In Storage', 'Maintenance', 'Disposed'] }),
+    (0, class_validator_1.IsEnum)(['In Use', 'In Storage', 'Maintenance', 'Disposed']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAssetDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...id', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAssetDto.prototype, "employeeId", void 0);
+class UpdateAssetDto extends (0, swagger_1.PartialType)(CreateAssetDto) {
+}
+exports.UpdateAssetDto = UpdateAssetDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/attendance/attendance.controller.ts"
+/*!*************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/attendance/attendance.controller.ts ***!
+  \*************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AttendanceController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const attendance_service_1 = __webpack_require__(/*! ./attendance.service */ "./apps/klypto-crm-nest-js/src/attendance/attendance.service.ts");
+const attendance_dto_1 = __webpack_require__(/*! ./dto/attendance.dto */ "./apps/klypto-crm-nest-js/src/attendance/dto/attendance.dto.ts");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let AttendanceController = class AttendanceController {
+    attendanceService;
+    constructor(attendanceService) {
+        this.attendanceService = attendanceService;
+    }
+    async create(req, createAttendanceDto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.attendanceService.getOrganizationId(req.user.sub);
+        return this.attendanceService.create(orgId, createAttendanceDto);
+    }
+    async findAll(req, date) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.attendanceService.getOrganizationId(req.user.sub);
+        return this.attendanceService.findAll(orgId, date);
+    }
+    async findOne(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.attendanceService.getOrganizationId(req.user.sub);
+        return this.attendanceService.findOne(orgId, id);
+    }
+    async update(req, id, updateAttendanceDto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.attendanceService.getOrganizationId(req.user.sub);
+        return this.attendanceService.update(orgId, id, updateAttendanceDto);
+    }
+};
+exports.AttendanceController = AttendanceController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create or update attendance record' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof attendance_dto_1.CreateAttendanceDto !== "undefined" && attendance_dto_1.CreateAttendanceDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get organization attendance' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('date')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a specific attendance record' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update an attendance record' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof attendance_dto_1.UpdateAttendanceDto !== "undefined" && attendance_dto_1.UpdateAttendanceDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "update", null);
+exports.AttendanceController = AttendanceController = __decorate([
+    (0, swagger_1.ApiTags)('Attendance'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('attendance'),
+    __metadata("design:paramtypes", [typeof (_a = typeof attendance_service_1.AttendanceService !== "undefined" && attendance_service_1.AttendanceService) === "function" ? _a : Object])
+], AttendanceController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/attendance/attendance.module.ts"
+/*!*********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/attendance/attendance.module.ts ***!
+  \*********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AttendanceModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const attendance_service_1 = __webpack_require__(/*! ./attendance.service */ "./apps/klypto-crm-nest-js/src/attendance/attendance.service.ts");
+const attendance_controller_1 = __webpack_require__(/*! ./attendance.controller */ "./apps/klypto-crm-nest-js/src/attendance/attendance.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let AttendanceModule = class AttendanceModule {
+};
+exports.AttendanceModule = AttendanceModule;
+exports.AttendanceModule = AttendanceModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [attendance_controller_1.AttendanceController],
+        providers: [attendance_service_1.AttendanceService],
+        exports: [attendance_service_1.AttendanceService],
+    })
+], AttendanceModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/attendance/attendance.service.ts"
+/*!**********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/attendance/attendance.service.ts ***!
+  \**********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AttendanceService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let AttendanceService = class AttendanceService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId, dateStr) {
+        let dateFilter = undefined;
+        if (dateStr) {
+            const date = new Date(dateStr);
+            const startOfDay = new Date(date);
+            startOfDay.setUTCHours(0, 0, 0, 0);
+            const endOfDay = new Date(date);
+            endOfDay.setUTCHours(23, 59, 59, 999);
+            dateFilter = {
+                gte: startOfDay,
+                lte: endOfDay,
+            };
+        }
+        const records = await this.prisma.attendanceRecord.findMany({
+            where: {
+                organizationId,
+                ...(dateFilter && { date: dateFilter }),
+            },
+            include: {
+                employee: true,
+            },
+            orderBy: {
+                employee: {
+                    name: 'asc'
+                }
+            },
+        });
+        return records;
+    }
+    async findOne(organizationId, id) {
+        const record = await this.prisma.attendanceRecord.findFirst({
+            where: { id, organizationId },
+            include: { employee: true },
+        });
+        if (!record)
+            throw new common_1.NotFoundException('Attendance record not found');
+        return record;
+    }
+    async create(organizationId, dto) {
+        const date = dto.date ? new Date(dto.date) : new Date();
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+        const existing = await this.prisma.attendanceRecord.findFirst({
+            where: {
+                organizationId,
+                employeeId: dto.employeeId,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+            },
+        });
+        if (existing) {
+            return this.update(organizationId, existing.id, dto);
+        }
+        const canonicalDate = new Date(date);
+        canonicalDate.setUTCHours(12, 0, 0, 0);
+        return this.prisma.attendanceRecord.create({
+            data: {
+                organizationId,
+                employeeId: dto.employeeId,
+                date: canonicalDate,
+                status: dto.status,
+                checkIn: dto.checkIn ? new Date(dto.checkIn) : null,
+                checkOut: dto.checkOut ? new Date(dto.checkOut) : null,
+            },
+            include: { employee: true },
+        });
+    }
+    async update(organizationId, id, dto) {
+        await this.findOne(organizationId, id);
+        const updateData = {};
+        if (dto.status)
+            updateData.status = dto.status;
+        if (dto.checkIn)
+            updateData.checkIn = new Date(dto.checkIn);
+        if (dto.checkOut)
+            updateData.checkOut = new Date(dto.checkOut);
+        return this.prisma.attendanceRecord.update({
+            where: { id },
+            data: updateData,
+            include: { employee: true },
+        });
+    }
+};
+exports.AttendanceService = AttendanceService;
+exports.AttendanceService = AttendanceService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], AttendanceService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/attendance/dto/attendance.dto.ts"
+/*!**********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/attendance/dto/attendance.dto.ts ***!
+  \**********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateAttendanceDto = exports.CreateAttendanceDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateAttendanceDto {
+    employeeId;
+    date;
+    status;
+    checkIn;
+    checkOut;
+}
+exports.CreateAttendanceDto = CreateAttendanceDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateAttendanceDto.prototype, "employeeId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAttendanceDto.prototype, "date", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ default: 'Present' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAttendanceDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAttendanceDto.prototype, "checkIn", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAttendanceDto.prototype, "checkOut", void 0);
+class UpdateAttendanceDto extends (0, swagger_1.PartialType)(CreateAttendanceDto) {
+}
+exports.UpdateAttendanceDto = UpdateAttendanceDto;
 
 
 /***/ },
@@ -395,7 +1316,6 @@ const system_role_enum_1 = __webpack_require__(/*! ./roles/system-role.enum */ "
 const DEFAULT_DASHBOARD_MODULES = [
     'dashboard',
     'leads',
-    'pipeline',
     'erp',
     'recruitment',
     'grievances',
@@ -1057,6 +1977,2416 @@ exports.RefreshTokenStrategy = RefreshTokenStrategy = __decorate([
 
 /***/ },
 
+/***/ "./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.controller.ts"
+/*!*****************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.controller.ts ***!
+  \*****************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CrmOverviewController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const crm_overview_service_1 = __webpack_require__(/*! ./crm-overview.service */ "./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.service.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let CrmOverviewController = class CrmOverviewController {
+    crmOverviewService;
+    constructor(crmOverviewService) {
+        this.crmOverviewService = crmOverviewService;
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.crmOverviewService.getOrganizationId(req.user.sub);
+        return this.crmOverviewService.getStats(orgId);
+    }
+    async getRecentLeads(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.crmOverviewService.getOrganizationId(req.user.sub);
+        return this.crmOverviewService.getRecentLeads(orgId);
+    }
+};
+exports.CrmOverviewController = CrmOverviewController;
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get aggregated CRM statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], CrmOverviewController.prototype, "getStats", null);
+__decorate([
+    (0, common_1.Get)('recent'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get recent leads' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], CrmOverviewController.prototype, "getRecentLeads", null);
+exports.CrmOverviewController = CrmOverviewController = __decorate([
+    (0, swagger_1.ApiTags)('CRM Overview'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('crm-overview'),
+    __metadata("design:paramtypes", [typeof (_a = typeof crm_overview_service_1.CrmOverviewService !== "undefined" && crm_overview_service_1.CrmOverviewService) === "function" ? _a : Object])
+], CrmOverviewController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.module.ts"
+/*!*************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.module.ts ***!
+  \*************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CrmOverviewModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const crm_overview_service_1 = __webpack_require__(/*! ./crm-overview.service */ "./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.service.ts");
+const crm_overview_controller_1 = __webpack_require__(/*! ./crm-overview.controller */ "./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let CrmOverviewModule = class CrmOverviewModule {
+};
+exports.CrmOverviewModule = CrmOverviewModule;
+exports.CrmOverviewModule = CrmOverviewModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [crm_overview_controller_1.CrmOverviewController],
+        providers: [crm_overview_service_1.CrmOverviewService],
+        exports: [crm_overview_service_1.CrmOverviewService],
+    })
+], CrmOverviewModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.service.ts"
+/*!**************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/crm-overview/crm-overview.service.ts ***!
+  \**************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CrmOverviewService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let CrmOverviewService = class CrmOverviewService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async getStats(organizationId) {
+        const [totalLeads, activeDeals, totalValue, wonLeads] = await Promise.all([
+            this.prisma.lead.count({ where: { organizationId } }),
+            this.prisma.lead.count({
+                where: {
+                    organizationId,
+                    status: { in: ['Discovery', 'Proposal', 'Negotiation'] }
+                }
+            }),
+            this.prisma.lead.aggregate({
+                where: { organizationId },
+                _sum: { value: true }
+            }),
+            this.prisma.lead.count({ where: { organizationId, status: 'Won' } })
+        ]);
+        const conversionRate = totalLeads > 0 ? (wonLeads / totalLeads) * 100 : 0;
+        return {
+            totalLeads,
+            activeDeals,
+            totalRevenue: `$${(totalValue._sum.value || 0).toLocaleString()}`,
+            conversionRate: `${conversionRate.toFixed(1)}%`
+        };
+    }
+    async getRecentLeads(organizationId) {
+        return this.prisma.lead.findMany({
+            where: { organizationId },
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            select: {
+                id: true,
+                name: true,
+                company: true,
+                value: true,
+                status: true,
+                createdAt: true
+            }
+        });
+    }
+};
+exports.CrmOverviewService = CrmOverviewService;
+exports.CrmOverviewService = CrmOverviewService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], CrmOverviewService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/employees/dto/employee.dto.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/employees/dto/employee.dto.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeeResponseDto = exports.UpdateEmployeeDto = exports.CreateEmployeeDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateEmployeeDto {
+    name;
+    code;
+    role;
+    department;
+    status;
+    userId;
+    organizationId;
+}
+exports.CreateEmployeeDto = CreateEmployeeDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Doe', description: 'Full name of the employee' }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'EMP-001', description: 'Unique employee code' }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "code", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'HR Manager', description: 'Role or job title' }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'People Ops', description: 'Department name' }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "department", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Active',
+        description: 'Status of the employee (e.g. Active, Onboarding, Inactive)',
+        required: false,
+        default: 'Active',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'clxyz...',
+        description: 'ID of the system user if employee has an account',
+        required: false,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "userId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxyz...', description: 'Organization ID' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "organizationId", void 0);
+class UpdateEmployeeDto extends (0, swagger_1.PartialType)(CreateEmployeeDto) {
+}
+exports.UpdateEmployeeDto = UpdateEmployeeDto;
+class EmployeeResponseDto {
+    id;
+    name;
+    code;
+    role;
+    department;
+    status;
+    organizationId;
+    createdAt;
+    updatedAt;
+}
+exports.EmployeeResponseDto = EmployeeResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxyz...' }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Doe' }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'EMP-001' }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "code", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'HR Manager' }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'People Ops' }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "department", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Active' }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxyz...' }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "organizationId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2026-04-10T00:00:00.000Z' }),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], EmployeeResponseDto.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2026-04-10T00:00:00.000Z' }),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], EmployeeResponseDto.prototype, "updatedAt", void 0);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/employees/employees.controller.ts"
+/*!***********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/employees/employees.controller.ts ***!
+  \***********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeesController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const employees_service_1 = __webpack_require__(/*! ./employees.service */ "./apps/klypto-crm-nest-js/src/employees/employees.service.ts");
+const employee_dto_1 = __webpack_require__(/*! ./dto/employee.dto */ "./apps/klypto-crm-nest-js/src/employees/dto/employee.dto.ts");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let EmployeesController = class EmployeesController {
+    employeesService;
+    constructor(employeesService) {
+        this.employeesService = employeesService;
+    }
+    async create(req, createEmployeeDto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.employeesService.getOrganizationId(req.user.sub);
+        return this.employeesService.create(orgId, createEmployeeDto);
+    }
+    async findAll(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.employeesService.getOrganizationId(req.user.sub);
+        return this.employeesService.findAll(orgId);
+    }
+    async findOne(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.employeesService.getOrganizationId(req.user.sub);
+        return this.employeesService.findOne(orgId, id);
+    }
+    async update(req, id, updateEmployeeDto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.employeesService.getOrganizationId(req.user.sub);
+        return this.employeesService.update(orgId, id, updateEmployeeDto);
+    }
+    async remove(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.employeesService.getOrganizationId(req.user.sub);
+        return this.employeesService.remove(orgId, id);
+    }
+};
+exports.EmployeesController = EmployeesController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new employee' }),
+    (0, swagger_1.ApiCreatedResponse)({
+        description: 'The employee has been successfully created.',
+        type: employee_dto_1.EmployeeResponseDto,
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof employee_dto_1.CreateEmployeeDto !== "undefined" && employee_dto_1.CreateEmployeeDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], EmployeesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all employees in the organization' }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'List of employees',
+        type: [employee_dto_1.EmployeeResponseDto],
+    }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EmployeesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a specific employee by ID' }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'The employee details',
+        type: employee_dto_1.EmployeeResponseDto,
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], EmployeesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update an employee' }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'The employee has been successfully updated.',
+        type: employee_dto_1.EmployeeResponseDto,
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof employee_dto_1.UpdateEmployeeDto !== "undefined" && employee_dto_1.UpdateEmployeeDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], EmployeesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete an employee' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'The employee has been deleted successfully.' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], EmployeesController.prototype, "remove", null);
+exports.EmployeesController = EmployeesController = __decorate([
+    (0, swagger_1.ApiTags)('Employees'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('employees'),
+    __metadata("design:paramtypes", [typeof (_a = typeof employees_service_1.EmployeesService !== "undefined" && employees_service_1.EmployeesService) === "function" ? _a : Object])
+], EmployeesController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/employees/employees.module.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/employees/employees.module.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeesModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const employees_service_1 = __webpack_require__(/*! ./employees.service */ "./apps/klypto-crm-nest-js/src/employees/employees.service.ts");
+const employees_controller_1 = __webpack_require__(/*! ./employees.controller */ "./apps/klypto-crm-nest-js/src/employees/employees.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let EmployeesModule = class EmployeesModule {
+};
+exports.EmployeesModule = EmployeesModule;
+exports.EmployeesModule = EmployeesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [employees_controller_1.EmployeesController],
+        providers: [employees_service_1.EmployeesService],
+    })
+], EmployeesModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/employees/employees.service.ts"
+/*!********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/employees/employees.service.ts ***!
+  \********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeesService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let EmployeesService = class EmployeesService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async create(organizationId, dto) {
+        const existing = await this.prisma.employee.findUnique({
+            where: { code: dto.code },
+        });
+        if (existing) {
+            throw new common_1.ConflictException(`Employee with code ${dto.code} already exists`);
+        }
+        return this.prisma.employee.create({
+            data: {
+                name: dto.name,
+                code: dto.code,
+                role: dto.role,
+                department: dto.department,
+                status: dto.status || 'Active',
+                organization: { connect: { id: organizationId } },
+                ...(dto.userId && { user: { connect: { id: dto.userId } } }),
+            },
+        });
+    }
+    async findAll(organizationId) {
+        return this.prisma.employee.findMany({
+            where: { organizationId },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async findOne(organizationId, id) {
+        const employee = await this.prisma.employee.findFirst({
+            where: { id, organizationId },
+        });
+        if (!employee) {
+            throw new common_1.NotFoundException(`Employee with ID ${id} not found`);
+        }
+        return employee;
+    }
+    async update(organizationId, id, dto) {
+        const employee = await this.findOne(organizationId, id);
+        if (dto.code && dto.code !== employee.code) {
+            const existing = await this.prisma.employee.findUnique({
+                where: { code: dto.code },
+            });
+            if (existing) {
+                throw new common_1.ConflictException(`Employee with code ${dto.code} already exists`);
+            }
+        }
+        return this.prisma.employee.update({
+            where: { id },
+            data: {
+                name: dto.name,
+                code: dto.code,
+                role: dto.role,
+                department: dto.department,
+                status: dto.status,
+                ...(dto.userId && { user: { connect: { id: dto.userId } } }),
+            },
+        });
+    }
+    async remove(organizationId, id) {
+        await this.findOne(organizationId, id);
+        await this.prisma.employee.delete({
+            where: { id },
+        });
+        return { message: 'Employee deleted successfully' };
+    }
+};
+exports.EmployeesService = EmployeesService;
+exports.EmployeesService = EmployeesService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], EmployeesService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/entities/dto/entities.dto.ts"
+/*!******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/entities/dto/entities.dto.ts ***!
+  \******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateDepartmentDto = exports.CreateDepartmentDto = exports.UpdateBranchDto = exports.CreateBranchDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateBranchDto {
+    name;
+    type;
+    headId;
+}
+exports.CreateBranchDto = CreateBranchDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'HQ - San Francisco' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateBranchDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Main', enum: ['Main', 'Branch', 'International'] }),
+    (0, class_validator_1.IsEnum)(['Main', 'Branch', 'International']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateBranchDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...id' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateBranchDto.prototype, "headId", void 0);
+class UpdateBranchDto extends (0, swagger_1.PartialType)(CreateBranchDto) {
+}
+exports.UpdateBranchDto = UpdateBranchDto;
+class CreateDepartmentDto {
+    name;
+    branchId;
+    headId;
+}
+exports.CreateDepartmentDto = CreateDepartmentDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Engineering' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateDepartmentDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...id' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateDepartmentDto.prototype, "branchId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...id' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateDepartmentDto.prototype, "headId", void 0);
+class UpdateDepartmentDto extends (0, swagger_1.PartialType)(CreateDepartmentDto) {
+}
+exports.UpdateDepartmentDto = UpdateDepartmentDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/entities/entities.controller.ts"
+/*!*********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/entities/entities.controller.ts ***!
+  \*********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EntitiesController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const entities_service_1 = __webpack_require__(/*! ./entities.service */ "./apps/klypto-crm-nest-js/src/entities/entities.service.ts");
+const entities_dto_1 = __webpack_require__(/*! ./dto/entities.dto */ "./apps/klypto-crm-nest-js/src/entities/dto/entities.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let EntitiesController = class EntitiesController {
+    entitiesService;
+    constructor(entitiesService) {
+        this.entitiesService = entitiesService;
+    }
+    async findAllBranches(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.findAllBranches(orgId);
+    }
+    async createBranch(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.createBranch(orgId, dto);
+    }
+    async findAllDepartments(req, branchId) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.findAllDepartments(orgId, branchId);
+    }
+    async createDepartment(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.createDepartment(orgId, dto);
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.getStats(orgId);
+    }
+};
+exports.EntitiesController = EntitiesController;
+__decorate([
+    (0, common_1.Get)('branches'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all branches' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "findAllBranches", null);
+__decorate([
+    (0, common_1.Post)('branches'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new branch' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof entities_dto_1.CreateBranchDto !== "undefined" && entities_dto_1.CreateBranchDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "createBranch", null);
+__decorate([
+    (0, common_1.Get)('departments'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all departments' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('branchId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "findAllDepartments", null);
+__decorate([
+    (0, common_1.Post)('departments'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new department' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_c = typeof entities_dto_1.CreateDepartmentDto !== "undefined" && entities_dto_1.CreateDepartmentDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "createDepartment", null);
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get organizational statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "getStats", null);
+exports.EntitiesController = EntitiesController = __decorate([
+    (0, swagger_1.ApiTags)('Entities'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('entities'),
+    __metadata("design:paramtypes", [typeof (_a = typeof entities_service_1.EntitiesService !== "undefined" && entities_service_1.EntitiesService) === "function" ? _a : Object])
+], EntitiesController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/entities/entities.module.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/entities/entities.module.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EntitiesModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const entities_service_1 = __webpack_require__(/*! ./entities.service */ "./apps/klypto-crm-nest-js/src/entities/entities.service.ts");
+const entities_controller_1 = __webpack_require__(/*! ./entities.controller */ "./apps/klypto-crm-nest-js/src/entities/entities.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let EntitiesModule = class EntitiesModule {
+};
+exports.EntitiesModule = EntitiesModule;
+exports.EntitiesModule = EntitiesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [entities_controller_1.EntitiesController],
+        providers: [entities_service_1.EntitiesService],
+        exports: [entities_service_1.EntitiesService],
+    })
+], EntitiesModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/entities/entities.service.ts"
+/*!******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/entities/entities.service.ts ***!
+  \******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EntitiesService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let EntitiesService = class EntitiesService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAllBranches(organizationId) {
+        return this.prisma.branch.findMany({
+            where: { organizationId },
+            include: {
+                head: { select: { id: true, name: true } },
+                _count: { select: { departments: true, employees: true } }
+            },
+            orderBy: { name: 'asc' },
+        });
+    }
+    async createBranch(organizationId, dto) {
+        return this.prisma.branch.create({
+            data: { ...dto, organizationId },
+        });
+    }
+    async updateBranch(organizationId, id, dto) {
+        const branch = await this.prisma.branch.findFirst({ where: { id, organizationId } });
+        if (!branch)
+            throw new common_1.NotFoundException('Branch not found');
+        return this.prisma.branch.update({ where: { id }, data: dto });
+    }
+    async findAllDepartments(organizationId, branchId) {
+        return this.prisma.department.findMany({
+            where: {
+                organizationId,
+                ...(branchId && { branchId })
+            },
+            include: {
+                head: { select: { id: true, name: true } },
+                branch: { select: { name: true } },
+                _count: { select: { employees: true } }
+            },
+            orderBy: { name: 'asc' },
+        });
+    }
+    async createDepartment(organizationId, dto) {
+        return this.prisma.department.create({
+            data: { ...dto, organizationId },
+        });
+    }
+    async updateDepartment(organizationId, id, dto) {
+        const department = await this.prisma.department.findFirst({ where: { id, organizationId } });
+        if (!department)
+            throw new common_1.NotFoundException('Department not found');
+        return this.prisma.department.update({ where: { id }, data: dto });
+    }
+    async getStats(organizationId) {
+        const [branches, departments, employees] = await Promise.all([
+            this.prisma.branch.count({ where: { organizationId } }),
+            this.prisma.department.count({ where: { organizationId } }),
+            this.prisma.employee.count({ where: { organizationId } }),
+        ]);
+        return { branches, departments, employees };
+    }
+};
+exports.EntitiesService = EntitiesService;
+exports.EntitiesService = EntitiesService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], EntitiesService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/finance/dto/finance.dto.ts"
+/*!****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/finance/dto/finance.dto.ts ***!
+  \****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateFinanceDto = exports.CreateFinanceDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateFinanceDto {
+    referenceNumber;
+    type;
+    amount;
+    date;
+    status;
+    partnerId;
+}
+exports.CreateFinanceDto = CreateFinanceDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'INV-2024-001' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateFinanceDto.prototype, "referenceNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'INVOICE', enum: ['INVOICE', 'PURCHASE_ORDER'] }),
+    (0, class_validator_1.IsEnum)(['INVOICE', 'PURCHASE_ORDER']),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateFinanceDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 4200.50 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], CreateFinanceDto.prototype, "amount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-03-25T00:00:00Z' }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateFinanceDto.prototype, "date", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Pending', enum: ['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled'] }),
+    (0, class_validator_1.IsEnum)(['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateFinanceDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...id' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateFinanceDto.prototype, "partnerId", void 0);
+class UpdateFinanceDto extends (0, swagger_1.PartialType)(CreateFinanceDto) {
+}
+exports.UpdateFinanceDto = UpdateFinanceDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/finance/finance.controller.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/finance/finance.controller.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FinanceController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const finance_service_1 = __webpack_require__(/*! ./finance.service */ "./apps/klypto-crm-nest-js/src/finance/finance.service.ts");
+const finance_dto_1 = __webpack_require__(/*! ./dto/finance.dto */ "./apps/klypto-crm-nest-js/src/finance/dto/finance.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let FinanceController = class FinanceController {
+    financeService;
+    constructor(financeService) {
+        this.financeService = financeService;
+    }
+    async findAll(req, type) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.financeService.getOrganizationId(req.user.sub);
+        return this.financeService.findAll(orgId, type);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.financeService.getOrganizationId(req.user.sub);
+        return this.financeService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.financeService.getOrganizationId(req.user.sub);
+        return this.financeService.update(orgId, id, dto);
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.financeService.getOrganizationId(req.user.sub);
+        return this.financeService.getStats(orgId);
+    }
+};
+exports.FinanceController = FinanceController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all financial transactions' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('type')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], FinanceController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new transaction' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof finance_dto_1.CreateFinanceDto !== "undefined" && finance_dto_1.CreateFinanceDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], FinanceController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update transaction status' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof finance_dto_1.UpdateFinanceDto !== "undefined" && finance_dto_1.UpdateFinanceDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], FinanceController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get financial statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], FinanceController.prototype, "getStats", null);
+exports.FinanceController = FinanceController = __decorate([
+    (0, swagger_1.ApiTags)('Finance'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('finance'),
+    __metadata("design:paramtypes", [typeof (_a = typeof finance_service_1.FinanceService !== "undefined" && finance_service_1.FinanceService) === "function" ? _a : Object])
+], FinanceController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/finance/finance.module.ts"
+/*!***************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/finance/finance.module.ts ***!
+  \***************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FinanceModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const finance_service_1 = __webpack_require__(/*! ./finance.service */ "./apps/klypto-crm-nest-js/src/finance/finance.service.ts");
+const finance_controller_1 = __webpack_require__(/*! ./finance.controller */ "./apps/klypto-crm-nest-js/src/finance/finance.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let FinanceModule = class FinanceModule {
+};
+exports.FinanceModule = FinanceModule;
+exports.FinanceModule = FinanceModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [finance_controller_1.FinanceController],
+        providers: [finance_service_1.FinanceService],
+        exports: [finance_service_1.FinanceService],
+    })
+], FinanceModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/finance/finance.service.ts"
+/*!****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/finance/finance.service.ts ***!
+  \****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FinanceService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let FinanceService = class FinanceService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId, type) {
+        return this.prisma.financialTransaction.findMany({
+            where: {
+                organizationId,
+                ...(type && { type })
+            },
+            include: { partner: { select: { name: true, type: true } } },
+            orderBy: { date: 'desc' },
+        });
+    }
+    async create(organizationId, dto) {
+        return this.prisma.financialTransaction.create({
+            data: { ...dto, organizationId, date: dto.date ? new Date(dto.date) : new Date() },
+        });
+    }
+    async update(organizationId, id, dto) {
+        const transaction = await this.prisma.financialTransaction.findFirst({ where: { id, organizationId } });
+        if (!transaction)
+            throw new common_1.NotFoundException('Transaction not found');
+        return this.prisma.financialTransaction.update({
+            where: { id },
+            data: {
+                ...dto,
+                ...(dto.date && { date: new Date(dto.date) })
+            },
+        });
+    }
+    async getStats(organizationId) {
+        const transactions = await this.prisma.financialTransaction.findMany({ where: { organizationId } });
+        const receivables = transactions.filter(t => t.type === 'INVOICE' && t.status !== 'Paid');
+        const payables = transactions.filter(t => t.type === 'PURCHASE_ORDER' && t.status !== 'Paid');
+        return {
+            totalReceivables: receivables.reduce((sum, t) => sum + t.amount, 0),
+            totalPayables: payables.reduce((sum, t) => sum + t.amount, 0),
+            count: transactions.length
+        };
+    }
+};
+exports.FinanceService = FinanceService;
+exports.FinanceService = FinanceService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], FinanceService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/grievances/dto/grievance.dto.ts"
+/*!*********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/grievances/dto/grievance.dto.ts ***!
+  \*********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateGrievanceDto = exports.CreateGrievanceDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateGrievanceDto {
+    subject;
+    category;
+    description;
+    severity;
+    isAnonymous;
+    employeeId;
+}
+exports.CreateGrievanceDto = CreateGrievanceDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Unfair treatment in project allocation' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateGrievanceDto.prototype, "subject", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Ethics' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateGrievanceDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'I have been consistently denied opportunities for high-impact projects despite performance.' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateGrievanceDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Medium', enum: ['Low', 'Medium', 'High', 'Critical'] }),
+    (0, class_validator_1.IsEnum)(['Low', 'Medium', 'High', 'Critical']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateGrievanceDto.prototype, "severity", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateGrievanceDto.prototype, "isAnonymous", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...id', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateGrievanceDto.prototype, "employeeId", void 0);
+class UpdateGrievanceDto extends (0, swagger_1.PartialType)(CreateGrievanceDto) {
+    status;
+}
+exports.UpdateGrievanceDto = UpdateGrievanceDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'In Review', enum: ['Open', 'In Review', 'Escalated', 'Resolved'] }),
+    (0, class_validator_1.IsEnum)(['Open', 'In Review', 'Escalated', 'Resolved']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateGrievanceDto.prototype, "status", void 0);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/grievances/grievances.controller.ts"
+/*!*************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/grievances/grievances.controller.ts ***!
+  \*************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GrievancesController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const grievances_service_1 = __webpack_require__(/*! ./grievances.service */ "./apps/klypto-crm-nest-js/src/grievances/grievances.service.ts");
+const grievance_dto_1 = __webpack_require__(/*! ./dto/grievance.dto */ "./apps/klypto-crm-nest-js/src/grievances/dto/grievance.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let GrievancesController = class GrievancesController {
+    grievancesService;
+    constructor(grievancesService) {
+        this.grievancesService = grievancesService;
+    }
+    async findAll(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+        return this.grievancesService.findAll(orgId);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+        return this.grievancesService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+        return this.grievancesService.update(orgId, id, dto);
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+        return this.grievancesService.getStats(orgId);
+    }
+    async findRecent(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+        return this.grievancesService.findRecent(orgId);
+    }
+};
+exports.GrievancesController = GrievancesController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all grievances' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], GrievancesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Submit a new grievance' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof grievance_dto_1.CreateGrievanceDto !== "undefined" && grievance_dto_1.CreateGrievanceDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], GrievancesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a grievance' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof grievance_dto_1.UpdateGrievanceDto !== "undefined" && grievance_dto_1.UpdateGrievanceDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], GrievancesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get grievance dashboard statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], GrievancesController.prototype, "getStats", null);
+__decorate([
+    (0, common_1.Get)('recent'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get recent grievances' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], GrievancesController.prototype, "findRecent", null);
+exports.GrievancesController = GrievancesController = __decorate([
+    (0, swagger_1.ApiTags)('Grievances'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('grievances'),
+    __metadata("design:paramtypes", [typeof (_a = typeof grievances_service_1.GrievancesService !== "undefined" && grievances_service_1.GrievancesService) === "function" ? _a : Object])
+], GrievancesController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/grievances/grievances.module.ts"
+/*!*********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/grievances/grievances.module.ts ***!
+  \*********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GrievancesModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const grievances_service_1 = __webpack_require__(/*! ./grievances.service */ "./apps/klypto-crm-nest-js/src/grievances/grievances.service.ts");
+const grievances_controller_1 = __webpack_require__(/*! ./grievances.controller */ "./apps/klypto-crm-nest-js/src/grievances/grievances.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let GrievancesModule = class GrievancesModule {
+};
+exports.GrievancesModule = GrievancesModule;
+exports.GrievancesModule = GrievancesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [grievances_controller_1.GrievancesController],
+        providers: [grievances_service_1.GrievancesService],
+        exports: [grievances_service_1.GrievancesService],
+    })
+], GrievancesModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/grievances/grievances.service.ts"
+/*!**********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/grievances/grievances.service.ts ***!
+  \**********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GrievancesService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let GrievancesService = class GrievancesService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId) {
+        const grievances = await this.prisma.grievance.findMany({
+            where: { organizationId },
+            include: {
+                employee: {
+                    select: { id: true, name: true, department: true }
+                }
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        return grievances.map(g => {
+            if (g.isAnonymous) {
+                return { ...g, employee: null };
+            }
+            return g;
+        });
+    }
+    async create(organizationId, dto) {
+        return this.prisma.grievance.create({
+            data: { ...dto, organizationId },
+        });
+    }
+    async update(organizationId, id, dto) {
+        const grievance = await this.prisma.grievance.findFirst({ where: { id, organizationId } });
+        if (!grievance)
+            throw new common_1.NotFoundException('Grievance not found');
+        return this.prisma.grievance.update({
+            where: { id },
+            data: dto,
+        });
+    }
+    async getStats(organizationId) {
+        const [total, unresolved, critical, resolved] = await Promise.all([
+            this.prisma.grievance.count({ where: { organizationId } }),
+            this.prisma.grievance.count({ where: { organizationId, status: { not: 'Resolved' } } }),
+            this.prisma.grievance.count({ where: { organizationId, severity: { in: ['High', 'Critical'] }, status: { not: 'Resolved' } } }),
+            this.prisma.grievance.count({
+                where: {
+                    organizationId,
+                    status: 'Resolved',
+                    updatedAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) }
+                }
+            }),
+        ]);
+        return { total, unresolved, critical, resolved };
+    }
+    async findRecent(organizationId) {
+        return this.prisma.grievance.findMany({
+            where: { organizationId },
+            take: 5,
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+};
+exports.GrievancesService = GrievancesService;
+exports.GrievancesService = GrievancesService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], GrievancesService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.controller.ts"
+/*!*******************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.controller.ts ***!
+  \*******************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.HrmsOverviewController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const hrms_overview_service_1 = __webpack_require__(/*! ./hrms-overview.service */ "./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.service.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let HrmsOverviewController = class HrmsOverviewController {
+    hrmsOverviewService;
+    constructor(hrmsOverviewService) {
+        this.hrmsOverviewService = hrmsOverviewService;
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.hrmsOverviewService.getOrganizationId(req.user.sub);
+        return this.hrmsOverviewService.getStats(orgId);
+    }
+};
+exports.HrmsOverviewController = HrmsOverviewController;
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get aggregated HRMS statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], HrmsOverviewController.prototype, "getStats", null);
+exports.HrmsOverviewController = HrmsOverviewController = __decorate([
+    (0, swagger_1.ApiTags)('HRMS Overview'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('hrms-overview'),
+    __metadata("design:paramtypes", [typeof (_a = typeof hrms_overview_service_1.HrmsOverviewService !== "undefined" && hrms_overview_service_1.HrmsOverviewService) === "function" ? _a : Object])
+], HrmsOverviewController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.module.ts"
+/*!***************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.module.ts ***!
+  \***************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.HrmsOverviewModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const hrms_overview_service_1 = __webpack_require__(/*! ./hrms-overview.service */ "./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.service.ts");
+const hrms_overview_controller_1 = __webpack_require__(/*! ./hrms-overview.controller */ "./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let HrmsOverviewModule = class HrmsOverviewModule {
+};
+exports.HrmsOverviewModule = HrmsOverviewModule;
+exports.HrmsOverviewModule = HrmsOverviewModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [hrms_overview_controller_1.HrmsOverviewController],
+        providers: [hrms_overview_service_1.HrmsOverviewService],
+        exports: [hrms_overview_service_1.HrmsOverviewService],
+    })
+], HrmsOverviewModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.service.ts"
+/*!****************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/hrms-overview/hrms-overview.service.ts ***!
+  \****************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.HrmsOverviewService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let HrmsOverviewService = class HrmsOverviewService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async getStats(organizationId) {
+        const [totalEmployees, pendingLeaves, activeEmployees, structuresCount, attendanceToday] = await Promise.all([
+            this.prisma.employee.count({ where: { organizationId } }),
+            this.prisma.leaveRequest.count({ where: { organizationId, status: 'Pending' } }),
+            this.prisma.employee.count({ where: { organizationId, status: { in: ['Active', 'Onboarding'] } } }),
+            this.prisma.salaryStructure.count({ where: { organizationId } }),
+            this.prisma.attendanceRecord.count({
+                where: {
+                    organizationId,
+                    date: {
+                        gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                        lte: new Date(new Date().setHours(23, 59, 59, 999)),
+                    },
+                    status: 'Present',
+                },
+            }),
+        ]);
+        const attendanceRate = activeEmployees > 0 ? (attendanceToday / activeEmployees) * 100 : 0;
+        const payrollReady = totalEmployees > 0 ? (structuresCount / totalEmployees) * 100 : 0;
+        return {
+            totalEmployees,
+            attendanceRate: attendanceRate.toFixed(1) + '%',
+            pendingLeaves,
+            payrollReady: payrollReady.toFixed(0) + '%',
+        };
+    }
+};
+exports.HrmsOverviewService = HrmsOverviewService;
+exports.HrmsOverviewService = HrmsOverviewService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], HrmsOverviewService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leads/dto/lead.dto.ts"
+/*!***********************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leads/dto/lead.dto.ts ***!
+  \***********************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateLeadNoteDto = exports.UpdateLeadDto = exports.CreateLeadDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateLeadDto {
+    name;
+    email;
+    phone;
+    company;
+    priority;
+    status;
+    value;
+    assigneeId;
+}
+exports.CreateLeadDto = CreateLeadDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Doe' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateLeadDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'john@example.com', required: false }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateLeadDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '+1234567890', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateLeadDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Acme Corp', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateLeadDto.prototype, "company", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Medium', enum: ['High', 'Medium', 'Low'] }),
+    (0, class_validator_1.IsEnum)(['High', 'Medium', 'Low']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateLeadDto.prototype, "priority", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'New',
+        enum: ['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost']
+    }),
+    (0, class_validator_1.IsEnum)(['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateLeadDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 1000, required: false }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateLeadDto.prototype, "value", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...userId', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateLeadDto.prototype, "assigneeId", void 0);
+class UpdateLeadDto extends (0, swagger_1.PartialType)(CreateLeadDto) {
+}
+exports.UpdateLeadDto = UpdateLeadDto;
+class CreateLeadNoteDto {
+    content;
+}
+exports.CreateLeadNoteDto = CreateLeadNoteDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Spoke with the client, they are interested.' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateLeadNoteDto.prototype, "content", void 0);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leads/leads.controller.ts"
+/*!***************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leads/leads.controller.ts ***!
+  \***************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LeadsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const leads_service_1 = __webpack_require__(/*! ./leads.service */ "./apps/klypto-crm-nest-js/src/leads/leads.service.ts");
+const lead_dto_1 = __webpack_require__(/*! ./dto/lead.dto */ "./apps/klypto-crm-nest-js/src/leads/dto/lead.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let LeadsController = class LeadsController {
+    leadsService;
+    constructor(leadsService) {
+        this.leadsService = leadsService;
+    }
+    async findAll(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leadsService.getOrganizationId(req.user.sub);
+        return this.leadsService.findAll(orgId);
+    }
+    async findOne(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leadsService.getOrganizationId(req.user.sub);
+        return this.leadsService.findOne(orgId, id);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leadsService.getOrganizationId(req.user.sub);
+        return this.leadsService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leadsService.getOrganizationId(req.user.sub);
+        return this.leadsService.update(orgId, id, dto);
+    }
+    async remove(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leadsService.getOrganizationId(req.user.sub);
+        return this.leadsService.delete(orgId, id);
+    }
+    async addNote(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leadsService.getOrganizationId(req.user.sub);
+        return this.leadsService.addNote(orgId, id, dto);
+    }
+    async getNotes(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leadsService.getOrganizationId(req.user.sub);
+        return this.leadsService.getNotes(orgId, id);
+    }
+};
+exports.LeadsController = LeadsController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all leads' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], LeadsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get lead details' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], LeadsController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new lead' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof lead_dto_1.CreateLeadDto !== "undefined" && lead_dto_1.CreateLeadDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], LeadsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a lead' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof lead_dto_1.UpdateLeadDto !== "undefined" && lead_dto_1.UpdateLeadDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], LeadsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a lead' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], LeadsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)(':id/notes'),
+    (0, swagger_1.ApiOperation)({ summary: 'Add a note to a lead' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_d = typeof lead_dto_1.CreateLeadNoteDto !== "undefined" && lead_dto_1.CreateLeadNoteDto) === "function" ? _d : Object]),
+    __metadata("design:returntype", Promise)
+], LeadsController.prototype, "addNote", null);
+__decorate([
+    (0, common_1.Get)(':id/notes'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get notes for a lead' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], LeadsController.prototype, "getNotes", null);
+exports.LeadsController = LeadsController = __decorate([
+    (0, swagger_1.ApiTags)('Leads'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('leads'),
+    __metadata("design:paramtypes", [typeof (_a = typeof leads_service_1.LeadsService !== "undefined" && leads_service_1.LeadsService) === "function" ? _a : Object])
+], LeadsController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leads/leads.module.ts"
+/*!***********************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leads/leads.module.ts ***!
+  \***********************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LeadsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const leads_service_1 = __webpack_require__(/*! ./leads.service */ "./apps/klypto-crm-nest-js/src/leads/leads.service.ts");
+const leads_controller_1 = __webpack_require__(/*! ./leads.controller */ "./apps/klypto-crm-nest-js/src/leads/leads.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let LeadsModule = class LeadsModule {
+};
+exports.LeadsModule = LeadsModule;
+exports.LeadsModule = LeadsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [leads_controller_1.LeadsController],
+        providers: [leads_service_1.LeadsService],
+        exports: [leads_service_1.LeadsService],
+    })
+], LeadsModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leads/leads.service.ts"
+/*!************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leads/leads.service.ts ***!
+  \************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LeadsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let LeadsService = class LeadsService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId) {
+        return this.prisma.lead.findMany({
+            where: { organizationId },
+            include: {
+                assignee: {
+                    select: { id: true, fullName: true, email: true }
+                },
+                _count: {
+                    select: { notes: true }
+                }
+            },
+            orderBy: { updatedAt: 'desc' },
+        });
+    }
+    async findOne(organizationId, id) {
+        const lead = await this.prisma.lead.findFirst({
+            where: { id, organizationId },
+            include: {
+                assignee: {
+                    select: { id: true, fullName: true, email: true }
+                },
+                notes: {
+                    orderBy: { createdAt: 'desc' }
+                }
+            },
+        });
+        if (!lead)
+            throw new common_1.NotFoundException('Lead not found');
+        return lead;
+    }
+    async create(organizationId, dto) {
+        return this.prisma.lead.create({
+            data: {
+                ...dto,
+                organizationId,
+            },
+            include: { assignee: true },
+        });
+    }
+    async update(organizationId, id, dto) {
+        await this.findOne(organizationId, id);
+        return this.prisma.lead.update({
+            where: { id },
+            data: dto,
+            include: { assignee: true },
+        });
+    }
+    async delete(organizationId, id) {
+        await this.findOne(organizationId, id);
+        return this.prisma.lead.delete({
+            where: { id },
+        });
+    }
+    async addNote(organizationId, leadId, dto) {
+        await this.findOne(organizationId, leadId);
+        return this.prisma.leadNote.create({
+            data: {
+                content: dto.content,
+                leadId,
+            },
+        });
+    }
+    async getNotes(organizationId, leadId) {
+        await this.findOne(organizationId, leadId);
+        return this.prisma.leadNote.findMany({
+            where: { leadId },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+};
+exports.LeadsService = LeadsService;
+exports.LeadsService = LeadsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], LeadsService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leaves/dto/leave.dto.ts"
+/*!*************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leaves/dto/leave.dto.ts ***!
+  \*************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateLeaveDto = exports.UpdateLeaveStatusDto = exports.CreateLeaveDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateLeaveDto {
+    type;
+    startDate;
+    endDate;
+    reason;
+    employeeId;
+}
+exports.CreateLeaveDto = CreateLeaveDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Annual' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateLeaveDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2026-04-11T00:00:00.000Z' }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateLeaveDto.prototype, "startDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2026-04-13T00:00:00.000Z' }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateLeaveDto.prototype, "endDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Family vacation' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateLeaveDto.prototype, "reason", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...employeeId' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateLeaveDto.prototype, "employeeId", void 0);
+class UpdateLeaveStatusDto {
+    status;
+}
+exports.UpdateLeaveStatusDto = UpdateLeaveStatusDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ enum: ['Pending', 'Approved', 'Rejected'] }),
+    (0, class_validator_1.IsEnum)(['Pending', 'Approved', 'Rejected']),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], UpdateLeaveStatusDto.prototype, "status", void 0);
+class UpdateLeaveDto extends (0, swagger_1.PartialType)(CreateLeaveDto) {
+}
+exports.UpdateLeaveDto = UpdateLeaveDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leaves/leaves.controller.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leaves/leaves.controller.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LeavesController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const leaves_service_1 = __webpack_require__(/*! ./leaves.service */ "./apps/klypto-crm-nest-js/src/leaves/leaves.service.ts");
+const leave_dto_1 = __webpack_require__(/*! ./dto/leave.dto */ "./apps/klypto-crm-nest-js/src/leaves/dto/leave.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let LeavesController = class LeavesController {
+    leavesService;
+    constructor(leavesService) {
+        this.leavesService = leavesService;
+    }
+    async findAll(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leavesService.getOrganizationId(req.user.sub);
+        return this.leavesService.findAll(orgId);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leavesService.getOrganizationId(req.user.sub);
+        return this.leavesService.create(orgId, dto);
+    }
+    async updateStatus(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.leavesService.getOrganizationId(req.user.sub);
+        return this.leavesService.updateStatus(orgId, id, dto);
+    }
+};
+exports.LeavesController = LeavesController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all leave requests' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], LeavesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new leave request' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof leave_dto_1.CreateLeaveDto !== "undefined" && leave_dto_1.CreateLeaveDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], LeavesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id/status'),
+    (0, swagger_1.ApiOperation)({ summary: 'Approve or reject a leave request' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof leave_dto_1.UpdateLeaveStatusDto !== "undefined" && leave_dto_1.UpdateLeaveStatusDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], LeavesController.prototype, "updateStatus", null);
+exports.LeavesController = LeavesController = __decorate([
+    (0, swagger_1.ApiTags)('Leaves'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('leaves'),
+    __metadata("design:paramtypes", [typeof (_a = typeof leaves_service_1.LeavesService !== "undefined" && leaves_service_1.LeavesService) === "function" ? _a : Object])
+], LeavesController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leaves/leaves.module.ts"
+/*!*************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leaves/leaves.module.ts ***!
+  \*************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LeavesModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const leaves_service_1 = __webpack_require__(/*! ./leaves.service */ "./apps/klypto-crm-nest-js/src/leaves/leaves.service.ts");
+const leaves_controller_1 = __webpack_require__(/*! ./leaves.controller */ "./apps/klypto-crm-nest-js/src/leaves/leaves.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let LeavesModule = class LeavesModule {
+};
+exports.LeavesModule = LeavesModule;
+exports.LeavesModule = LeavesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [leaves_controller_1.LeavesController],
+        providers: [leaves_service_1.LeavesService],
+        exports: [leaves_service_1.LeavesService],
+    })
+], LeavesModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/leaves/leaves.service.ts"
+/*!**************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/leaves/leaves.service.ts ***!
+  \**************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LeavesService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let LeavesService = class LeavesService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId) {
+        return this.prisma.leaveRequest.findMany({
+            where: { organizationId },
+            include: { employee: true },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async create(organizationId, dto) {
+        console.log('Creating leave request:', { organizationId, dto });
+        return this.prisma.leaveRequest.create({
+            data: {
+                type: dto.type,
+                startDate: new Date(dto.startDate),
+                endDate: new Date(dto.endDate),
+                reason: dto.reason,
+                status: 'Pending',
+                employee: { connect: { id: dto.employeeId } },
+                organization: { connect: { id: organizationId } },
+            },
+            include: { employee: true },
+        });
+    }
+    async updateStatus(organizationId, id, dto) {
+        const leave = await this.prisma.leaveRequest.findFirst({
+            where: { id, organizationId },
+        });
+        if (!leave)
+            throw new common_1.NotFoundException('Leave request not found');
+        return this.prisma.leaveRequest.update({
+            where: { id },
+            data: { status: dto.status },
+            include: { employee: true },
+        });
+    }
+};
+exports.LeavesService = LeavesService;
+exports.LeavesService = LeavesService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], LeavesService);
+
+
+/***/ },
+
 /***/ "./apps/klypto-crm-nest-js/src/mail/mail.module.ts"
 /*!*********************************************************!*\
   !*** ./apps/klypto-crm-nest-js/src/mail/mail.module.ts ***!
@@ -1139,6 +4469,1165 @@ exports.MailService = MailService = __decorate([
 
 /***/ },
 
+/***/ "./apps/klypto-crm-nest-js/src/organizations/dto/organization.dto.ts"
+/*!***************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/organizations/dto/organization.dto.ts ***!
+  \***************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateOrganizationDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class UpdateOrganizationDto {
+    name;
+    registrationNumber;
+    website;
+    primaryEmail;
+    phoneNumber;
+    taxId;
+    address;
+}
+exports.UpdateOrganizationDto = UpdateOrganizationDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Nexus Global Corp' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizationDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'REG-2024-98765' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizationDto.prototype, "registrationNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'www.nexusglobal.com' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizationDto.prototype, "website", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'admin@nexusglobal.com' }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizationDto.prototype, "primaryEmail", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '+1 (555) 123-4567' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizationDto.prototype, "phoneNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '27AAAAA0000A1Z5' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizationDto.prototype, "taxId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '123 Tech Avenue, San Francisco, CA' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizationDto.prototype, "address", void 0);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/organizations/organizations.controller.ts"
+/*!*******************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/organizations/organizations.controller.ts ***!
+  \*******************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OrganizationsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const organizations_service_1 = __webpack_require__(/*! ./organizations.service */ "./apps/klypto-crm-nest-js/src/organizations/organizations.service.ts");
+const organization_dto_1 = __webpack_require__(/*! ./dto/organization.dto */ "./apps/klypto-crm-nest-js/src/organizations/dto/organization.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let OrganizationsController = class OrganizationsController {
+    organizationsService;
+    constructor(organizationsService) {
+        this.organizationsService = organizationsService;
+    }
+    async getProfile(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.organizationsService.getOrganizationId(req.user.sub);
+        return this.organizationsService.getProfile(orgId);
+    }
+    async updateProfile(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.organizationsService.getOrganizationId(req.user.sub);
+        return this.organizationsService.updateProfile(orgId, dto);
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.organizationsService.getOrganizationId(req.user.sub);
+        return this.organizationsService.getDetailedStats(orgId);
+    }
+};
+exports.OrganizationsController = OrganizationsController;
+__decorate([
+    (0, common_1.Get)('profile'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get organization profile' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], OrganizationsController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Patch)('profile'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update organization profile' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof organization_dto_1.UpdateOrganizationDto !== "undefined" && organization_dto_1.UpdateOrganizationDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], OrganizationsController.prototype, "updateProfile", null);
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get detailed organizational stats' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], OrganizationsController.prototype, "getStats", null);
+exports.OrganizationsController = OrganizationsController = __decorate([
+    (0, swagger_1.ApiTags)('Organizations'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('organizations'),
+    __metadata("design:paramtypes", [typeof (_a = typeof organizations_service_1.OrganizationsService !== "undefined" && organizations_service_1.OrganizationsService) === "function" ? _a : Object])
+], OrganizationsController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/organizations/organizations.module.ts"
+/*!***************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/organizations/organizations.module.ts ***!
+  \***************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OrganizationsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const organizations_service_1 = __webpack_require__(/*! ./organizations.service */ "./apps/klypto-crm-nest-js/src/organizations/organizations.service.ts");
+const organizations_controller_1 = __webpack_require__(/*! ./organizations.controller */ "./apps/klypto-crm-nest-js/src/organizations/organizations.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let OrganizationsModule = class OrganizationsModule {
+};
+exports.OrganizationsModule = OrganizationsModule;
+exports.OrganizationsModule = OrganizationsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [organizations_controller_1.OrganizationsController],
+        providers: [organizations_service_1.OrganizationsService],
+        exports: [organizations_service_1.OrganizationsService],
+    })
+], OrganizationsModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/organizations/organizations.service.ts"
+/*!****************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/organizations/organizations.service.ts ***!
+  \****************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OrganizationsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let OrganizationsService = class OrganizationsService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async getProfile(organizationId) {
+        const org = await this.prisma.organization.findUnique({
+            where: { id: organizationId }
+        });
+        if (!org)
+            throw new common_1.NotFoundException('Organization not found');
+        return org;
+    }
+    async updateProfile(organizationId, dto) {
+        return this.prisma.organization.update({
+            where: { id: organizationId },
+            data: dto
+        });
+    }
+    async getDetailedStats(organizationId) {
+        const [employees, departments, branches] = await Promise.all([
+            this.prisma.employee.count({ where: { organizationId } }),
+            this.prisma.department.count({ where: { organizationId } }),
+            this.prisma.branch.count({ where: { organizationId } }),
+        ]);
+        return { employees, departments, branches };
+    }
+};
+exports.OrganizationsService = OrganizationsService;
+exports.OrganizationsService = OrganizationsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], OrganizationsService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/partners/dto/partner.dto.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/partners/dto/partner.dto.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdatePartnerDto = exports.CreatePartnerDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreatePartnerDto {
+    name;
+    type;
+    contactPerson;
+    email;
+    phone;
+    status;
+    category;
+    creditLimit;
+}
+exports.CreatePartnerDto = CreatePartnerDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Global Tech Solutions' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'CUSTOMER', enum: ['CUSTOMER', 'VENDOR'] }),
+    (0, class_validator_1.IsEnum)(['CUSTOMER', 'VENDOR']),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John Carter' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "contactPerson", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'john@gt-solutions.com' }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '+1 415 555 0122' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Active', enum: ['Active', 'Inactive', 'Blocked'] }),
+    (0, class_validator_1.IsEnum)(['Active', 'Inactive', 'Blocked']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'IT Electronics' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 50000 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreatePartnerDto.prototype, "creditLimit", void 0);
+class UpdatePartnerDto extends (0, swagger_1.PartialType)(CreatePartnerDto) {
+}
+exports.UpdatePartnerDto = UpdatePartnerDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/partners/partners.controller.ts"
+/*!*********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/partners/partners.controller.ts ***!
+  \*********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartnersController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const partners_service_1 = __webpack_require__(/*! ./partners.service */ "./apps/klypto-crm-nest-js/src/partners/partners.service.ts");
+const partner_dto_1 = __webpack_require__(/*! ./dto/partner.dto */ "./apps/klypto-crm-nest-js/src/partners/dto/partner.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let PartnersController = class PartnersController {
+    partnersService;
+    constructor(partnersService) {
+        this.partnersService = partnersService;
+    }
+    async findAll(req, type) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.partnersService.getOrganizationId(req.user.sub);
+        return this.partnersService.findAll(orgId, type);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.partnersService.getOrganizationId(req.user.sub);
+        return this.partnersService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.partnersService.getOrganizationId(req.user.sub);
+        return this.partnersService.update(orgId, id, dto);
+    }
+    async getStats(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.partnersService.getOrganizationId(req.user.sub);
+        return this.partnersService.getStats(orgId);
+    }
+};
+exports.PartnersController = PartnersController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all partners' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('type')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], PartnersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Add a new partner' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof partner_dto_1.CreatePartnerDto !== "undefined" && partner_dto_1.CreatePartnerDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], PartnersController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update partner details' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof partner_dto_1.UpdatePartnerDto !== "undefined" && partner_dto_1.UpdatePartnerDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], PartnersController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)('stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get partner statistics' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PartnersController.prototype, "getStats", null);
+exports.PartnersController = PartnersController = __decorate([
+    (0, swagger_1.ApiTags)('Partners'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('partners'),
+    __metadata("design:paramtypes", [typeof (_a = typeof partners_service_1.PartnersService !== "undefined" && partners_service_1.PartnersService) === "function" ? _a : Object])
+], PartnersController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/partners/partners.module.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/partners/partners.module.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartnersModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const partners_service_1 = __webpack_require__(/*! ./partners.service */ "./apps/klypto-crm-nest-js/src/partners/partners.service.ts");
+const partners_controller_1 = __webpack_require__(/*! ./partners.controller */ "./apps/klypto-crm-nest-js/src/partners/partners.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let PartnersModule = class PartnersModule {
+};
+exports.PartnersModule = PartnersModule;
+exports.PartnersModule = PartnersModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [partners_controller_1.PartnersController],
+        providers: [partners_service_1.PartnersService],
+        exports: [partners_service_1.PartnersService],
+    })
+], PartnersModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/partners/partners.service.ts"
+/*!******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/partners/partners.service.ts ***!
+  \******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartnersService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let PartnersService = class PartnersService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId, type) {
+        return this.prisma.partner.findMany({
+            where: {
+                organizationId,
+                ...(type && { type })
+            },
+            orderBy: { name: 'asc' },
+        });
+    }
+    async create(organizationId, dto) {
+        return this.prisma.partner.create({
+            data: { ...dto, organizationId },
+        });
+    }
+    async update(organizationId, id, dto) {
+        const partner = await this.prisma.partner.findFirst({ where: { id, organizationId } });
+        if (!partner)
+            throw new common_1.NotFoundException('Partner not found');
+        return this.prisma.partner.update({
+            where: { id },
+            data: dto,
+        });
+    }
+    async getStats(organizationId) {
+        const [customers, vendors] = await Promise.all([
+            this.prisma.partner.count({ where: { organizationId, type: 'CUSTOMER' } }),
+            this.prisma.partner.count({ where: { organizationId, type: 'VENDOR' } }),
+        ]);
+        return { customers, vendors };
+    }
+};
+exports.PartnersService = PartnersService;
+exports.PartnersService = PartnersService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], PartnersService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/payroll/dto/payroll.dto.ts"
+/*!****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/payroll/dto/payroll.dto.ts ***!
+  \****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ProcessPayrollDto = exports.CreateSalaryStructureDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateSalaryStructureDto {
+    employeeId;
+    basicSalary;
+    hra;
+    allowances;
+    deductions;
+}
+exports.CreateSalaryStructureDto = CreateSalaryStructureDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...employeeId' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateSalaryStructureDto.prototype, "employeeId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 50000 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], CreateSalaryStructureDto.prototype, "basicSalary", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 15000 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], CreateSalaryStructureDto.prototype, "hra", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 5000 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], CreateSalaryStructureDto.prototype, "allowances", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 2000 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], CreateSalaryStructureDto.prototype, "deductions", void 0);
+class ProcessPayrollDto {
+    month;
+    year;
+}
+exports.ProcessPayrollDto = ProcessPayrollDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 4 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(12),
+    __metadata("design:type", Number)
+], ProcessPayrollDto.prototype, "month", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 2026 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(2024),
+    __metadata("design:type", Number)
+], ProcessPayrollDto.prototype, "year", void 0);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/payroll/payroll.controller.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/payroll/payroll.controller.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PayrollController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const payroll_service_1 = __webpack_require__(/*! ./payroll.service */ "./apps/klypto-crm-nest-js/src/payroll/payroll.service.ts");
+const payroll_dto_1 = __webpack_require__(/*! ./dto/payroll.dto */ "./apps/klypto-crm-nest-js/src/payroll/dto/payroll.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let PayrollController = class PayrollController {
+    payrollService;
+    constructor(payrollService) {
+        this.payrollService = payrollService;
+    }
+    async findStructures(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.payrollService.getOrganizationId(req.user.sub);
+        return this.payrollService.findStructures(orgId);
+    }
+    async upsertStructure(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.payrollService.getOrganizationId(req.user.sub);
+        return this.payrollService.upsertStructure(orgId, dto);
+    }
+    async findAllRecords(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.payrollService.getOrganizationId(req.user.sub);
+        return this.payrollService.findAllRecords(orgId);
+    }
+    async processPayroll(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.payrollService.getOrganizationId(req.user.sub);
+        return this.payrollService.processPayroll(orgId, dto);
+    }
+};
+exports.PayrollController = PayrollController;
+__decorate([
+    (0, common_1.Get)('structures'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all salary structures' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PayrollController.prototype, "findStructures", null);
+__decorate([
+    (0, common_1.Post)('structures'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create or update salary structure' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof payroll_dto_1.CreateSalaryStructureDto !== "undefined" && payroll_dto_1.CreateSalaryStructureDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], PayrollController.prototype, "upsertStructure", null);
+__decorate([
+    (0, common_1.Get)('records'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all payroll records' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PayrollController.prototype, "findAllRecords", null);
+__decorate([
+    (0, common_1.Post)('process'),
+    (0, swagger_1.ApiOperation)({ summary: 'Process payroll for a month' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_c = typeof payroll_dto_1.ProcessPayrollDto !== "undefined" && payroll_dto_1.ProcessPayrollDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], PayrollController.prototype, "processPayroll", null);
+exports.PayrollController = PayrollController = __decorate([
+    (0, swagger_1.ApiTags)('Payroll'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('payroll'),
+    __metadata("design:paramtypes", [typeof (_a = typeof payroll_service_1.PayrollService !== "undefined" && payroll_service_1.PayrollService) === "function" ? _a : Object])
+], PayrollController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/payroll/payroll.module.ts"
+/*!***************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/payroll/payroll.module.ts ***!
+  \***************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PayrollModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const payroll_service_1 = __webpack_require__(/*! ./payroll.service */ "./apps/klypto-crm-nest-js/src/payroll/payroll.service.ts");
+const payroll_controller_1 = __webpack_require__(/*! ./payroll.controller */ "./apps/klypto-crm-nest-js/src/payroll/payroll.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let PayrollModule = class PayrollModule {
+};
+exports.PayrollModule = PayrollModule;
+exports.PayrollModule = PayrollModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [payroll_controller_1.PayrollController],
+        providers: [payroll_service_1.PayrollService],
+        exports: [payroll_service_1.PayrollService],
+    })
+], PayrollModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/payroll/payroll.service.ts"
+/*!****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/payroll/payroll.service.ts ***!
+  \****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PayrollService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let PayrollService = class PayrollService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findStructures(organizationId) {
+        return this.prisma.salaryStructure.findMany({
+            where: { organizationId },
+            include: { employee: true },
+        });
+    }
+    async upsertStructure(organizationId, dto) {
+        return this.prisma.salaryStructure.upsert({
+            where: { employeeId: dto.employeeId },
+            create: {
+                ...dto,
+                organizationId,
+            },
+            update: {
+                basicSalary: dto.basicSalary,
+                hra: dto.hra,
+                allowances: dto.allowances,
+                deductions: dto.deductions,
+            },
+            include: { employee: true },
+        });
+    }
+    async findAllRecords(organizationId) {
+        return this.prisma.payrollRecord.findMany({
+            where: { organizationId },
+            include: { employee: true },
+            orderBy: [{ year: 'desc' }, { month: 'desc' }],
+        });
+    }
+    async processPayroll(organizationId, dto) {
+        const structures = await this.prisma.salaryStructure.findMany({
+            where: { organizationId },
+        });
+        const records = [];
+        for (const struct of structures) {
+            const netPay = struct.basicSalary + struct.hra + struct.allowances - struct.deductions;
+            const record = await this.prisma.payrollRecord.upsert({
+                where: {
+                    employeeId_month_year: {
+                        employeeId: struct.employeeId,
+                        month: dto.month,
+                        year: dto.year,
+                    },
+                },
+                create: {
+                    employeeId: struct.employeeId,
+                    month: dto.month,
+                    year: dto.year,
+                    netPay,
+                    status: 'Paid',
+                    organizationId,
+                },
+                update: {
+                    netPay,
+                    status: 'Paid',
+                },
+            });
+            records.push(record);
+        }
+        return records;
+    }
+};
+exports.PayrollService = PayrollService;
+exports.PayrollService = PayrollService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], PayrollService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/performance/dto/performance.dto.ts"
+/*!************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/performance/dto/performance.dto.ts ***!
+  \************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdatePerformanceReviewDto = exports.CreatePerformanceReviewDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreatePerformanceReviewDto {
+    employeeId;
+    cycle;
+    rating;
+    feedback;
+    status;
+}
+exports.CreatePerformanceReviewDto = CreatePerformanceReviewDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clx...employeeId' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePerformanceReviewDto.prototype, "employeeId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Q1 2026' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePerformanceReviewDto.prototype, "cycle", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 4.5 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.Max)(5),
+    __metadata("design:type", Number)
+], CreatePerformanceReviewDto.prototype, "rating", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Excellent teamwork and delivery.' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePerformanceReviewDto.prototype, "feedback", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Complete' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePerformanceReviewDto.prototype, "status", void 0);
+class UpdatePerformanceReviewDto extends (0, swagger_1.PartialType)(CreatePerformanceReviewDto) {
+}
+exports.UpdatePerformanceReviewDto = UpdatePerformanceReviewDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/performance/performance.controller.ts"
+/*!***************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/performance/performance.controller.ts ***!
+  \***************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PerformanceController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const performance_service_1 = __webpack_require__(/*! ./performance.service */ "./apps/klypto-crm-nest-js/src/performance/performance.service.ts");
+const performance_dto_1 = __webpack_require__(/*! ./dto/performance.dto */ "./apps/klypto-crm-nest-js/src/performance/dto/performance.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let PerformanceController = class PerformanceController {
+    performanceService;
+    constructor(performanceService) {
+        this.performanceService = performanceService;
+    }
+    async findAll(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.performanceService.getOrganizationId(req.user.sub);
+        return this.performanceService.findAll(orgId);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.performanceService.getOrganizationId(req.user.sub);
+        return this.performanceService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.performanceService.getOrganizationId(req.user.sub);
+        return this.performanceService.update(orgId, id, dto);
+    }
+};
+exports.PerformanceController = PerformanceController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all performance reviews' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PerformanceController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new performance review' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof performance_dto_1.CreatePerformanceReviewDto !== "undefined" && performance_dto_1.CreatePerformanceReviewDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], PerformanceController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a performance review' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof performance_dto_1.UpdatePerformanceReviewDto !== "undefined" && performance_dto_1.UpdatePerformanceReviewDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], PerformanceController.prototype, "update", null);
+exports.PerformanceController = PerformanceController = __decorate([
+    (0, swagger_1.ApiTags)('Performance'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('performance'),
+    __metadata("design:paramtypes", [typeof (_a = typeof performance_service_1.PerformanceService !== "undefined" && performance_service_1.PerformanceService) === "function" ? _a : Object])
+], PerformanceController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/performance/performance.module.ts"
+/*!***********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/performance/performance.module.ts ***!
+  \***********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PerformanceModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const performance_service_1 = __webpack_require__(/*! ./performance.service */ "./apps/klypto-crm-nest-js/src/performance/performance.service.ts");
+const performance_controller_1 = __webpack_require__(/*! ./performance.controller */ "./apps/klypto-crm-nest-js/src/performance/performance.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let PerformanceModule = class PerformanceModule {
+};
+exports.PerformanceModule = PerformanceModule;
+exports.PerformanceModule = PerformanceModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [performance_controller_1.PerformanceController],
+        providers: [performance_service_1.PerformanceService],
+        exports: [performance_service_1.PerformanceService],
+    })
+], PerformanceModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/performance/performance.service.ts"
+/*!************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/performance/performance.service.ts ***!
+  \************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PerformanceService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let PerformanceService = class PerformanceService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId) {
+        return this.prisma.performanceReview.findMany({
+            where: { organizationId },
+            include: { employee: true },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async create(organizationId, dto) {
+        return this.prisma.performanceReview.create({
+            data: {
+                ...dto,
+                organizationId,
+            },
+            include: { employee: true },
+        });
+    }
+    async update(organizationId, id, dto) {
+        const review = await this.prisma.performanceReview.findFirst({
+            where: { id, organizationId },
+        });
+        if (!review)
+            throw new common_1.NotFoundException('Performance review not found');
+        return this.prisma.performanceReview.update({
+            where: { id },
+            data: { ...dto },
+            include: { employee: true },
+        });
+    }
+};
+exports.PerformanceService = PerformanceService;
+exports.PerformanceService = PerformanceService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], PerformanceService);
+
+
+/***/ },
+
 /***/ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts"
 /*!*************************************************************!*\
   !*** ./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts ***!
@@ -1199,6 +5688,397 @@ exports.PrismaService = PrismaService;
 exports.PrismaService = PrismaService = __decorate([
     (0, common_1.Injectable)()
 ], PrismaService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/projects/dto/project.dto.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/projects/dto/project.dto.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateProjectTaskDto = exports.CreateProjectTaskDto = exports.UpdateProjectDto = exports.CreateProjectDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateProjectDto {
+    name;
+    description;
+    status;
+}
+exports.CreateProjectDto = CreateProjectDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Website Redesign' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Refactoring the main customer portal with React 19' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Active', enum: ['Active', 'Completed'] }),
+    (0, class_validator_1.IsEnum)(['Active', 'Completed']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "status", void 0);
+class UpdateProjectDto extends (0, swagger_1.PartialType)(CreateProjectDto) {
+}
+exports.UpdateProjectDto = UpdateProjectDto;
+class CreateProjectTaskDto {
+    title;
+    description;
+    priority;
+    status;
+    dueDate;
+    assigneeId;
+    projectId;
+}
+exports.CreateProjectTaskDto = CreateProjectTaskDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Fix Layout Issues' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateProjectTaskDto.prototype, "title", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Fix the mobile responsive layout for the checkout page' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectTaskDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Medium', enum: ['Low', 'Medium', 'High', 'Critical'] }),
+    (0, class_validator_1.IsEnum)(['Low', 'Medium', 'High', 'Critical']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectTaskDto.prototype, "priority", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'todo', enum: ['todo', 'inprogress', 'review', 'done'] }),
+    (0, class_validator_1.IsEnum)(['todo', 'inprogress', 'review', 'done']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectTaskDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2026-05-15T00:00:00Z' }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectTaskDto.prototype, "dueDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'user-clx...id', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectTaskDto.prototype, "assigneeId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'project-clx...id' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateProjectTaskDto.prototype, "projectId", void 0);
+class UpdateProjectTaskDto extends (0, swagger_1.PartialType)(CreateProjectTaskDto) {
+}
+exports.UpdateProjectTaskDto = UpdateProjectTaskDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/projects/projects.controller.ts"
+/*!*********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/projects/projects.controller.ts ***!
+  \*********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ProjectsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const projects_service_1 = __webpack_require__(/*! ./projects.service */ "./apps/klypto-crm-nest-js/src/projects/projects.service.ts");
+const project_dto_1 = __webpack_require__(/*! ./dto/project.dto */ "./apps/klypto-crm-nest-js/src/projects/dto/project.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let ProjectsController = class ProjectsController {
+    projectsService;
+    constructor(projectsService) {
+        this.projectsService = projectsService;
+    }
+    async findAllProjects(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        return this.projectsService.findAllProjects(orgId);
+    }
+    async createProject(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        return this.projectsService.createProject(orgId, dto);
+    }
+    async updateProject(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        return this.projectsService.updateProject(orgId, id, dto);
+    }
+    async findAllTasks(req, projectId) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        return this.projectsService.findAllTasks(orgId, projectId);
+    }
+    async createTask(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        return this.projectsService.createTask(orgId, dto);
+    }
+    async updateTask(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        return this.projectsService.updateTask(orgId, id, dto);
+    }
+    async removeTask(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        return this.projectsService.deleteTask(orgId, id);
+    }
+};
+exports.ProjectsController = ProjectsController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all projects' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "findAllProjects", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new project' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof project_dto_1.CreateProjectDto !== "undefined" && project_dto_1.CreateProjectDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "createProject", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a project' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof project_dto_1.UpdateProjectDto !== "undefined" && project_dto_1.UpdateProjectDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "updateProject", null);
+__decorate([
+    (0, common_1.Get)('tasks'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all tasks' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('projectId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "findAllTasks", null);
+__decorate([
+    (0, common_1.Post)('tasks'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new task' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_d = typeof project_dto_1.CreateProjectTaskDto !== "undefined" && project_dto_1.CreateProjectTaskDto) === "function" ? _d : Object]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "createTask", null);
+__decorate([
+    (0, common_1.Patch)('tasks/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a task' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_e = typeof project_dto_1.UpdateProjectTaskDto !== "undefined" && project_dto_1.UpdateProjectTaskDto) === "function" ? _e : Object]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "updateTask", null);
+__decorate([
+    (0, common_1.Delete)('tasks/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a task' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "removeTask", null);
+exports.ProjectsController = ProjectsController = __decorate([
+    (0, swagger_1.ApiTags)('Projects'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('projects'),
+    __metadata("design:paramtypes", [typeof (_a = typeof projects_service_1.ProjectsService !== "undefined" && projects_service_1.ProjectsService) === "function" ? _a : Object])
+], ProjectsController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/projects/projects.module.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/projects/projects.module.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ProjectsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const projects_service_1 = __webpack_require__(/*! ./projects.service */ "./apps/klypto-crm-nest-js/src/projects/projects.service.ts");
+const projects_controller_1 = __webpack_require__(/*! ./projects.controller */ "./apps/klypto-crm-nest-js/src/projects/projects.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let ProjectsModule = class ProjectsModule {
+};
+exports.ProjectsModule = ProjectsModule;
+exports.ProjectsModule = ProjectsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [projects_controller_1.ProjectsController],
+        providers: [projects_service_1.ProjectsService],
+        exports: [projects_service_1.ProjectsService],
+    })
+], ProjectsModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/projects/projects.service.ts"
+/*!******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/projects/projects.service.ts ***!
+  \******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ProjectsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let ProjectsService = class ProjectsService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAllProjects(organizationId) {
+        return this.prisma.project.findMany({
+            where: { organizationId },
+            include: { _count: { select: { tasks: true } } },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async createProject(organizationId, dto) {
+        return this.prisma.project.create({
+            data: { ...dto, organizationId },
+        });
+    }
+    async updateProject(organizationId, id, dto) {
+        const project = await this.prisma.project.findFirst({ where: { id, organizationId } });
+        if (!project)
+            throw new common_1.NotFoundException('Project not found');
+        return this.prisma.project.update({ where: { id }, data: dto });
+    }
+    async findAllTasks(organizationId, projectId) {
+        return this.prisma.projectTask.findMany({
+            where: {
+                organizationId,
+                ...(projectId && { projectId })
+            },
+            include: {
+                assignee: { select: { id: true, fullName: true } },
+                project: { select: { name: true } }
+            },
+            orderBy: { updatedAt: 'desc' },
+        });
+    }
+    async createTask(organizationId, dto) {
+        return this.prisma.projectTask.create({
+            data: { ...dto, organizationId },
+            include: { assignee: { select: { id: true, fullName: true } } },
+        });
+    }
+    async updateTask(organizationId, id, dto) {
+        const task = await this.prisma.projectTask.findFirst({ where: { id, organizationId } });
+        if (!task)
+            throw new common_1.NotFoundException('Task not found');
+        return this.prisma.projectTask.update({
+            where: { id },
+            data: dto,
+            include: { assignee: { select: { id: true, fullName: true } } },
+        });
+    }
+    async deleteTask(organizationId, id) {
+        const task = await this.prisma.projectTask.findFirst({ where: { id, organizationId } });
+        if (!task)
+            throw new common_1.NotFoundException('Task not found');
+        return this.prisma.projectTask.delete({ where: { id } });
+    }
+};
+exports.ProjectsService = ProjectsService;
+exports.ProjectsService = ProjectsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], ProjectsService);
 
 
 /***/ },
@@ -1914,7 +6794,6 @@ const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./
 const DEFAULT_DASHBOARD_MODULES = [
     'dashboard',
     'leads',
-    'pipeline',
     'erp',
     'recruitment',
     'grievances',
@@ -1928,7 +6807,6 @@ const DEFAULT_DASHBOARD_MODULES = [
 const DASHBOARD_MODULE_LABELS = {
     dashboard: 'Dashboard',
     leads: 'Leads',
-    pipeline: 'Pipeline',
     erp: 'ERP Portal',
     recruitment: 'Recruitment',
     grievances: 'Grievances',
@@ -2208,8 +7086,6 @@ let RbacService = class RbacService {
                 return 'Executive summary cards and insights';
             case 'leads':
                 return 'Lead and pipeline tracking';
-            case 'pipeline':
-                return 'Sales pipeline overview';
             case 'erp':
                 return 'Finance, procurement, and ERP workflows';
             case 'recruitment':
@@ -2247,6 +7123,412 @@ exports.RbacService = RbacService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
 ], RbacService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/recruitment/dto/recruitment.dto.ts"
+/*!************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/recruitment/dto/recruitment.dto.ts ***!
+  \************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateCandidateDto = exports.CreateCandidateDto = exports.UpdateJobPostingDto = exports.CreateJobPostingDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateJobPostingDto {
+    title;
+    department;
+    status;
+}
+exports.CreateJobPostingDto = CreateJobPostingDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Senior React Developer' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateJobPostingDto.prototype, "title", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Engineering' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateJobPostingDto.prototype, "department", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Active', enum: ['Active', 'Paused', 'Closed'] }),
+    (0, class_validator_1.IsEnum)(['Active', 'Paused', 'Closed']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateJobPostingDto.prototype, "status", void 0);
+class UpdateJobPostingDto extends (0, swagger_1.PartialType)(CreateJobPostingDto) {
+}
+exports.UpdateJobPostingDto = UpdateJobPostingDto;
+class CreateCandidateDto {
+    name;
+    email;
+    phone;
+    role;
+    jobId;
+    score;
+    stage;
+}
+exports.CreateCandidateDto = CreateCandidateDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Alice Smith' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateCandidateDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'alice@example.com' }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCandidateDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '+1234567890' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCandidateDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Senior React Developer' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateCandidateDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'JOB-clx...id', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCandidateDto.prototype, "jobId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 85, required: false }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateCandidateDto.prototype, "score", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Applied', enum: ['Applied', 'Screening', 'Technical', 'Interview', 'Offered', 'Hired', 'Rejected'] }),
+    (0, class_validator_1.IsEnum)(['Applied', 'Screening', 'Technical', 'Interview', 'Offered', 'Hired', 'Rejected']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCandidateDto.prototype, "stage", void 0);
+class UpdateCandidateDto extends (0, swagger_1.PartialType)(CreateCandidateDto) {
+}
+exports.UpdateCandidateDto = UpdateCandidateDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/recruitment/recruitment.controller.ts"
+/*!***************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/recruitment/recruitment.controller.ts ***!
+  \***************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RecruitmentController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const recruitment_service_1 = __webpack_require__(/*! ./recruitment.service */ "./apps/klypto-crm-nest-js/src/recruitment/recruitment.service.ts");
+const recruitment_dto_1 = __webpack_require__(/*! ./dto/recruitment.dto */ "./apps/klypto-crm-nest-js/src/recruitment/dto/recruitment.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let RecruitmentController = class RecruitmentController {
+    recruitmentService;
+    constructor(recruitmentService) {
+        this.recruitmentService = recruitmentService;
+    }
+    async findAllJobs(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.findAllJobs(orgId);
+    }
+    async createJob(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.createJob(orgId, dto);
+    }
+    async updateJob(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.updateJob(orgId, id, dto);
+    }
+    async findAllCandidates(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.findAllCandidates(orgId);
+    }
+    async createCandidate(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.createCandidate(orgId, dto);
+    }
+    async updateCandidate(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.updateCandidate(orgId, id, dto);
+    }
+    async removeCandidate(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.deleteCandidate(orgId, id);
+    }
+};
+exports.RecruitmentController = RecruitmentController;
+__decorate([
+    (0, common_1.Get)('jobs'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all job postings' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "findAllJobs", null);
+__decorate([
+    (0, common_1.Post)('jobs'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new job posting' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof recruitment_dto_1.CreateJobPostingDto !== "undefined" && recruitment_dto_1.CreateJobPostingDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "createJob", null);
+__decorate([
+    (0, common_1.Patch)('jobs/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a job posting' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof recruitment_dto_1.UpdateJobPostingDto !== "undefined" && recruitment_dto_1.UpdateJobPostingDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "updateJob", null);
+__decorate([
+    (0, common_1.Get)('candidates'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all candidates' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "findAllCandidates", null);
+__decorate([
+    (0, common_1.Post)('candidates'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new candidate' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_d = typeof recruitment_dto_1.CreateCandidateDto !== "undefined" && recruitment_dto_1.CreateCandidateDto) === "function" ? _d : Object]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "createCandidate", null);
+__decorate([
+    (0, common_1.Patch)('candidates/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a candidate' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_e = typeof recruitment_dto_1.UpdateCandidateDto !== "undefined" && recruitment_dto_1.UpdateCandidateDto) === "function" ? _e : Object]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "updateCandidate", null);
+__decorate([
+    (0, common_1.Delete)('candidates/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a candidate' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "removeCandidate", null);
+exports.RecruitmentController = RecruitmentController = __decorate([
+    (0, swagger_1.ApiTags)('Recruitment'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('recruitment'),
+    __metadata("design:paramtypes", [typeof (_a = typeof recruitment_service_1.RecruitmentService !== "undefined" && recruitment_service_1.RecruitmentService) === "function" ? _a : Object])
+], RecruitmentController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/recruitment/recruitment.module.ts"
+/*!***********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/recruitment/recruitment.module.ts ***!
+  \***********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RecruitmentModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const recruitment_service_1 = __webpack_require__(/*! ./recruitment.service */ "./apps/klypto-crm-nest-js/src/recruitment/recruitment.service.ts");
+const recruitment_controller_1 = __webpack_require__(/*! ./recruitment.controller */ "./apps/klypto-crm-nest-js/src/recruitment/recruitment.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let RecruitmentModule = class RecruitmentModule {
+};
+exports.RecruitmentModule = RecruitmentModule;
+exports.RecruitmentModule = RecruitmentModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [recruitment_controller_1.RecruitmentController],
+        providers: [recruitment_service_1.RecruitmentService],
+        exports: [recruitment_service_1.RecruitmentService],
+    })
+], RecruitmentModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/recruitment/recruitment.service.ts"
+/*!************************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/recruitment/recruitment.service.ts ***!
+  \************************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RecruitmentService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let RecruitmentService = class RecruitmentService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAllJobs(organizationId) {
+        return this.prisma.jobPosting.findMany({
+            where: { organizationId },
+            include: { _count: { select: { candidates: true } } },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async createJob(organizationId, dto) {
+        return this.prisma.jobPosting.create({
+            data: { ...dto, organizationId },
+        });
+    }
+    async updateJob(organizationId, id, dto) {
+        const job = await this.prisma.jobPosting.findFirst({ where: { id, organizationId } });
+        if (!job)
+            throw new common_1.NotFoundException('Job posting not found');
+        return this.prisma.jobPosting.update({ where: { id }, data: dto });
+    }
+    async findAllCandidates(organizationId) {
+        return this.prisma.candidate.findMany({
+            where: { organizationId },
+            include: { job: true },
+            orderBy: { updatedAt: 'desc' },
+        });
+    }
+    async createCandidate(organizationId, dto) {
+        return this.prisma.candidate.create({
+            data: { ...dto, organizationId },
+            include: { job: true },
+        });
+    }
+    async updateCandidate(organizationId, id, dto) {
+        const candidate = await this.prisma.candidate.findFirst({ where: { id, organizationId } });
+        if (!candidate)
+            throw new common_1.NotFoundException('Candidate not found');
+        const updatedCandidate = await this.prisma.candidate.update({
+            where: { id },
+            data: dto,
+            include: { job: true },
+        });
+        if (dto.stage === 'Hired' && candidate.stage !== 'Hired') {
+            await this.onboardCandidate(organizationId, updatedCandidate);
+        }
+        return updatedCandidate;
+    }
+    async onboardCandidate(organizationId, candidate) {
+        const code = `EMP-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+        const existing = await this.prisma.employee.findFirst({
+            where: { name: candidate.name, organizationId }
+        });
+        if (!existing) {
+            await this.prisma.employee.create({
+                data: {
+                    name: candidate.name,
+                    role: candidate.role,
+                    department: candidate.job?.department || 'General',
+                    code,
+                    status: 'Active',
+                    organizationId,
+                }
+            });
+        }
+    }
+    async deleteCandidate(organizationId, id) {
+        const candidate = await this.prisma.candidate.findFirst({ where: { id, organizationId } });
+        if (!candidate)
+            throw new common_1.NotFoundException('Candidate not found');
+        return this.prisma.candidate.delete({ where: { id } });
+    }
+};
+exports.RecruitmentService = RecruitmentService;
+exports.RecruitmentService = RecruitmentService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], RecruitmentService);
 
 
 /***/ },

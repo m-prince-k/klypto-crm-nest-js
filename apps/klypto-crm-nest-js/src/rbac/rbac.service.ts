@@ -16,7 +16,6 @@ import {
 const DEFAULT_DASHBOARD_MODULES = [
   'dashboard',
   'leads',
-  'pipeline',
   'erp',
   'recruitment',
   'grievances',
@@ -31,7 +30,6 @@ const DEFAULT_DASHBOARD_MODULES = [
 const DASHBOARD_MODULE_LABELS: Record<string, string> = {
   dashboard: 'Dashboard',
   leads: 'Leads',
-  pipeline: 'Pipeline',
   erp: 'ERP Portal',
   recruitment: 'Recruitment',
   grievances: 'Grievances',
@@ -361,8 +359,6 @@ export class RbacService {
         return 'Executive summary cards and insights';
       case 'leads':
         return 'Lead and pipeline tracking';
-      case 'pipeline':
-        return 'Sales pipeline overview';
       case 'erp':
         return 'Finance, procurement, and ERP workflows';
       case 'recruitment':
