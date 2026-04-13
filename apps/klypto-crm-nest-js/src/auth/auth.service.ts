@@ -45,12 +45,22 @@ const ROLE_MODULES: Record<string, string[]> = {
   MANAGER: [
     'dashboard',
     'leads',
+    'erp',
     'recruitment',
     'grievances',
     'leave',
     'settings',
   ],
-  HR: ['dashboard', 'hrms', 'employees', 'leave', 'settings'],
+  HR: [
+    'dashboard',
+    'erp',
+    'hrms',
+    'employees',
+    'leave',
+    'payroll',
+    'users',
+    'settings',
+  ],
   EMPLOYEE: ['dashboard', 'employees', 'leave', 'grievances', 'settings'],
 };
 
@@ -100,9 +110,9 @@ export class AuthService {
     };
   }
 
-  /** SuperAdmin / Admin creates a new employee account */
+  /** SuperAdmin / Admin / HR creates a new employee account */
   async createUser(adminUserId: string, dto: CreateUserDto) {
-    // 1. Verify the caller exists and has admin rights
+    // 1. Verify the caller exists and has rights
     const adminUser = await this.usersService.findOneById(adminUserId);
     if (!adminUser) throw new UnauthorizedException('Invalid user context');
 
@@ -111,9 +121,21 @@ export class AuthService {
     );
     const canCreate =
       adminRoles.includes(SystemRole.SUPER_ADMIN) ||
-      adminRoles.includes(SystemRole.ADMIN);
+      adminRoles.includes(SystemRole.ADMIN) ||
+      adminRoles.includes(SystemRole.HR);
     if (!canCreate)
-      throw new ForbiddenException('Only admins can create user accounts');
+      throw new ForbiddenException(
+        'Only super admins, admins, or HR can create user accounts',
+      );
+
+    const createdRole = String(dto.role || '').toUpperCase();
+    const isHrOnlyCreator =
+      adminRoles.includes(SystemRole.HR) &&
+      !adminRoles.includes(SystemRole.SUPER_ADMIN) &&
+      !adminRoles.includes(SystemRole.ADMIN);
+    if (isHrOnlyCreator && createdRole !== SystemRole.EMPLOYEE) {
+      throw new ForbiddenException('HR can only create employee accounts');
+    }
 
     // 2. Ensure email is unique
     const existing = await this.usersService.findOneByEmail(dto.email);
@@ -130,7 +152,7 @@ export class AuthService {
     });
 
     // 4. Ensure the system role exists with correct modules and assign it
-    const roleKey = dto.role.toUpperCase();
+    const roleKey = createdRole;
     const roleModules = ROLE_MODULES[roleKey] ?? ROLE_MODULES.EMPLOYEE;
     await this.ensureRole(roleKey, roleModules);
     await this.assignRole(newUser.id, roleKey);
@@ -204,9 +226,12 @@ export class AuthService {
     );
     if (
       !adminRoles.includes(SystemRole.SUPER_ADMIN) &&
-      !adminRoles.includes(SystemRole.ADMIN)
+      !adminRoles.includes(SystemRole.ADMIN) &&
+      !adminRoles.includes(SystemRole.HR)
     ) {
-      throw new ForbiddenException('Only admins can modify user status');
+      throw new ForbiddenException(
+        'Only super admins, admins, or HR can modify user status',
+      );
     }
 
     const target = await this.prisma.user.findUnique({
@@ -394,9 +419,12 @@ export class AuthService {
     const roleSet = new Set(roles.map((role) => role.toUpperCase()));
     const hasSuperAdmin = roleSet.has(SystemRole.SUPER_ADMIN);
     const hasAdmin = roleSet.has(SystemRole.ADMIN);
+    const roleDefaultModules = hasSuperAdmin
+      ? DEFAULT_DASHBOARD_MODULES
+      : roles.flatMap((role) => ROLE_MODULES[String(role).toUpperCase()] || []);
     const effectiveModules = hasSuperAdmin
       ? DEFAULT_DASHBOARD_MODULES
-      : dashboardModules;
+      : [...new Set([...(dashboardModules || []), ...roleDefaultModules])];
 
     return {
       isSuperAdmin: hasSuperAdmin,

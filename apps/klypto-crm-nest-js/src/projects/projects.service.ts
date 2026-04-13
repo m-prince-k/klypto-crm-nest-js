@@ -1,10 +1,39 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateProjectDto, UpdateProjectDto, CreateProjectTaskDto, UpdateProjectTaskDto } from './dto/project.dto';
+import {
+  CreateProjectDto,
+  UpdateProjectDto,
+  CreateProjectTaskDto,
+  UpdateProjectTaskDto,
+} from './dto/project.dto';
 
 @Injectable()
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
+
+  private async resolveManagerId(
+    organizationId: string,
+    managerId?: string,
+  ): Promise<string | null> {
+    if (!managerId) return null;
+
+    const manager = await this.prisma.user.findFirst({
+      where: { id: managerId, organizationId },
+      select: { id: true },
+    });
+
+    if (!manager) {
+      throw new NotFoundException(
+        'Selected project manager not found in organization',
+      );
+    }
+
+    return manager.id;
+  }
 
   async getOrganizationId(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
@@ -18,38 +47,109 @@ export class ProjectsService {
   }
 
   // Projects
-  async findAllProjects(organizationId: string) {
+  async findAllProjects(organizationId: string, assigneeId?: string) {
     return this.prisma.project.findMany({
-      where: { organizationId },
-      include: { _count: { select: { tasks: true } } },
+      where: {
+        organizationId,
+        ...(assigneeId
+          ? {
+              tasks: {
+                some: { assigneeId },
+              },
+            }
+          : {}),
+      },
+      include: {
+        manager: { select: { id: true, fullName: true } },
+        createdBy: { select: { id: true, fullName: true } },
+        _count: { select: { tasks: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async createProject(organizationId: string, dto: CreateProjectDto) {
+  async createProject(
+    organizationId: string,
+    creatorUserId: string,
+    dto: CreateProjectDto,
+  ) {
+    const managerId = await this.resolveManagerId(
+      organizationId,
+      dto.managerId,
+    );
+
     return this.prisma.project.create({
-      data: { ...dto, organizationId },
+      data: {
+        name: dto.name,
+        description: dto.description,
+        status: dto.status,
+        organizationId,
+        createdById: creatorUserId,
+        managerId,
+      },
+      include: {
+        manager: { select: { id: true, fullName: true } },
+        createdBy: { select: { id: true, fullName: true } },
+        _count: { select: { tasks: true } },
+      },
     });
   }
 
-  async updateProject(organizationId: string, id: string, dto: UpdateProjectDto) {
-    const project = await this.prisma.project.findFirst({ where: { id, organizationId } });
+  async updateProject(
+    organizationId: string,
+    id: string,
+    dto: UpdateProjectDto,
+  ) {
+    const project = await this.prisma.project.findFirst({
+      where: { id, organizationId },
+    });
     if (!project) throw new NotFoundException('Project not found');
-    return this.prisma.project.update({ where: { id }, data: dto });
+    const managerId = await this.resolveManagerId(
+      organizationId,
+      dto.managerId,
+    );
+
+    return this.prisma.project.update({
+      where: { id },
+      data: {
+        ...(dto.name !== undefined ? { name: dto.name } : {}),
+        ...(dto.description !== undefined
+          ? { description: dto.description }
+          : {}),
+        ...(dto.status !== undefined ? { status: dto.status } : {}),
+        ...(dto.managerId !== undefined ? { managerId } : {}),
+      },
+      include: {
+        manager: { select: { id: true, fullName: true } },
+        createdBy: { select: { id: true, fullName: true } },
+        _count: { select: { tasks: true } },
+      },
+    });
   }
 
   // Tasks
-  async findAllTasks(organizationId: string, projectId?: string) {
+  async findAllTasks(
+    organizationId: string,
+    projectId?: string,
+    assigneeId?: string,
+  ) {
     return this.prisma.projectTask.findMany({
-      where: { 
+      where: {
         organizationId,
-        ...(projectId && { projectId })
+        ...(projectId && { projectId }),
+        ...(assigneeId && { assigneeId }),
       },
-      include: { 
+      include: {
         assignee: { select: { id: true, fullName: true } },
-        project: { select: { name: true } }
+        project: { select: { name: true } },
       },
       orderBy: { updatedAt: 'desc' },
+    });
+  }
+
+  async findTaskById(organizationId: string, id: string) {
+    return this.prisma.projectTask.findFirst({
+      where: { id, organizationId },
     });
   }
 
@@ -60,8 +160,14 @@ export class ProjectsService {
     });
   }
 
-  async updateTask(organizationId: string, id: string, dto: UpdateProjectTaskDto) {
-    const task = await this.prisma.projectTask.findFirst({ where: { id, organizationId } });
+  async updateTask(
+    organizationId: string,
+    id: string,
+    dto: UpdateProjectTaskDto,
+  ) {
+    const task = await this.prisma.projectTask.findFirst({
+      where: { id, organizationId },
+    });
     if (!task) throw new NotFoundException('Task not found');
 
     return this.prisma.projectTask.update({
@@ -72,7 +178,9 @@ export class ProjectsService {
   }
 
   async deleteTask(organizationId: string, id: string) {
-    const task = await this.prisma.projectTask.findFirst({ where: { id, organizationId } });
+    const task = await this.prisma.projectTask.findFirst({
+      where: { id, organizationId },
+    });
     if (!task) throw new NotFoundException('Task not found');
     return this.prisma.projectTask.delete({ where: { id } });
   }

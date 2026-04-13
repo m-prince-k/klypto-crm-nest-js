@@ -52,6 +52,8 @@ model User {
   employee                Employee?
   assignedLeads           Lead[]        @relation("LeadAssignee")
   assignedTasks           ProjectTask[]
+  managedProjects         Project[]     @relation("ProjectManager")
+  createdProjects         Project[]     @relation("ProjectCreator")
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
 }
@@ -262,6 +264,10 @@ model Project {
   status         String        @default("Active") // Active, Completed
   organizationId String
   organization   Organization  @relation(fields: [organizationId], references: [id])
+  managerId      String?
+  manager        User?         @relation("ProjectManager", fields: [managerId], references: [id])
+  createdById    String?
+  createdBy      User?         @relation("ProjectCreator", fields: [createdById], references: [id])
   tasks          ProjectTask[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt

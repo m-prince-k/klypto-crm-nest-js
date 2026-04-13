@@ -1,5 +1,11 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty({ example: 'Website Redesign' })
@@ -7,7 +13,9 @@ export class CreateProjectDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'Refactoring the main customer portal with React 19' })
+  @ApiProperty({
+    example: 'Refactoring the main customer portal with React 19',
+  })
   @IsString()
   @IsOptional()
   description?: string;
@@ -16,6 +24,11 @@ export class CreateProjectDto {
   @IsEnum(['Active', 'Completed'])
   @IsOptional()
   status?: string;
+
+  @ApiProperty({ example: 'user-clx...id', required: false })
+  @IsString()
+  @IsOptional()
+  managerId?: string;
 }
 
 export class UpdateProjectDto extends PartialType(CreateProjectDto) {}
@@ -26,17 +39,25 @@ export class CreateProjectTaskDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Fix the mobile responsive layout for the checkout page' })
+  @ApiProperty({
+    example: 'Fix the mobile responsive layout for the checkout page',
+  })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ example: 'Medium', enum: ['Low', 'Medium', 'High', 'Critical'] })
+  @ApiProperty({
+    example: 'Medium',
+    enum: ['Low', 'Medium', 'High', 'Critical'],
+  })
   @IsEnum(['Low', 'Medium', 'High', 'Critical'])
   @IsOptional()
   priority?: string;
 
-  @ApiProperty({ example: 'todo', enum: ['todo', 'inprogress', 'review', 'done'] })
+  @ApiProperty({
+    example: 'todo',
+    enum: ['todo', 'inprogress', 'review', 'done'],
+  })
   @IsEnum(['todo', 'inprogress', 'review', 'done'])
   @IsOptional()
   status?: string;
