@@ -34,7 +34,7 @@ const DASHBOARD_MODULE_LABELS: Record<string, string> = {
   recruitment: 'Recruitment',
   grievances: 'Grievances',
   payroll: 'Payroll',
-  hrms: 'HRMS',
+  hrms: 'HR',
   leave: 'Leave',
   employees: 'Employees',
   settings: 'Settings',
@@ -119,13 +119,18 @@ export class RbacService {
       );
     }
 
-    if (existingRole.isSystem && hasNameUpdate) {
-      throw new ConflictException('System role name cannot be changed');
-    }
-
     const nextName = hasNameUpdate
       ? dto.name!.trim().toUpperCase()
       : existingRole.name;
+
+    if (
+      existingRole.isSystem &&
+      hasNameUpdate &&
+      nextName !== existingRole.name
+    ) {
+      throw new ConflictException('System role name cannot be changed');
+    }
+
     const dashboardModules = hasModulesUpdate
       ? this.normalizeDashboardModules(dto.dashboardModules)
       : existingRole.dashboardModules;
@@ -368,7 +373,7 @@ export class RbacService {
       case 'payroll':
         return 'Salary and compensation management';
       case 'hrms':
-        return 'HRMS overview and operations';
+        return 'HR overview and operations';
       case 'leave':
         return 'Leave requests and approvals';
       case 'employees':

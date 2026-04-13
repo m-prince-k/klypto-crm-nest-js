@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto, SignupDto, CreateUserDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
 import { SystemRole } from './roles/system-role.enum';
+import { AuthEventsService } from './auth-events.service';
 
 const DEFAULT_DASHBOARD_MODULES = [
   'dashboard',
@@ -20,7 +21,6 @@ const DEFAULT_DASHBOARD_MODULES = [
   'payroll',
   'hrms',
   'leave',
-  'employees',
   'settings',
   'roles-access',
   'users',
@@ -70,6 +70,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
+    private readonly authEventsService: AuthEventsService,
   ) {}
 
   /** One-time org bootstrap — only called from the /signup page */
@@ -92,6 +93,22 @@ export class AuthService {
       fullName: signupDto.fullName,
       passwordHash,
       organization: { connect: { id: organization.id } },
+    });
+
+    const superAdminCode = `ADM-${Date.now().toString(36).toUpperCase()}-${user.id
+      .slice(-4)
+      .toUpperCase()}`;
+
+    await this.prisma.employee.create({
+      data: {
+        name: signupDto.fullName,
+        code: superAdminCode,
+        role: SystemRole.SUPER_ADMIN,
+        department: 'Administration',
+        status: 'Active',
+        organization: { connect: { id: organization.id } },
+        user: { connect: { id: user.id } },
+      },
     });
 
     // First user is always SUPER_ADMIN
@@ -241,8 +258,13 @@ export class AuthService {
 
     const updated = await this.prisma.user.update({
       where: { id: targetUserId },
-      data: { isActive: !target.isActive },
+      data: {
+        isActive: !target.isActive,
+        ...(target.isActive ? { hashedRefreshToken: null } : {}),
+      },
     });
+
+    this.authEventsService.emitUserStatusChange(updated.id, updated.isActive);
 
     return { id: updated.id, isActive: updated.isActive };
   }
@@ -311,12 +333,20 @@ export class AuthService {
       where: { id: userId },
       data: { hashedRefreshToken: null },
     });
+
+    return { message: 'Logged out successfully' };
   }
 
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.usersService.findOneById(userId);
     if (!user || !user.hashedRefreshToken) {
       throw new UnauthorizedException('Access Denied');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException(
+        'Your account has been deactivated. Contact your administrator.',
+      );
     }
 
     const refreshTokenMatches = await bcrypt.compare(

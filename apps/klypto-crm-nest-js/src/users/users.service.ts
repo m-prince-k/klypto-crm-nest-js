@@ -14,7 +14,6 @@ export class UsersService {
         roleAssignments: {
           include: {
             role: true,
-            assignedBy: true,
           },
         },
       },
@@ -29,9 +28,18 @@ export class UsersService {
         roleAssignments: {
           include: {
             role: true,
-            assignedBy: true,
           },
         },
+      },
+    });
+  }
+
+  async findActiveStatusById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        isActive: true,
       },
     });
   }

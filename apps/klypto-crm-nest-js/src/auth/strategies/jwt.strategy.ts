@@ -1,17 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(private readonly usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.JWT_ACCESS_SECRET || 'access-secret',
     });
   }
 
-  validate(payload: any) {
+  async validate(payload: any) {
+    const user = await this.usersService.findActiveStatusById(payload?.sub);
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException(
+        'Your account has been deactivated. Contact your administrator.',
+      );
+    }
+
     return payload;
   }
 }

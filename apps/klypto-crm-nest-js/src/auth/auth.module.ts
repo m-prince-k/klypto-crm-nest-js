@@ -10,6 +10,7 @@ import {
 } from './strategies/jwt.strategy';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { AuthEventsService } from './auth-events.service';
 
 @Module({
   imports: [UsersModule, PassportModule, JwtModule.register({})],
@@ -20,6 +21,7 @@ import { RefreshTokenGuard } from './guards/refresh-token.guard';
     RefreshTokenStrategy,
     AccessTokenGuard,
     RefreshTokenGuard,
+    AuthEventsService,
   ],
   exports: [AuthService, AccessTokenGuard, RefreshTokenGuard],
 })

@@ -37,7 +37,11 @@ export class RolesGuard implements CanActivate {
     const assignedRoles = await this.prisma.userRole.findMany({
       where: { userId },
       include: {
-        role: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 

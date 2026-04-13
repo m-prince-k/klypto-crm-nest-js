@@ -2,9 +2,15 @@ import {
   Injectable,
   UnauthorizedException,
   NotFoundException,
+  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateLeaveDto, UpdateLeaveStatusDto } from './dto/leave.dto';
+import {
+  CreateLeaveDto,
+  UpdateLeaveDto,
+  UpdateLeaveStatusDto,
+} from './dto/leave.dto';
 
 @Injectable()
 export class LeavesService {
@@ -94,6 +100,67 @@ export class LeavesService {
     });
   }
 
+  async updateLeave(organizationId: string, id: string, dto: UpdateLeaveDto) {
+    const leave = await this.prisma.leaveRequest.findFirst({
+      where: { id, organizationId },
+      select: {
+        id: true,
+        status: true,
+        startDate: true,
+        endDate: true,
+      },
+    });
+
+    if (!leave) throw new NotFoundException('Leave request not found');
+
+    if (leave.status !== 'Pending') {
+      throw new ForbiddenException('Only pending leave requests can be edited');
+    }
+
+    if (dto.employeeId) {
+      const employee = await this.prisma.employee.findFirst({
+        where: { id: dto.employeeId, organizationId },
+        select: { id: true },
+      });
+      if (!employee) {
+        throw new NotFoundException('Employee not found in organization');
+      }
+    }
+
+    const nextStartDate = dto.startDate
+      ? new Date(dto.startDate)
+      : leave.startDate;
+    const nextEndDate = dto.endDate ? new Date(dto.endDate) : leave.endDate;
+
+    if (nextStartDate > nextEndDate) {
+      throw new BadRequestException('Start date cannot be later than end date');
+    }
+
+    return this.prisma.leaveRequest.update({
+      where: { id },
+      data: {
+        ...(dto.type !== undefined ? { type: dto.type } : {}),
+        ...(dto.startDate ? { startDate: new Date(dto.startDate) } : {}),
+        ...(dto.endDate ? { endDate: new Date(dto.endDate) } : {}),
+        ...(dto.reason !== undefined ? { reason: dto.reason } : {}),
+        ...(dto.employeeId
+          ? { employee: { connect: { id: dto.employeeId } } }
+          : {}),
+      },
+      include: {
+        employee: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            role: true,
+            department: true,
+          },
+        },
+      },
+    });
+  }
+
   async getStats(organizationId: string) {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -136,6 +203,55 @@ export class LeavesService {
       where: { userId },
       select: { id: true },
     });
-    return employee?.id ?? null;
+
+    if (employee?.id) {
+      return employee.id;
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        fullName: true,
+        organizationId: true,
+        roleAssignments: {
+          include: {
+            role: { select: { name: true } },
+          },
+        },
+      },
+    });
+
+    if (!user?.organizationId) {
+      return null;
+    }
+
+    const hasSuperAdminRole = (user.roleAssignments || []).some(
+      (assignment) =>
+        String(assignment.role?.name).toUpperCase() === 'SUPER_ADMIN',
+    );
+
+    if (!hasSuperAdminRole) {
+      return null;
+    }
+
+    const generatedCode = `ADM-${Date.now().toString(36).toUpperCase()}-${user.id
+      .slice(-4)
+      .toUpperCase()}`;
+
+    const created = await this.prisma.employee.create({
+      data: {
+        name: user.fullName,
+        code: generatedCode,
+        role: 'SUPER_ADMIN',
+        department: 'Administration',
+        status: 'Active',
+        organization: { connect: { id: user.organizationId } },
+        user: { connect: { id: user.id } },
+      },
+      select: { id: true },
+    });
+
+    return created.id;
   }
 }

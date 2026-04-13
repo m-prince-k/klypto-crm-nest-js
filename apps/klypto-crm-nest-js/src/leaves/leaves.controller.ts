@@ -12,7 +12,11 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { LeavesService } from './leaves.service';
-import { CreateLeaveDto, UpdateLeaveStatusDto } from './dto/leave.dto';
+import {
+  CreateLeaveDto,
+  UpdateLeaveDto,
+  UpdateLeaveStatusDto,
+} from './dto/leave.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 
@@ -31,6 +35,10 @@ export class LeavesController {
     return ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR'].some((role) =>
       roles.includes(role),
     );
+  }
+
+  private hasLeaveEditAccess(roles: string[]) {
+    return ['SUPER_ADMIN', 'HR'].some((role) => roles.includes(role));
   }
 
   @Get('stats')
@@ -76,6 +84,26 @@ export class LeavesController {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.leavesService.getOrganizationId(req.user.sub);
     return this.leavesService.create(orgId, dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update leave request details while pending' })
+  async update(
+    @Req() req: { user?: { sub?: string; roles?: string[] } },
+    @Param('id') id: string,
+    @Body() dto: UpdateLeaveDto,
+  ) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+
+    const roles = this.getNormalizedRoles(req.user.roles || []);
+    if (!this.hasLeaveEditAccess(roles)) {
+      throw new ForbiddenException(
+        'You do not have permission to edit leave requests',
+      );
+    }
+
+    const orgId = await this.leavesService.getOrganizationId(req.user.sub);
+    return this.leavesService.updateLeave(orgId, id, dto);
   }
 
   @Patch(':id/status')

@@ -1060,6 +1060,65 @@ exports.UpdateAttendanceDto = UpdateAttendanceDto;
 
 /***/ },
 
+/***/ "./apps/klypto-crm-nest-js/src/auth/auth-events.service.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/auth/auth-events.service.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AuthEventsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
+const events_1 = __webpack_require__(/*! events */ "events");
+let AuthEventsService = class AuthEventsService {
+    emitter = new events_1.EventEmitter();
+    createUserEventStream(userId) {
+        return new rxjs_1.Observable((subscriber) => {
+            const channel = `user:${userId}`;
+            const listener = (payload) => {
+                subscriber.next({ data: payload });
+            };
+            this.emitter.on(channel, listener);
+            subscriber.next({
+                data: {
+                    type: 'CONNECTED',
+                    userId,
+                    at: new Date().toISOString(),
+                    message: 'Realtime session channel connected',
+                },
+            });
+            return () => {
+                this.emitter.off(channel, listener);
+            };
+        });
+    }
+    emitUserStatusChange(userId, isActive) {
+        this.emitter.emit(`user:${userId}`, {
+            type: isActive ? 'USER_ACTIVATED' : 'USER_DEACTIVATED',
+            userId,
+            at: new Date().toISOString(),
+            message: isActive
+                ? 'Your account has been activated by HR/Admin.'
+                : 'Your account has been deactivated by HR/Admin.',
+        });
+    }
+};
+exports.AuthEventsService = AuthEventsService;
+exports.AuthEventsService = AuthEventsService = __decorate([
+    (0, common_1.Injectable)()
+], AuthEventsService);
+
+
+/***/ },
+
 /***/ "./apps/klypto-crm-nest-js/src/auth/auth.controller.ts"
 /*!*************************************************************!*\
   !*** ./apps/klypto-crm-nest-js/src/auth/auth.controller.ts ***!
@@ -1079,7 +1138,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+var _a, _b, _c, _d, _e, _f, _g, _h;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -1088,10 +1147,19 @@ const auth_dto_1 = __webpack_require__(/*! ./dto/auth.dto */ "./apps/klypto-crm-
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
 const access_token_guard_1 = __webpack_require__(/*! ./guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
 const refresh_token_guard_1 = __webpack_require__(/*! ./guards/refresh-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/refresh-token.guard.ts");
+const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
+const users_service_1 = __webpack_require__(/*! ../users/users.service */ "./apps/klypto-crm-nest-js/src/users/users.service.ts");
+const auth_events_service_1 = __webpack_require__(/*! ./auth-events.service */ "./apps/klypto-crm-nest-js/src/auth/auth-events.service.ts");
 let AuthController = class AuthController {
     authService;
-    constructor(authService) {
+    jwtService;
+    usersService;
+    authEventsService;
+    constructor(authService, jwtService, usersService, authEventsService) {
         this.authService = authService;
+        this.jwtService = jwtService;
+        this.usersService = usersService;
+        this.authEventsService = authEventsService;
     }
     orgExists() {
         return this.authService.checkOrgExists();
@@ -1139,6 +1207,29 @@ let AuthController = class AuthController {
             throw new common_1.UnauthorizedException('Invalid user context');
         return this.authService.getProfile(userId);
     }
+    async events(req) {
+        const token = typeof req.query?.token === 'string' ? String(req.query.token) : '';
+        if (!token) {
+            throw new common_1.UnauthorizedException('Missing access token');
+        }
+        let payload;
+        try {
+            payload = this.jwtService.verify(token, {
+                secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
+            });
+        }
+        catch {
+            throw new common_1.UnauthorizedException('Invalid access token');
+        }
+        if (!payload?.sub) {
+            throw new common_1.UnauthorizedException('Invalid access token');
+        }
+        const user = await this.usersService.findActiveStatusById(payload.sub);
+        if (!user || !user.isActive) {
+            throw new common_1.UnauthorizedException('Account is inactive');
+        }
+        return this.authEventsService.createUserEventStream(payload.sub);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -1148,11 +1239,13 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+    __metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
 ], AuthController.prototype, "orgExists", null);
 __decorate([
     (0, common_1.Post)('signup'),
-    (0, swagger_1.ApiOperation)({ summary: 'Bootstrap organization with first SuperAdmin account' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Bootstrap organization with first SuperAdmin account',
+    }),
     (0, swagger_1.ApiResponse)({
         status: 201,
         description: 'Organization and SuperAdmin created',
@@ -1162,7 +1255,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof auth_dto_1.SignupDto !== "undefined" && auth_dto_1.SignupDto) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [typeof (_f = typeof auth_dto_1.SignupDto !== "undefined" && auth_dto_1.SignupDto) === "function" ? _f : Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "signup", null);
 __decorate([
@@ -1177,14 +1270,16 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_d = typeof auth_dto_1.LoginDto !== "undefined" && auth_dto_1.LoginDto) === "function" ? _d : Object]),
+    __metadata("design:paramtypes", [typeof (_g = typeof auth_dto_1.LoginDto !== "undefined" && auth_dto_1.LoginDto) === "function" ? _g : Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Post)('invite-user'),
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiOperation)({ summary: 'SuperAdmin / Admin: create an employee user account' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'SuperAdmin / Admin: create an employee user account',
+    }),
     (0, swagger_1.ApiResponse)({ status: 201, type: auth_dto_1.CreatedUserResponseDto }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden — admin only' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already exists' }),
@@ -1192,14 +1287,16 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_f = typeof auth_dto_1.CreateUserDto !== "undefined" && auth_dto_1.CreateUserDto) === "function" ? _f : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_h = typeof auth_dto_1.CreateUserDto !== "undefined" && auth_dto_1.CreateUserDto) === "function" ? _h : Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "inviteUser", null);
 __decorate([
     (0, common_1.Get)('users'),
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiOperation)({ summary: 'SuperAdmin / Admin: list all users in the organization' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'SuperAdmin / Admin: list all users in the organization',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User list returned' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
@@ -1211,7 +1308,9 @@ __decorate([
     (0, common_1.Patch)('users/:id/toggle-status'),
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiOperation)({ summary: 'SuperAdmin / Admin: toggle a user active/inactive' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'SuperAdmin / Admin: toggle a user active/inactive',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Status toggled' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Req)()),
@@ -1258,10 +1357,20 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "me", null);
+__decorate([
+    (0, common_1.Sse)('events'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'SSE stream for authenticated session events (deactivation/activation)',
+    }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "events", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('Authentication'),
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [typeof (_a = typeof auth_service_1.AuthService !== "undefined" && auth_service_1.AuthService) === "function" ? _a : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof auth_service_1.AuthService !== "undefined" && auth_service_1.AuthService) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object, typeof (_c = typeof users_service_1.UsersService !== "undefined" && users_service_1.UsersService) === "function" ? _c : Object, typeof (_d = typeof auth_events_service_1.AuthEventsService !== "undefined" && auth_events_service_1.AuthEventsService) === "function" ? _d : Object])
 ], AuthController);
 
 
@@ -1291,6 +1400,7 @@ const users_module_1 = __webpack_require__(/*! ../users/users.module */ "./apps/
 const jwt_strategy_1 = __webpack_require__(/*! ./strategies/jwt.strategy */ "./apps/klypto-crm-nest-js/src/auth/strategies/jwt.strategy.ts");
 const access_token_guard_1 = __webpack_require__(/*! ./guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
 const refresh_token_guard_1 = __webpack_require__(/*! ./guards/refresh-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/refresh-token.guard.ts");
+const auth_events_service_1 = __webpack_require__(/*! ./auth-events.service */ "./apps/klypto-crm-nest-js/src/auth/auth-events.service.ts");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -1304,6 +1414,7 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_strategy_1.RefreshTokenStrategy,
             access_token_guard_1.AccessTokenGuard,
             refresh_token_guard_1.RefreshTokenGuard,
+            auth_events_service_1.AuthEventsService,
         ],
         exports: [auth_service_1.AuthService, access_token_guard_1.AccessTokenGuard, refresh_token_guard_1.RefreshTokenGuard],
     })
@@ -1361,7 +1472,7 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -1370,6 +1481,7 @@ const users_service_1 = __webpack_require__(/*! ../users/users.service */ "./app
 const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
 const bcrypt = __importStar(__webpack_require__(/*! bcryptjs */ "bcryptjs"));
 const system_role_enum_1 = __webpack_require__(/*! ./roles/system-role.enum */ "./apps/klypto-crm-nest-js/src/auth/roles/system-role.enum.ts");
+const auth_events_service_1 = __webpack_require__(/*! ./auth-events.service */ "./apps/klypto-crm-nest-js/src/auth/auth-events.service.ts");
 const DEFAULT_DASHBOARD_MODULES = [
     'dashboard',
     'leads',
@@ -1379,7 +1491,6 @@ const DEFAULT_DASHBOARD_MODULES = [
     'payroll',
     'hrms',
     'leave',
-    'employees',
     'settings',
     'roles-access',
     'users',
@@ -1424,10 +1535,12 @@ let AuthService = class AuthService {
     usersService;
     jwtService;
     prisma;
-    constructor(usersService, jwtService, prisma) {
+    authEventsService;
+    constructor(usersService, jwtService, prisma, authEventsService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.prisma = prisma;
+        this.authEventsService = authEventsService;
     }
     async signup(signupDto) {
         const existingUser = await this.usersService.findOneByEmail(signupDto.email);
@@ -1443,6 +1556,20 @@ let AuthService = class AuthService {
             fullName: signupDto.fullName,
             passwordHash,
             organization: { connect: { id: organization.id } },
+        });
+        const superAdminCode = `ADM-${Date.now().toString(36).toUpperCase()}-${user.id
+            .slice(-4)
+            .toUpperCase()}`;
+        await this.prisma.employee.create({
+            data: {
+                name: signupDto.fullName,
+                code: superAdminCode,
+                role: system_role_enum_1.SystemRole.SUPER_ADMIN,
+                department: 'Administration',
+                status: 'Active',
+                organization: { connect: { id: organization.id } },
+                user: { connect: { id: user.id } },
+            },
         });
         await this.ensureRole(system_role_enum_1.SystemRole.SUPER_ADMIN, DEFAULT_DASHBOARD_MODULES);
         await this.assignRole(user.id, system_role_enum_1.SystemRole.SUPER_ADMIN);
@@ -1553,8 +1680,12 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Target user not found');
         const updated = await this.prisma.user.update({
             where: { id: targetUserId },
-            data: { isActive: !target.isActive },
+            data: {
+                isActive: !target.isActive,
+                ...(target.isActive ? { hashedRefreshToken: null } : {}),
+            },
         });
+        this.authEventsService.emitUserStatusChange(updated.id, updated.isActive);
         return { id: updated.id, isActive: updated.isActive };
     }
     async login(loginDto) {
@@ -1607,11 +1738,15 @@ let AuthService = class AuthService {
             where: { id: userId },
             data: { hashedRefreshToken: null },
         });
+        return { message: 'Logged out successfully' };
     }
     async refreshTokens(userId, refreshToken) {
         const user = await this.usersService.findOneById(userId);
         if (!user || !user.hashedRefreshToken) {
             throw new common_1.UnauthorizedException('Access Denied');
+        }
+        if (!user.isActive) {
+            throw new common_1.UnauthorizedException('Your account has been deactivated. Contact your administrator.');
         }
         const refreshTokenMatches = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
         if (!refreshTokenMatches) {
@@ -1714,7 +1849,7 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof users_service_1.UsersService !== "undefined" && users_service_1.UsersService) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object, typeof (_c = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _c : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof users_service_1.UsersService !== "undefined" && users_service_1.UsersService) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object, typeof (_c = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _c : Object, typeof (_d = typeof auth_events_service_1.AuthEventsService !== "undefined" && auth_events_service_1.AuthEventsService) === "function" ? _d : Object])
 ], AuthService);
 
 
@@ -2159,7 +2294,11 @@ let RolesGuard = class RolesGuard {
         const assignedRoles = await this.prisma.userRole.findMany({
             where: { userId },
             include: {
-                role: true,
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
         });
         const roleSet = new Set(assignedRoles.map((entry) => entry.role.name.toUpperCase()));
@@ -2212,26 +2351,34 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RefreshTokenStrategy = exports.AccessTokenStrategy = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
 const passport_jwt_1 = __webpack_require__(/*! passport-jwt */ "passport-jwt");
+const users_service_1 = __webpack_require__(/*! ../../users/users.service */ "./apps/klypto-crm-nest-js/src/users/users.service.ts");
 let AccessTokenStrategy = class AccessTokenStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt') {
-    constructor() {
+    usersService;
+    constructor(usersService) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: process.env.JWT_ACCESS_SECRET || 'access-secret',
         });
+        this.usersService = usersService;
     }
-    validate(payload) {
+    async validate(payload) {
+        const user = await this.usersService.findActiveStatusById(payload?.sub);
+        if (!user || !user.isActive) {
+            throw new common_1.UnauthorizedException('Your account has been deactivated. Contact your administrator.');
+        }
         return payload;
     }
 };
 exports.AccessTokenStrategy = AccessTokenStrategy;
 exports.AccessTokenStrategy = AccessTokenStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [typeof (_a = typeof users_service_1.UsersService !== "undefined" && users_service_1.UsersService) === "function" ? _a : Object])
 ], AccessTokenStrategy);
 let RefreshTokenStrategy = class RefreshTokenStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt-refresh') {
     constructor() {
@@ -4109,14 +4256,14 @@ let HrmsOverviewController = class HrmsOverviewController {
 exports.HrmsOverviewController = HrmsOverviewController;
 __decorate([
     (0, common_1.Get)('stats'),
-    (0, swagger_1.ApiOperation)({ summary: 'Get aggregated HRMS statistics' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get aggregated HR statistics' }),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], HrmsOverviewController.prototype, "getStats", null);
 exports.HrmsOverviewController = HrmsOverviewController = __decorate([
-    (0, swagger_1.ApiTags)('HRMS Overview'),
+    (0, swagger_1.ApiTags)('HR Overview'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
     (0, common_1.Controller)('hrms-overview'),
@@ -4726,7 +4873,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LeavesController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -4745,6 +4892,9 @@ let LeavesController = class LeavesController {
     }
     hasPrivilegedLeaveAccess(roles) {
         return ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR'].some((role) => roles.includes(role));
+    }
+    hasLeaveEditAccess(roles) {
+        return ['SUPER_ADMIN', 'HR'].some((role) => roles.includes(role));
     }
     async getStats(req) {
         if (!req.user?.sub)
@@ -4777,6 +4927,16 @@ let LeavesController = class LeavesController {
             throw new common_1.UnauthorizedException('Invalid user context');
         const orgId = await this.leavesService.getOrganizationId(req.user.sub);
         return this.leavesService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const roles = this.getNormalizedRoles(req.user.roles || []);
+        if (!this.hasLeaveEditAccess(roles)) {
+            throw new common_1.ForbiddenException('You do not have permission to edit leave requests');
+        }
+        const orgId = await this.leavesService.getOrganizationId(req.user.sub);
+        return this.leavesService.updateLeave(orgId, id, dto);
     }
     async updateStatus(req, id, dto) {
         if (!req.user?.sub)
@@ -4824,13 +4984,23 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LeavesController.prototype, "create", null);
 __decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update leave request details while pending' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof leave_dto_1.UpdateLeaveDto !== "undefined" && leave_dto_1.UpdateLeaveDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], LeavesController.prototype, "update", null);
+__decorate([
     (0, common_1.Patch)(':id/status'),
     (0, swagger_1.ApiOperation)({ summary: 'Approve or reject a leave request' }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof leave_dto_1.UpdateLeaveStatusDto !== "undefined" && leave_dto_1.UpdateLeaveStatusDto) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [Object, String, typeof (_d = typeof leave_dto_1.UpdateLeaveStatusDto !== "undefined" && leave_dto_1.UpdateLeaveStatusDto) === "function" ? _d : Object]),
     __metadata("design:returntype", Promise)
 ], LeavesController.prototype, "updateStatus", null);
 exports.LeavesController = LeavesController = __decorate([
@@ -4980,6 +5150,61 @@ let LeavesService = class LeavesService {
             },
         });
     }
+    async updateLeave(organizationId, id, dto) {
+        const leave = await this.prisma.leaveRequest.findFirst({
+            where: { id, organizationId },
+            select: {
+                id: true,
+                status: true,
+                startDate: true,
+                endDate: true,
+            },
+        });
+        if (!leave)
+            throw new common_1.NotFoundException('Leave request not found');
+        if (leave.status !== 'Pending') {
+            throw new common_1.ForbiddenException('Only pending leave requests can be edited');
+        }
+        if (dto.employeeId) {
+            const employee = await this.prisma.employee.findFirst({
+                where: { id: dto.employeeId, organizationId },
+                select: { id: true },
+            });
+            if (!employee) {
+                throw new common_1.NotFoundException('Employee not found in organization');
+            }
+        }
+        const nextStartDate = dto.startDate
+            ? new Date(dto.startDate)
+            : leave.startDate;
+        const nextEndDate = dto.endDate ? new Date(dto.endDate) : leave.endDate;
+        if (nextStartDate > nextEndDate) {
+            throw new common_1.BadRequestException('Start date cannot be later than end date');
+        }
+        return this.prisma.leaveRequest.update({
+            where: { id },
+            data: {
+                ...(dto.type !== undefined ? { type: dto.type } : {}),
+                ...(dto.startDate ? { startDate: new Date(dto.startDate) } : {}),
+                ...(dto.endDate ? { endDate: new Date(dto.endDate) } : {}),
+                ...(dto.reason !== undefined ? { reason: dto.reason } : {}),
+                ...(dto.employeeId
+                    ? { employee: { connect: { id: dto.employeeId } } }
+                    : {}),
+            },
+            include: {
+                employee: {
+                    select: {
+                        id: true,
+                        name: true,
+                        code: true,
+                        role: true,
+                        department: true,
+                    },
+                },
+            },
+        });
+    }
     async getStats(organizationId) {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -5017,7 +5242,45 @@ let LeavesService = class LeavesService {
             where: { userId },
             select: { id: true },
         });
-        return employee?.id ?? null;
+        if (employee?.id) {
+            return employee.id;
+        }
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                fullName: true,
+                organizationId: true,
+                roleAssignments: {
+                    include: {
+                        role: { select: { name: true } },
+                    },
+                },
+            },
+        });
+        if (!user?.organizationId) {
+            return null;
+        }
+        const hasSuperAdminRole = (user.roleAssignments || []).some((assignment) => String(assignment.role?.name).toUpperCase() === 'SUPER_ADMIN');
+        if (!hasSuperAdminRole) {
+            return null;
+        }
+        const generatedCode = `ADM-${Date.now().toString(36).toUpperCase()}-${user.id
+            .slice(-4)
+            .toUpperCase()}`;
+        const created = await this.prisma.employee.create({
+            data: {
+                name: user.fullName,
+                code: generatedCode,
+                role: 'SUPER_ADMIN',
+                department: 'Administration',
+                status: 'Active',
+                organization: { connect: { id: user.organizationId } },
+                user: { connect: { id: user.id } },
+            },
+            select: { id: true },
+        });
+        return created.id;
     }
 };
 exports.LeavesService = LeavesService;
@@ -7635,7 +7898,7 @@ const DASHBOARD_MODULE_LABELS = {
     recruitment: 'Recruitment',
     grievances: 'Grievances',
     payroll: 'Payroll',
-    hrms: 'HRMS',
+    hrms: 'HR',
     leave: 'Leave',
     employees: 'Employees',
     settings: 'Settings',
@@ -7704,12 +7967,14 @@ let RbacService = class RbacService {
         if (!hasNameUpdate && !hasDescriptionUpdate && !hasModulesUpdate) {
             throw new common_1.BadRequestException('Provide name, description or dashboard modules to update');
         }
-        if (existingRole.isSystem && hasNameUpdate) {
-            throw new common_1.ConflictException('System role name cannot be changed');
-        }
         const nextName = hasNameUpdate
             ? dto.name.trim().toUpperCase()
             : existingRole.name;
+        if (existingRole.isSystem &&
+            hasNameUpdate &&
+            nextName !== existingRole.name) {
+            throw new common_1.ConflictException('System role name cannot be changed');
+        }
         const dashboardModules = hasModulesUpdate
             ? this.normalizeDashboardModules(dto.dashboardModules)
             : existingRole.dashboardModules;
@@ -7919,7 +8184,7 @@ let RbacService = class RbacService {
             case 'payroll':
                 return 'Salary and compensation management';
             case 'hrms':
-                return 'HRMS overview and operations';
+                return 'HR overview and operations';
             case 'leave':
                 return 'Leave requests and approvals';
             case 'employees':
@@ -8421,7 +8686,6 @@ let UsersService = class UsersService {
                 roleAssignments: {
                     include: {
                         role: true,
-                        assignedBy: true,
                     },
                 },
             },
@@ -8435,9 +8699,17 @@ let UsersService = class UsersService {
                 roleAssignments: {
                     include: {
                         role: true,
-                        assignedBy: true,
                     },
                 },
+            },
+        });
+    }
+    async findActiveStatusById(id) {
+        return this.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                isActive: true,
             },
         });
     }
@@ -8556,6 +8828,16 @@ module.exports = require("class-validator");
 
 /***/ },
 
+/***/ "events"
+/*!*************************!*\
+  !*** external "events" ***!
+  \*************************/
+(module) {
+
+module.exports = require("events");
+
+/***/ },
+
 /***/ "passport-jwt"
 /*!*******************************!*\
   !*** external "passport-jwt" ***!
@@ -8563,6 +8845,16 @@ module.exports = require("class-validator");
 (module) {
 
 module.exports = require("passport-jwt");
+
+/***/ },
+
+/***/ "rxjs"
+/*!***********************!*\
+  !*** external "rxjs" ***!
+  \***********************/
+(module) {
+
+module.exports = require("rxjs");
 
 /***/ }
 

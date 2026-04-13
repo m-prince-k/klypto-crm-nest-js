@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   UnauthorizedException,
+  Sse,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -22,7 +23,7 @@ import {
   OrgExistsResponseDto,
   CreatedUserResponseDto,
 } from './dto/auth.dto';
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -31,11 +32,19 @@ import {
 } from '@nestjs/swagger';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import { AuthEventsService } from './auth-events.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
+    private readonly authEventsService: AuthEventsService,
+  ) {}
 
   // ── Public: first-time setup check ─────────────────────────────────────────
   @Get('org-exists')
@@ -48,7 +57,9 @@ export class AuthController {
 
   // ── Public: one-time organization bootstrap ────────────────────────────────
   @Post('signup')
-  @ApiOperation({ summary: 'Bootstrap organization with first SuperAdmin account' })
+  @ApiOperation({
+    summary: 'Bootstrap organization with first SuperAdmin account',
+  })
   @ApiResponse({
     status: 201,
     description: 'Organization and SuperAdmin created',
@@ -79,7 +90,9 @@ export class AuthController {
   @Post('invite-user')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'SuperAdmin / Admin: create an employee user account' })
+  @ApiOperation({
+    summary: 'SuperAdmin / Admin: create an employee user account',
+  })
   @ApiResponse({ status: 201, type: CreatedUserResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden — admin only' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
@@ -96,7 +109,9 @@ export class AuthController {
   @Get('users')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'SuperAdmin / Admin: list all users in the organization' })
+  @ApiOperation({
+    summary: 'SuperAdmin / Admin: list all users in the organization',
+  })
   @ApiResponse({ status: 200, description: 'User list returned' })
   @HttpCode(HttpStatus.OK)
   listUsers(@Req() req: Request & { user?: { sub?: string } }) {
@@ -108,7 +123,9 @@ export class AuthController {
   @Patch('users/:id/toggle-status')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'SuperAdmin / Admin: toggle a user active/inactive' })
+  @ApiOperation({
+    summary: 'SuperAdmin / Admin: toggle a user active/inactive',
+  })
   @ApiResponse({ status: 200, description: 'Status toggled' })
   @HttpCode(HttpStatus.OK)
   toggleUserStatus(
@@ -162,5 +179,38 @@ export class AuthController {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('Invalid user context');
     return this.authService.getProfile(userId);
+  }
+
+  @Sse('events')
+  @ApiOperation({
+    summary:
+      'SSE stream for authenticated session events (deactivation/activation)',
+  })
+  async events(@Req() req: Request) {
+    const token =
+      typeof req.query?.token === 'string' ? String(req.query.token) : '';
+    if (!token) {
+      throw new UnauthorizedException('Missing access token');
+    }
+
+    let payload: { sub?: string };
+    try {
+      payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
+      }) as { sub?: string };
+    } catch {
+      throw new UnauthorizedException('Invalid access token');
+    }
+
+    if (!payload?.sub) {
+      throw new UnauthorizedException('Invalid access token');
+    }
+
+    const user = await this.usersService.findActiveStatusById(payload.sub);
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('Account is inactive');
+    }
+
+    return this.authEventsService.createUserEventStream(payload.sub);
   }
 }
