@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Delete,
   UseGuards,
   Req,
   UnauthorizedException,
@@ -82,6 +83,25 @@ export class GrievancesController {
 
     const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
     return this.grievancesService.update(orgId, id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a grievance' })
+  async remove(
+    @Req() req: { user?: { sub?: string; roles?: string[] } },
+    @Param('id') id: string,
+  ) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+
+    const roles = this.getNormalizedRoles(req.user.roles || []);
+    if (!this.hasPrivilegedGrievanceAccess(roles)) {
+      throw new ForbiddenException(
+        'You do not have permission to delete grievance records',
+      );
+    }
+
+    const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+    return this.grievancesService.delete(orgId, id);
   }
 
   @Get('stats')

@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AssetsService } from './assets.service';
 import { CreateAssetDto, UpdateAssetDto } from './dto/asset.dto';
@@ -22,7 +33,10 @@ export class AssetsController {
 
   @Post()
   @ApiOperation({ summary: 'Add a new asset' })
-  async create(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateAssetDto) {
+  async create(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreateAssetDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.assetsService.getOrganizationId(req.user.sub);
     return this.assetsService.create(orgId, dto);
@@ -38,6 +52,17 @@ export class AssetsController {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.assetsService.getOrganizationId(req.user.sub);
     return this.assetsService.update(orgId, id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete an asset' })
+  async remove(
+    @Req() req: { user?: { sub?: string } },
+    @Param('id') id: string,
+  ) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+    const orgId = await this.assetsService.getOrganizationId(req.user.sub);
+    return this.assetsService.delete(orgId, id);
   }
 
   @Get('stats')

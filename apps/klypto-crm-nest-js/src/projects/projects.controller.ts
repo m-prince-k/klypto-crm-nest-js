@@ -116,12 +116,35 @@ export class ProjectsController {
   ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const roles = this.normalizeRoles(req.user.roles || []);
-    if (!this.hasProjectManageAccess(roles)) {
-      throw new ForbiddenException(
-        'Only project managers, HR, or admins can create tasks',
-      );
-    }
     const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+
+    if (!this.hasProjectManageAccess(roles)) {
+      const myProjects = await this.projectsService.findAllProjects(
+        orgId,
+        req.user.sub,
+      );
+      const canCreateInProject = myProjects.some(
+        (project) => String(project.id) === String(dto.projectId),
+      );
+
+      if (!canCreateInProject) {
+        throw new ForbiddenException(
+          'You can only create tasks in projects assigned to you',
+        );
+      }
+
+      if (dto.assigneeId && dto.assigneeId !== req.user.sub) {
+        throw new ForbiddenException(
+          'You can only create tasks assigned to yourself',
+        );
+      }
+
+      return this.projectsService.createTask(orgId, {
+        ...dto,
+        assigneeId: req.user.sub,
+      });
+    }
+
     return this.projectsService.createTask(orgId, dto);
   }
 

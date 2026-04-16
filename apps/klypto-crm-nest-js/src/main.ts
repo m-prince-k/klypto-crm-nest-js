@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -53,8 +54,25 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: (validationErrors = []) => {
+        const messages = validationErrors.flatMap((error) => {
+          const constraints = error.constraints
+            ? Object.values(error.constraints)
+            : [];
+          return constraints.length > 0
+            ? constraints
+            : [`${error.property} is invalid`];
+        });
+
+        return new BadRequestException({
+          message: messages,
+          error: 'Validation failed',
+        });
+      },
     }),
   );
+
+  app.useGlobalFilters(new PrismaExceptionFilter());
 
   // Swagger Configuration
   const config = new DocumentBuilder()

@@ -362,6 +362,7 @@ const DEFAULT_DASHBOARD_MODULES = [
     'dashboard',
     'leads',
     'erp',
+    'projects',
     'recruitment',
     'grievances',
     'payroll',
@@ -373,26 +374,13 @@ const DEFAULT_DASHBOARD_MODULES = [
 ];
 const ROLE_MODULES = {
     SUPER_ADMIN: DEFAULT_DASHBOARD_MODULES,
-    ADMIN: [
-        'dashboard',
-        'leads',
-        'erp',
-        'recruitment',
-        'grievances',
-        'payroll',
-        'hrms',
-        'leave',
-        'employees',
-        'settings',
-        'users',
-    ],
     MANAGER: [
         'dashboard',
         'leads',
-        'erp',
+        'projects',
         'recruitment',
         'grievances',
-        'leave',
+        'employees',
         'settings',
     ],
     HR: [
@@ -419,6 +407,10 @@ let AuthService = class AuthService {
         this.authEventsService = authEventsService;
     }
     async signup(signupDto) {
+        const orgCount = await this.prisma.organization.count();
+        if (orgCount > 0) {
+            throw new common_1.ConflictException('Organization is already initialized. Signup can only be used once.');
+        }
         const existingUser = await this.usersService.findOneByEmail(signupDto.email);
         if (existingUser) {
             throw new common_1.ConflictException('User already exists');
@@ -465,11 +457,16 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Invalid user context');
         const adminRoles = adminUser.roleAssignments.map((r) => r.role.name.toUpperCase());
         const canCreate = adminRoles.includes(system_role_enum_1.SystemRole.SUPER_ADMIN) ||
-            adminRoles.includes(system_role_enum_1.SystemRole.ADMIN) ||
             adminRoles.includes(system_role_enum_1.SystemRole.HR);
         if (!canCreate)
-            throw new common_1.ForbiddenException('Only super admins, admins, or HR can create user accounts');
+            throw new common_1.ForbiddenException('Only super admins or HR can create user accounts');
         const createdRole = String(dto.role || '').toUpperCase();
+        if (createdRole === system_role_enum_1.SystemRole.SUPER_ADMIN) {
+            throw new common_1.ForbiddenException('Super Admin can only be created during first-time signup.');
+        }
+        if (createdRole === system_role_enum_1.SystemRole.ADMIN) {
+            throw new common_1.ForbiddenException('ADMIN role is deprecated and cannot be assigned');
+        }
         const isHrOnlyCreator = adminRoles.includes(system_role_enum_1.SystemRole.HR) &&
             !adminRoles.includes(system_role_enum_1.SystemRole.SUPER_ADMIN) &&
             !adminRoles.includes(system_role_enum_1.SystemRole.ADMIN);
@@ -545,9 +542,8 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException();
         const adminRoles = adminUser.roleAssignments.map((r) => r.role.name.toUpperCase());
         if (!adminRoles.includes(system_role_enum_1.SystemRole.SUPER_ADMIN) &&
-            !adminRoles.includes(system_role_enum_1.SystemRole.ADMIN) &&
             !adminRoles.includes(system_role_enum_1.SystemRole.HR)) {
-            throw new common_1.ForbiddenException('Only super admins, admins, or HR can modify user status');
+            throw new common_1.ForbiddenException('Only super admins or HR can modify user status');
         }
         const target = await this.prisma.user.findUnique({
             where: { id: targetUserId },
@@ -576,6 +572,8 @@ let AuthService = class AuthService {
         if (!passwordMatches) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
+        await this.syncSystemRoleModules();
+        await this.enforceSingleSuperAdmin();
         await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
         const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         const tokens = await this.getTokens(user.id, user.email, roles);
@@ -595,6 +593,8 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnauthorizedException('User not found');
         }
+        await this.syncSystemRoleModules();
+        await this.enforceSingleSuperAdmin();
         await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
         const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         return {
@@ -628,6 +628,8 @@ let AuthService = class AuthService {
         if (!refreshTokenMatches) {
             throw new common_1.UnauthorizedException('Access Denied');
         }
+        await this.syncSystemRoleModules();
+        await this.enforceSingleSuperAdmin();
         await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
         const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
         const tokens = await this.getTokens(user.id, user.email, roles);
@@ -700,7 +702,6 @@ let AuthService = class AuthService {
     buildAccessFromRoles(roles, dashboardModules) {
         const roleSet = new Set(roles.map((role) => role.toUpperCase()));
         const hasSuperAdmin = roleSet.has(system_role_enum_1.SystemRole.SUPER_ADMIN);
-        const hasAdmin = roleSet.has(system_role_enum_1.SystemRole.ADMIN);
         const roleDefaultModules = hasSuperAdmin
             ? DEFAULT_DASHBOARD_MODULES
             : roles.flatMap((role) => ROLE_MODULES[String(role).toUpperCase()] || []);
@@ -709,7 +710,7 @@ let AuthService = class AuthService {
             : [...new Set([...(dashboardModules || []), ...roleDefaultModules])];
         return {
             isSuperAdmin: hasSuperAdmin,
-            canManageUsers: hasSuperAdmin || hasAdmin,
+            canManageUsers: hasSuperAdmin,
             canManageRbac: hasSuperAdmin,
             canViewDashboard: hasSuperAdmin || effectiveModules.length > 0,
             dashboardModules: effectiveModules,
@@ -720,6 +721,35 @@ let AuthService = class AuthService {
             return;
         await this.ensureRole(system_role_enum_1.SystemRole.EMPLOYEE, ROLE_MODULES.EMPLOYEE);
         await this.assignRole(userId, system_role_enum_1.SystemRole.EMPLOYEE);
+    }
+    async syncSystemRoleModules() {
+        await Promise.all([
+            this.ensureRole(system_role_enum_1.SystemRole.SUPER_ADMIN, ROLE_MODULES.SUPER_ADMIN),
+            this.ensureRole(system_role_enum_1.SystemRole.MANAGER, ROLE_MODULES.MANAGER),
+            this.ensureRole(system_role_enum_1.SystemRole.HR, ROLE_MODULES.HR),
+            this.ensureRole(system_role_enum_1.SystemRole.EMPLOYEE, ROLE_MODULES.EMPLOYEE),
+        ]);
+    }
+    async enforceSingleSuperAdmin() {
+        const superAdminRole = await this.prisma.role.findUnique({
+            where: { name: system_role_enum_1.SystemRole.SUPER_ADMIN },
+            select: { id: true },
+        });
+        if (!superAdminRole)
+            return;
+        const assignments = await this.prisma.userRole.findMany({
+            where: { roleId: superAdminRole.id },
+            orderBy: { createdAt: 'asc' },
+            select: { id: true },
+        });
+        if (assignments.length <= 1)
+            return;
+        const assignmentsToRemove = assignments.slice(1).map((entry) => entry.id);
+        await this.prisma.userRole.deleteMany({
+            where: {
+                id: { in: assignmentsToRemove },
+            },
+        });
     }
 };
 exports.AuthService = AuthService;
@@ -1399,7 +1429,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "fullName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'HR', enum: ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'HR', 'EMPLOYEE'] }),
+    (0, swagger_1.ApiProperty)({ example: 'HR', enum: ['MANAGER', 'HR', 'EMPLOYEE'] }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -2462,6 +2492,7 @@ const DEFAULT_DASHBOARD_MODULES = [
     'dashboard',
     'leads',
     'erp',
+    'projects',
     'recruitment',
     'grievances',
     'payroll',
@@ -2475,6 +2506,7 @@ const DASHBOARD_MODULE_LABELS = {
     dashboard: 'Dashboard',
     leads: 'Leads',
     erp: 'ERP Portal',
+    projects: 'Projects',
     recruitment: 'Recruitment',
     grievances: 'Grievances',
     payroll: 'Payroll',
@@ -2491,6 +2523,9 @@ let RbacService = class RbacService {
     }
     async createRole(dto) {
         const roleName = dto.name.trim().toUpperCase();
+        if (roleName === system_role_enum_1.SystemRole.ADMIN) {
+            throw new common_1.ConflictException('ADMIN role is deprecated and cannot be used');
+        }
         const dashboardModules = this.normalizeDashboardModules(dto.dashboardModules);
         const existingRole = await this.prisma.role.findUnique({
             where: { name: roleName },
@@ -2509,6 +2544,11 @@ let RbacService = class RbacService {
     }
     async listRoles() {
         const roles = await this.prisma.role.findMany({
+            where: {
+                name: {
+                    not: system_role_enum_1.SystemRole.ADMIN,
+                },
+            },
             orderBy: { createdAt: 'asc' },
             include: {
                 _count: {
@@ -2550,6 +2590,9 @@ let RbacService = class RbacService {
         const nextName = hasNameUpdate
             ? dto.name.trim().toUpperCase()
             : existingRole.name;
+        if (nextName === system_role_enum_1.SystemRole.ADMIN) {
+            throw new common_1.ConflictException('ADMIN role is deprecated and cannot be used');
+        }
         if (existingRole.isSystem &&
             hasNameUpdate &&
             nextName !== existingRole.name) {
@@ -2616,6 +2659,21 @@ let RbacService = class RbacService {
     }
     async assignRole(dto, assignedById) {
         const roleName = dto.roleName.trim().toUpperCase();
+        if (roleName === system_role_enum_1.SystemRole.ADMIN) {
+            throw new common_1.ConflictException('ADMIN role is deprecated and cannot be assigned');
+        }
+        if (roleName === system_role_enum_1.SystemRole.SUPER_ADMIN) {
+            const existingSuperAdminAssignment = await this.prisma.userRole.findFirst({
+                where: {
+                    role: { name: system_role_enum_1.SystemRole.SUPER_ADMIN },
+                },
+                select: { userId: true },
+            });
+            if (existingSuperAdminAssignment &&
+                existingSuperAdminAssignment.userId !== dto.userId) {
+                throw new common_1.ConflictException('A Super Admin already exists. Only one Super Admin is allowed.');
+            }
+        }
         const user = await this.prisma.user.findUnique({
             where: { id: dto.userId },
         });
@@ -2724,7 +2782,6 @@ let RbacService = class RbacService {
         return users.map((user) => {
             const roles = user.roleAssignments.map((assignment) => assignment.role.name);
             const hasSuperAdmin = roles.includes(system_role_enum_1.SystemRole.SUPER_ADMIN);
-            const hasAdmin = roles.includes(system_role_enum_1.SystemRole.ADMIN);
             return {
                 id: user.id,
                 email: user.email,
@@ -2738,7 +2795,7 @@ let RbacService = class RbacService {
                 ],
                 access: {
                     isSuperAdmin: hasSuperAdmin,
-                    canManageUsers: hasSuperAdmin || hasAdmin,
+                    canManageUsers: hasSuperAdmin,
                     canManageRbac: hasSuperAdmin,
                     canViewDashboard: hasSuperAdmin || roles.length > 0,
                     dashboardModules: [
@@ -2870,6 +2927,12 @@ let EmployeesService = class EmployeesService {
                 code: dto.code,
                 role: dto.role,
                 department: dto.department,
+                ...(dto.departmentId?.trim()
+                    ? { dept: { connect: { id: dto.departmentId } } }
+                    : {}),
+                ...(dto.branchId?.trim()
+                    ? { branch: { connect: { id: dto.branchId } } }
+                    : {}),
                 status: dto.status || 'Active',
                 organization: { connect: { id: organizationId } },
                 ...(dto.userId && { user: { connect: { id: dto.userId } } }),
@@ -2908,6 +2971,20 @@ let EmployeesService = class EmployeesService {
                 code: dto.code,
                 role: dto.role,
                 department: dto.department,
+                ...(dto.departmentId !== undefined
+                    ? {
+                        dept: dto.departmentId?.trim()
+                            ? { connect: { id: dto.departmentId } }
+                            : { disconnect: true },
+                    }
+                    : {}),
+                ...(dto.branchId !== undefined
+                    ? {
+                        branch: dto.branchId?.trim()
+                            ? { connect: { id: dto.branchId } }
+                            : { disconnect: true },
+                    }
+                    : {}),
                 status: dto.status,
                 ...(dto.userId && { user: { connect: { id: dto.userId } } }),
             },
@@ -2915,9 +2992,42 @@ let EmployeesService = class EmployeesService {
     }
     async remove(organizationId, id) {
         await this.findOne(organizationId, id);
-        await this.prisma.employee.delete({
-            where: { id },
-        });
+        await this.prisma.$transaction([
+            this.prisma.attendanceRecord.deleteMany({
+                where: { organizationId, employeeId: id },
+            }),
+            this.prisma.leaveRequest.deleteMany({
+                where: { organizationId, employeeId: id },
+            }),
+            this.prisma.salaryStructure.deleteMany({
+                where: { organizationId, employeeId: id },
+            }),
+            this.prisma.payrollRecord.deleteMany({
+                where: { organizationId, employeeId: id },
+            }),
+            this.prisma.performanceReview.deleteMany({
+                where: { organizationId, employeeId: id },
+            }),
+            this.prisma.grievance.updateMany({
+                where: { organizationId, employeeId: id },
+                data: { employeeId: null },
+            }),
+            this.prisma.asset.updateMany({
+                where: { organizationId, employeeId: id },
+                data: { employeeId: null },
+            }),
+            this.prisma.branch.updateMany({
+                where: { organizationId, headId: id },
+                data: { headId: null },
+            }),
+            this.prisma.department.updateMany({
+                where: { organizationId, headId: id },
+                data: { headId: null },
+            }),
+            this.prisma.employee.delete({
+                where: { id },
+            }),
+        ]);
         return { message: 'Employee deleted successfully' };
     }
 };
@@ -3086,13 +3196,18 @@ class CreateEmployeeDto {
     code;
     role;
     department;
+    departmentId;
+    branchId;
     status;
     userId;
     organizationId;
 }
 exports.CreateEmployeeDto = CreateEmployeeDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'John Doe', description: 'Full name of the employee' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'John Doe',
+        description: 'Full name of the employee',
+    }),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -3115,6 +3230,26 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateEmployeeDto.prototype, "department", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'clxyz...',
+        description: 'Department entity ID for hierarchy mapping',
+        required: false,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "departmentId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'clxyz...',
+        description: 'Branch entity ID for hierarchy mapping',
+        required: false,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEmployeeDto.prototype, "branchId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'Active',
@@ -3151,6 +3286,8 @@ class EmployeeResponseDto {
     code;
     role;
     department;
+    departmentId;
+    branchId;
     status;
     organizationId;
     createdAt;
@@ -3177,6 +3314,14 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'People Ops' }),
     __metadata("design:type", String)
 ], EmployeeResponseDto.prototype, "department", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxyz...', required: false }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "departmentId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'clxyz...', required: false }),
+    __metadata("design:type", String)
+], EmployeeResponseDto.prototype, "branchId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Active' }),
     __metadata("design:type", String)
@@ -5412,10 +5557,26 @@ let RecruitmentService = class RecruitmentService {
         });
     }
     async updateJob(organizationId, id, dto) {
-        const job = await this.prisma.jobPosting.findFirst({ where: { id, organizationId } });
+        const job = await this.prisma.jobPosting.findFirst({
+            where: { id, organizationId },
+        });
         if (!job)
             throw new common_1.NotFoundException('Job posting not found');
         return this.prisma.jobPosting.update({ where: { id }, data: dto });
+    }
+    async deleteJob(organizationId, id) {
+        const job = await this.prisma.jobPosting.findFirst({
+            where: { id, organizationId },
+        });
+        if (!job)
+            throw new common_1.NotFoundException('Job posting not found');
+        await this.prisma.$transaction([
+            this.prisma.candidate.deleteMany({
+                where: { organizationId, jobId: id },
+            }),
+            this.prisma.jobPosting.delete({ where: { id } }),
+        ]);
+        return { message: 'Job posting deleted successfully' };
     }
     async findAllCandidates(organizationId) {
         return this.prisma.candidate.findMany({
@@ -5431,7 +5592,9 @@ let RecruitmentService = class RecruitmentService {
         });
     }
     async updateCandidate(organizationId, id, dto) {
-        const candidate = await this.prisma.candidate.findFirst({ where: { id, organizationId } });
+        const candidate = await this.prisma.candidate.findFirst({
+            where: { id, organizationId },
+        });
         if (!candidate)
             throw new common_1.NotFoundException('Candidate not found');
         const updatedCandidate = await this.prisma.candidate.update({
@@ -5447,7 +5610,7 @@ let RecruitmentService = class RecruitmentService {
     async onboardCandidate(organizationId, candidate) {
         const code = `EMP-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
         const existing = await this.prisma.employee.findFirst({
-            where: { name: candidate.name, organizationId }
+            where: { name: candidate.name, organizationId },
         });
         if (!existing) {
             await this.prisma.employee.create({
@@ -5458,12 +5621,14 @@ let RecruitmentService = class RecruitmentService {
                     code,
                     status: 'Active',
                     organizationId,
-                }
+                },
             });
         }
     }
     async deleteCandidate(organizationId, id) {
-        const candidate = await this.prisma.candidate.findFirst({ where: { id, organizationId } });
+        const candidate = await this.prisma.candidate.findFirst({
+            where: { id, organizationId },
+        });
         if (!candidate)
             throw new common_1.NotFoundException('Candidate not found');
         return this.prisma.candidate.delete({ where: { id } });
@@ -5525,6 +5690,12 @@ let RecruitmentController = class RecruitmentController {
         const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
         return this.recruitmentService.updateJob(orgId, id, dto);
     }
+    async removeJob(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+        return this.recruitmentService.deleteJob(orgId, id);
+    }
     async findAllCandidates(req) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -5578,6 +5749,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, typeof (_c = typeof recruitment_dto_1.UpdateJobPostingDto !== "undefined" && recruitment_dto_1.UpdateJobPostingDto) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], RecruitmentController.prototype, "updateJob", null);
+__decorate([
+    (0, common_1.Delete)('jobs/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a job posting' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], RecruitmentController.prototype, "removeJob", null);
 __decorate([
     (0, common_1.Get)('candidates'),
     (0, swagger_1.ApiOperation)({ summary: 'Get all candidates' }),
@@ -5825,6 +6005,14 @@ let GrievancesService = class GrievancesService {
             data: dto,
         });
     }
+    async delete(organizationId, id) {
+        const grievance = await this.prisma.grievance.findFirst({
+            where: { id, organizationId },
+        });
+        if (!grievance)
+            throw new common_1.NotFoundException('Grievance not found');
+        return this.prisma.grievance.delete({ where: { id } });
+    }
     async getStats(organizationId) {
         const [total, unresolved, critical, resolved] = await Promise.all([
             this.prisma.grievance.count({ where: { organizationId } }),
@@ -5939,6 +6127,16 @@ let GrievancesController = class GrievancesController {
         const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
         return this.grievancesService.update(orgId, id, dto);
     }
+    async remove(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const roles = this.getNormalizedRoles(req.user.roles || []);
+        if (!this.hasPrivilegedGrievanceAccess(roles)) {
+            throw new common_1.ForbiddenException('You do not have permission to delete grievance records');
+        }
+        const orgId = await this.grievancesService.getOrganizationId(req.user.sub);
+        return this.grievancesService.delete(orgId, id);
+    }
     async getStats(req) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -5980,6 +6178,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, typeof (_c = typeof grievance_dto_1.UpdateGrievanceDto !== "undefined" && grievance_dto_1.UpdateGrievanceDto) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], GrievancesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a grievance' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], GrievancesController.prototype, "remove", null);
 __decorate([
     (0, common_1.Get)('stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get grievance dashboard statistics' }),
@@ -6348,10 +6555,21 @@ let ProjectsController = class ProjectsController {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
         const roles = this.normalizeRoles(req.user.roles || []);
-        if (!this.hasProjectManageAccess(roles)) {
-            throw new common_1.ForbiddenException('Only project managers, HR, or admins can create tasks');
-        }
         const orgId = await this.projectsService.getOrganizationId(req.user.sub);
+        if (!this.hasProjectManageAccess(roles)) {
+            const myProjects = await this.projectsService.findAllProjects(orgId, req.user.sub);
+            const canCreateInProject = myProjects.some((project) => String(project.id) === String(dto.projectId));
+            if (!canCreateInProject) {
+                throw new common_1.ForbiddenException('You can only create tasks in projects assigned to you');
+            }
+            if (dto.assigneeId && dto.assigneeId !== req.user.sub) {
+                throw new common_1.ForbiddenException('You can only create tasks assigned to yourself');
+            }
+            return this.projectsService.createTask(orgId, {
+                ...dto,
+                assigneeId: req.user.sub,
+            });
+        }
         return this.projectsService.createTask(orgId, dto);
     }
     async updateTask(req, id, dto) {
@@ -6648,7 +6866,7 @@ let AssetsService = class AssetsService {
         return this.prisma.asset.findMany({
             where: { organizationId },
             include: {
-                employee: { select: { id: true, name: true } }
+                employee: { select: { id: true, name: true } },
             },
             orderBy: { createdAt: 'desc' },
         });
@@ -6659,7 +6877,9 @@ let AssetsService = class AssetsService {
         });
     }
     async update(organizationId, id, dto) {
-        const asset = await this.prisma.asset.findFirst({ where: { id, organizationId } });
+        const asset = await this.prisma.asset.findFirst({
+            where: { id, organizationId },
+        });
         if (!asset)
             throw new common_1.NotFoundException('Asset not found');
         return this.prisma.asset.update({
@@ -6667,11 +6887,23 @@ let AssetsService = class AssetsService {
             data: dto,
         });
     }
+    async delete(organizationId, id) {
+        const asset = await this.prisma.asset.findFirst({
+            where: { id, organizationId },
+        });
+        if (!asset)
+            throw new common_1.NotFoundException('Asset not found');
+        return this.prisma.asset.delete({
+            where: { id },
+        });
+    }
     async getStats(organizationId) {
-        const assets = await this.prisma.asset.findMany({ where: { organizationId } });
+        const assets = await this.prisma.asset.findMany({
+            where: { organizationId },
+        });
         const totalValuation = assets.reduce((sum, a) => sum + (a.value || 0), 0);
-        const inUse = assets.filter(a => a.status === 'In Use').length;
-        const maintenance = assets.filter(a => a.status === 'Maintenance').length;
+        const inUse = assets.filter((a) => a.status === 'In Use').length;
+        const maintenance = assets.filter((a) => a.status === 'Maintenance').length;
         return { total: assets.length, totalValuation, inUse, maintenance };
     }
 };
@@ -6731,6 +6963,12 @@ let AssetsController = class AssetsController {
         const orgId = await this.assetsService.getOrganizationId(req.user.sub);
         return this.assetsService.update(orgId, id, dto);
     }
+    async remove(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.assetsService.getOrganizationId(req.user.sub);
+        return this.assetsService.delete(orgId, id);
+    }
     async getStats(req) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -6766,6 +7004,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, typeof (_c = typeof asset_dto_1.UpdateAssetDto !== "undefined" && asset_dto_1.UpdateAssetDto) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], AssetsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete an asset' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], AssetsController.prototype, "remove", null);
 __decorate([
     (0, common_1.Get)('stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get asset statistics' }),
@@ -6919,7 +7166,7 @@ let PartnersService = class PartnersService {
         return this.prisma.partner.findMany({
             where: {
                 organizationId,
-                ...(type && { type })
+                ...(type && { type }),
             },
             orderBy: { name: 'asc' },
         });
@@ -6930,7 +7177,9 @@ let PartnersService = class PartnersService {
         });
     }
     async update(organizationId, id, dto) {
-        const partner = await this.prisma.partner.findFirst({ where: { id, organizationId } });
+        const partner = await this.prisma.partner.findFirst({
+            where: { id, organizationId },
+        });
         if (!partner)
             throw new common_1.NotFoundException('Partner not found');
         return this.prisma.partner.update({
@@ -6938,9 +7187,19 @@ let PartnersService = class PartnersService {
             data: dto,
         });
     }
+    async delete(organizationId, id) {
+        const partner = await this.prisma.partner.findFirst({
+            where: { id, organizationId },
+        });
+        if (!partner)
+            throw new common_1.NotFoundException('Partner not found');
+        return this.prisma.partner.delete({ where: { id } });
+    }
     async getStats(organizationId) {
         const [customers, vendors] = await Promise.all([
-            this.prisma.partner.count({ where: { organizationId, type: 'CUSTOMER' } }),
+            this.prisma.partner.count({
+                where: { organizationId, type: 'CUSTOMER' },
+            }),
             this.prisma.partner.count({ where: { organizationId, type: 'VENDOR' } }),
         ]);
         return { customers, vendors };
@@ -7002,6 +7261,12 @@ let PartnersController = class PartnersController {
         const orgId = await this.partnersService.getOrganizationId(req.user.sub);
         return this.partnersService.update(orgId, id, dto);
     }
+    async remove(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.partnersService.getOrganizationId(req.user.sub);
+        return this.partnersService.delete(orgId, id);
+    }
     async getStats(req) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -7038,6 +7303,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, typeof (_c = typeof partner_dto_1.UpdatePartnerDto !== "undefined" && partner_dto_1.UpdatePartnerDto) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], PartnersController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a partner' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], PartnersController.prototype, "remove", null);
 __decorate([
     (0, common_1.Get)('stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get partner statistics' }),
@@ -7205,7 +7479,7 @@ let FinanceService = class FinanceService {
         return this.prisma.financialTransaction.findMany({
             where: {
                 organizationId,
-                ...(type && { type })
+                ...(type && { type }),
             },
             include: { partner: { select: { name: true, type: true } } },
             orderBy: { date: 'desc' },
@@ -7213,29 +7487,45 @@ let FinanceService = class FinanceService {
     }
     async create(organizationId, dto) {
         return this.prisma.financialTransaction.create({
-            data: { ...dto, organizationId, date: dto.date ? new Date(dto.date) : new Date() },
+            data: {
+                ...dto,
+                organizationId,
+                date: dto.date ? new Date(dto.date) : new Date(),
+            },
         });
     }
     async update(organizationId, id, dto) {
-        const transaction = await this.prisma.financialTransaction.findFirst({ where: { id, organizationId } });
+        const transaction = await this.prisma.financialTransaction.findFirst({
+            where: { id, organizationId },
+        });
         if (!transaction)
             throw new common_1.NotFoundException('Transaction not found');
         return this.prisma.financialTransaction.update({
             where: { id },
             data: {
                 ...dto,
-                ...(dto.date && { date: new Date(dto.date) })
+                ...(dto.date && { date: new Date(dto.date) }),
             },
         });
     }
+    async delete(organizationId, id) {
+        const transaction = await this.prisma.financialTransaction.findFirst({
+            where: { id, organizationId },
+        });
+        if (!transaction)
+            throw new common_1.NotFoundException('Transaction not found');
+        return this.prisma.financialTransaction.delete({ where: { id } });
+    }
     async getStats(organizationId) {
-        const transactions = await this.prisma.financialTransaction.findMany({ where: { organizationId } });
-        const receivables = transactions.filter(t => t.type === 'INVOICE' && t.status !== 'Paid');
-        const payables = transactions.filter(t => t.type === 'PURCHASE_ORDER' && t.status !== 'Paid');
+        const transactions = await this.prisma.financialTransaction.findMany({
+            where: { organizationId },
+        });
+        const receivables = transactions.filter((t) => t.type === 'INVOICE' && t.status !== 'Paid');
+        const payables = transactions.filter((t) => t.type === 'PURCHASE_ORDER' && t.status !== 'Paid');
         return {
             totalReceivables: receivables.reduce((sum, t) => sum + t.amount, 0),
             totalPayables: payables.reduce((sum, t) => sum + t.amount, 0),
-            count: transactions.length
+            count: transactions.length,
         };
     }
 };
@@ -7295,6 +7585,12 @@ let FinanceController = class FinanceController {
         const orgId = await this.financeService.getOrganizationId(req.user.sub);
         return this.financeService.update(orgId, id, dto);
     }
+    async remove(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.financeService.getOrganizationId(req.user.sub);
+        return this.financeService.delete(orgId, id);
+    }
     async getStats(req) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -7331,6 +7627,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, typeof (_c = typeof finance_dto_1.UpdateFinanceDto !== "undefined" && finance_dto_1.UpdateFinanceDto) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], FinanceController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a transaction' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], FinanceController.prototype, "remove", null);
 __decorate([
     (0, common_1.Get)('stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get financial statistics' }),
@@ -7485,46 +7790,90 @@ let EntitiesService = class EntitiesService {
             where: { organizationId },
             include: {
                 head: { select: { id: true, name: true } },
-                _count: { select: { departments: true, employees: true } }
+                _count: { select: { departments: true, employees: true } },
             },
             orderBy: { name: 'asc' },
         });
     }
     async createBranch(organizationId, dto) {
         return this.prisma.branch.create({
-            data: { ...dto, organizationId },
+            data: {
+                ...dto,
+                organizationId,
+                headId: dto.headId?.trim() ? dto.headId : undefined,
+            },
         });
     }
     async updateBranch(organizationId, id, dto) {
-        const branch = await this.prisma.branch.findFirst({ where: { id, organizationId } });
+        const branch = await this.prisma.branch.findFirst({
+            where: { id, organizationId },
+        });
         if (!branch)
             throw new common_1.NotFoundException('Branch not found');
-        return this.prisma.branch.update({ where: { id }, data: dto });
+        return this.prisma.branch.update({
+            where: { id },
+            data: {
+                ...dto,
+                ...(dto.headId !== undefined
+                    ? { headId: dto.headId?.trim() ? dto.headId : null }
+                    : {}),
+            },
+        });
+    }
+    async deleteBranch(organizationId, id) {
+        const branch = await this.prisma.branch.findFirst({
+            where: { id, organizationId },
+        });
+        if (!branch)
+            throw new common_1.NotFoundException('Branch not found');
+        return this.prisma.branch.delete({ where: { id } });
     }
     async findAllDepartments(organizationId, branchId) {
         return this.prisma.department.findMany({
             where: {
                 organizationId,
-                ...(branchId && { branchId })
+                ...(branchId && { branchId }),
             },
             include: {
                 head: { select: { id: true, name: true } },
                 branch: { select: { name: true } },
-                _count: { select: { employees: true } }
+                _count: { select: { employees: true } },
             },
             orderBy: { name: 'asc' },
         });
     }
     async createDepartment(organizationId, dto) {
         return this.prisma.department.create({
-            data: { ...dto, organizationId },
+            data: {
+                ...dto,
+                organizationId,
+                headId: dto.headId?.trim() ? dto.headId : undefined,
+            },
         });
     }
     async updateDepartment(organizationId, id, dto) {
-        const department = await this.prisma.department.findFirst({ where: { id, organizationId } });
+        const department = await this.prisma.department.findFirst({
+            where: { id, organizationId },
+        });
         if (!department)
             throw new common_1.NotFoundException('Department not found');
-        return this.prisma.department.update({ where: { id }, data: dto });
+        return this.prisma.department.update({
+            where: { id },
+            data: {
+                ...dto,
+                ...(dto.headId !== undefined
+                    ? { headId: dto.headId?.trim() ? dto.headId : null }
+                    : {}),
+            },
+        });
+    }
+    async deleteDepartment(organizationId, id) {
+        const department = await this.prisma.department.findFirst({
+            where: { id, organizationId },
+        });
+        if (!department)
+            throw new common_1.NotFoundException('Department not found');
+        return this.prisma.department.delete({ where: { id } });
     }
     async getStats(organizationId) {
         const [branches, departments, employees] = await Promise.all([
@@ -7559,7 +7908,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.EntitiesController = void 0;
 const common_1 = __webpack_require__(2);
@@ -7585,6 +7934,18 @@ let EntitiesController = class EntitiesController {
         const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
         return this.entitiesService.createBranch(orgId, dto);
     }
+    async updateBranch(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.updateBranch(orgId, id, dto);
+    }
+    async removeBranch(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.deleteBranch(orgId, id);
+    }
     async findAllDepartments(req, branchId) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
@@ -7596,6 +7957,18 @@ let EntitiesController = class EntitiesController {
             throw new common_1.UnauthorizedException('Invalid user context');
         const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
         return this.entitiesService.createDepartment(orgId, dto);
+    }
+    async updateDepartment(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.updateDepartment(orgId, id, dto);
+    }
+    async removeDepartment(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.entitiesService.getOrganizationId(req.user.sub);
+        return this.entitiesService.deleteDepartment(orgId, id);
     }
     async getStats(req) {
         if (!req.user?.sub)
@@ -7623,6 +7996,25 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EntitiesController.prototype, "createBranch", null);
 __decorate([
+    (0, common_1.Patch)('branches/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a branch' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof entities_dto_1.UpdateBranchDto !== "undefined" && entities_dto_1.UpdateBranchDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "updateBranch", null);
+__decorate([
+    (0, common_1.Delete)('branches/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a branch' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "removeBranch", null);
+__decorate([
     (0, common_1.Get)('departments'),
     (0, swagger_1.ApiOperation)({ summary: 'Get all departments' }),
     __param(0, (0, common_1.Req)()),
@@ -7637,9 +8029,28 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_c = typeof entities_dto_1.CreateDepartmentDto !== "undefined" && entities_dto_1.CreateDepartmentDto) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_d = typeof entities_dto_1.CreateDepartmentDto !== "undefined" && entities_dto_1.CreateDepartmentDto) === "function" ? _d : Object]),
     __metadata("design:returntype", Promise)
 ], EntitiesController.prototype, "createDepartment", null);
+__decorate([
+    (0, common_1.Patch)('departments/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a department' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_e = typeof entities_dto_1.UpdateDepartmentDto !== "undefined" && entities_dto_1.UpdateDepartmentDto) === "function" ? _e : Object]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "updateDepartment", null);
+__decorate([
+    (0, common_1.Delete)('departments/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a department' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], EntitiesController.prototype, "removeDepartment", null);
 __decorate([
     (0, common_1.Get)('stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get organizational statistics' }),
@@ -8433,6 +8844,74 @@ exports.ErpOverviewController = ErpOverviewController = __decorate([
 ], ErpOverviewController);
 
 
+/***/ }),
+/* 107 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PrismaExceptionFilter = void 0;
+const common_1 = __webpack_require__(2);
+const client_1 = __webpack_require__(10);
+let PrismaExceptionFilter = class PrismaExceptionFilter {
+    catch(exception, host) {
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse();
+        const request = ctx.getRequest();
+        const code = exception.code;
+        let status = common_1.HttpStatus.BAD_REQUEST;
+        let message = 'Database request failed';
+        const normalizeFieldLabel = (value) => {
+            const raw = value || '';
+            if (raw.includes('Branch_headId_fkey')) {
+                return 'selected branch head';
+            }
+            if (raw.includes('Department_headId_fkey')) {
+                return 'selected department head';
+            }
+            if (raw.includes('FinancialTransaction_partnerId_fkey')) {
+                return 'linked financial transactions';
+            }
+            if (raw.includes('AttendanceRecord_employeeId_fkey')) {
+                return 'linked attendance records';
+            }
+            return raw;
+        };
+        if (code === 'P2002') {
+            const fields = Array.isArray(exception.meta?.target)
+                ? exception.meta?.target.join(', ')
+                : 'unique field';
+            message = `${fields} already exists. Please use a different value.`;
+        }
+        else if (code === 'P2003') {
+            const field = normalizeFieldLabel(String(exception.meta?.field_name || 'related data'));
+            message = `Cannot complete action because ${field} is invalid or still linked.`;
+        }
+        else if (code === 'P2025') {
+            status = common_1.HttpStatus.NOT_FOUND;
+            message = 'Requested record does not exist';
+        }
+        response.status(status).json({
+            statusCode: status,
+            message,
+            code,
+            timestamp: new Date().toISOString(),
+            path: request.url,
+        });
+    }
+};
+exports.PrismaExceptionFilter = PrismaExceptionFilter;
+exports.PrismaExceptionFilter = PrismaExceptionFilter = __decorate([
+    (0, common_1.Catch)(client_1.Prisma.PrismaClientKnownRequestError)
+], PrismaExceptionFilter);
+
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -8471,6 +8950,7 @@ const core_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(2);
 const app_module_1 = __webpack_require__(3);
 const swagger_1 = __webpack_require__(23);
+const prisma_exception_filter_1 = __webpack_require__(107);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const isProduction = process.env.NODE_ENV === 'production';
@@ -8505,7 +8985,22 @@ async function bootstrap() {
         whitelist: true,
         forbidNonWhitelisted: true,
         transform: true,
+        exceptionFactory: (validationErrors = []) => {
+            const messages = validationErrors.flatMap((error) => {
+                const constraints = error.constraints
+                    ? Object.values(error.constraints)
+                    : [];
+                return constraints.length > 0
+                    ? constraints
+                    : [`${error.property} is invalid`];
+            });
+            return new common_1.BadRequestException({
+                message: messages,
+                error: 'Validation failed',
+            });
+        },
     }));
+    app.useGlobalFilters(new prisma_exception_filter_1.PrismaExceptionFilter());
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Klypto CRM API')
         .setDescription('The Klypto CRM ERP Portal API documentation')

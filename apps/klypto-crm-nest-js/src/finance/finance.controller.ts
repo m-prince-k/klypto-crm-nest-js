@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req, Query, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Query,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FinanceService } from './finance.service';
 import { CreateFinanceDto, UpdateFinanceDto } from './dto/finance.dto';
@@ -14,7 +26,10 @@ export class FinanceController {
 
   @Get()
   @ApiOperation({ summary: 'Get all financial transactions' })
-  async findAll(@Req() req: { user?: { sub?: string } }, @Query('type') type?: string) {
+  async findAll(
+    @Req() req: { user?: { sub?: string } },
+    @Query('type') type?: string,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.financeService.getOrganizationId(req.user.sub);
     return this.financeService.findAll(orgId, type);
@@ -22,7 +37,10 @@ export class FinanceController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new transaction' })
-  async create(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateFinanceDto) {
+  async create(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreateFinanceDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.financeService.getOrganizationId(req.user.sub);
     return this.financeService.create(orgId, dto);
@@ -38,6 +56,17 @@ export class FinanceController {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.financeService.getOrganizationId(req.user.sub);
     return this.financeService.update(orgId, id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a transaction' })
+  async remove(
+    @Req() req: { user?: { sub?: string } },
+    @Param('id') id: string,
+  ) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+    const orgId = await this.financeService.getOrganizationId(req.user.sub);
+    return this.financeService.delete(orgId, id);
   }
 
   @Get('stats')

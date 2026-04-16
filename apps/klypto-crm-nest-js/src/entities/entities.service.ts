@@ -1,6 +1,15 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateBranchDto, UpdateBranchDto, CreateDepartmentDto, UpdateDepartmentDto } from './dto/entities.dto';
+import {
+  CreateBranchDto,
+  UpdateBranchDto,
+  CreateDepartmentDto,
+  UpdateDepartmentDto,
+} from './dto/entities.dto';
 
 @Injectable()
 export class EntitiesService {
@@ -21,9 +30,9 @@ export class EntitiesService {
   async findAllBranches(organizationId: string) {
     return this.prisma.branch.findMany({
       where: { organizationId },
-      include: { 
+      include: {
         head: { select: { id: true, name: true } },
-        _count: { select: { departments: true, employees: true } }
+        _count: { select: { departments: true, employees: true } },
       },
       orderBy: { name: 'asc' },
     });
@@ -31,27 +40,49 @@ export class EntitiesService {
 
   async createBranch(organizationId: string, dto: CreateBranchDto) {
     return this.prisma.branch.create({
-      data: { ...dto, organizationId },
+      data: {
+        ...dto,
+        organizationId,
+        headId: dto.headId?.trim() ? dto.headId : undefined,
+      },
     });
   }
 
   async updateBranch(organizationId: string, id: string, dto: UpdateBranchDto) {
-    const branch = await this.prisma.branch.findFirst({ where: { id, organizationId } });
+    const branch = await this.prisma.branch.findFirst({
+      where: { id, organizationId },
+    });
     if (!branch) throw new NotFoundException('Branch not found');
-    return this.prisma.branch.update({ where: { id }, data: dto });
+    return this.prisma.branch.update({
+      where: { id },
+      data: {
+        ...dto,
+        ...(dto.headId !== undefined
+          ? { headId: dto.headId?.trim() ? dto.headId : null }
+          : {}),
+      },
+    });
+  }
+
+  async deleteBranch(organizationId: string, id: string) {
+    const branch = await this.prisma.branch.findFirst({
+      where: { id, organizationId },
+    });
+    if (!branch) throw new NotFoundException('Branch not found');
+    return this.prisma.branch.delete({ where: { id } });
   }
 
   // Departments
   async findAllDepartments(organizationId: string, branchId?: string) {
     return this.prisma.department.findMany({
-      where: { 
+      where: {
         organizationId,
-        ...(branchId && { branchId })
+        ...(branchId && { branchId }),
       },
-      include: { 
+      include: {
         head: { select: { id: true, name: true } },
         branch: { select: { name: true } },
-        _count: { select: { employees: true } }
+        _count: { select: { employees: true } },
       },
       orderBy: { name: 'asc' },
     });
@@ -59,14 +90,40 @@ export class EntitiesService {
 
   async createDepartment(organizationId: string, dto: CreateDepartmentDto) {
     return this.prisma.department.create({
-      data: { ...dto, organizationId },
+      data: {
+        ...dto,
+        organizationId,
+        headId: dto.headId?.trim() ? dto.headId : undefined,
+      },
     });
   }
 
-  async updateDepartment(organizationId: string, id: string, dto: UpdateDepartmentDto) {
-    const department = await this.prisma.department.findFirst({ where: { id, organizationId } });
+  async updateDepartment(
+    organizationId: string,
+    id: string,
+    dto: UpdateDepartmentDto,
+  ) {
+    const department = await this.prisma.department.findFirst({
+      where: { id, organizationId },
+    });
     if (!department) throw new NotFoundException('Department not found');
-    return this.prisma.department.update({ where: { id }, data: dto });
+    return this.prisma.department.update({
+      where: { id },
+      data: {
+        ...dto,
+        ...(dto.headId !== undefined
+          ? { headId: dto.headId?.trim() ? dto.headId : null }
+          : {}),
+      },
+    });
+  }
+
+  async deleteDepartment(organizationId: string, id: string) {
+    const department = await this.prisma.department.findFirst({
+      where: { id, organizationId },
+    });
+    if (!department) throw new NotFoundException('Department not found');
+    return this.prisma.department.delete({ where: { id } });
   }
 
   async getStats(organizationId: string) {

@@ -62,6 +62,15 @@ export class GrievancesService {
     });
   }
 
+  async delete(organizationId: string, id: string) {
+    const grievance = await this.prisma.grievance.findFirst({
+      where: { id, organizationId },
+    });
+    if (!grievance) throw new NotFoundException('Grievance not found');
+
+    return this.prisma.grievance.delete({ where: { id } });
+  }
+
   async getStats(organizationId: string) {
     const [total, unresolved, critical, resolved] = await Promise.all([
       this.prisma.grievance.count({ where: { organizationId } }),

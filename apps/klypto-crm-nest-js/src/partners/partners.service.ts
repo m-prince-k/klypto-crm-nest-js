@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePartnerDto, UpdatePartnerDto } from './dto/partner.dto';
 
@@ -19,9 +23,9 @@ export class PartnersService {
 
   async findAll(organizationId: string, type?: string) {
     return this.prisma.partner.findMany({
-      where: { 
+      where: {
         organizationId,
-        ...(type && { type })
+        ...(type && { type }),
       },
       orderBy: { name: 'asc' },
     });
@@ -34,7 +38,9 @@ export class PartnersService {
   }
 
   async update(organizationId: string, id: string, dto: UpdatePartnerDto) {
-    const partner = await this.prisma.partner.findFirst({ where: { id, organizationId } });
+    const partner = await this.prisma.partner.findFirst({
+      where: { id, organizationId },
+    });
     if (!partner) throw new NotFoundException('Partner not found');
 
     return this.prisma.partner.update({
@@ -43,9 +49,20 @@ export class PartnersService {
     });
   }
 
+  async delete(organizationId: string, id: string) {
+    const partner = await this.prisma.partner.findFirst({
+      where: { id, organizationId },
+    });
+    if (!partner) throw new NotFoundException('Partner not found');
+
+    return this.prisma.partner.delete({ where: { id } });
+  }
+
   async getStats(organizationId: string) {
     const [customers, vendors] = await Promise.all([
-      this.prisma.partner.count({ where: { organizationId, type: 'CUSTOMER' } }),
+      this.prisma.partner.count({
+        where: { organizationId, type: 'CUSTOMER' },
+      }),
       this.prisma.partner.count({ where: { organizationId, type: 'VENDOR' } }),
     ]);
 

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAssetDto, UpdateAssetDto } from './dto/asset.dto';
 
@@ -20,8 +24,8 @@ export class AssetsService {
   async findAll(organizationId: string) {
     return this.prisma.asset.findMany({
       where: { organizationId },
-      include: { 
-        employee: { select: { id: true, name: true } } 
+      include: {
+        employee: { select: { id: true, name: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -34,7 +38,9 @@ export class AssetsService {
   }
 
   async update(organizationId: string, id: string, dto: UpdateAssetDto) {
-    const asset = await this.prisma.asset.findFirst({ where: { id, organizationId } });
+    const asset = await this.prisma.asset.findFirst({
+      where: { id, organizationId },
+    });
     if (!asset) throw new NotFoundException('Asset not found');
 
     return this.prisma.asset.update({
@@ -43,12 +49,25 @@ export class AssetsService {
     });
   }
 
+  async delete(organizationId: string, id: string) {
+    const asset = await this.prisma.asset.findFirst({
+      where: { id, organizationId },
+    });
+    if (!asset) throw new NotFoundException('Asset not found');
+
+    return this.prisma.asset.delete({
+      where: { id },
+    });
+  }
+
   async getStats(organizationId: string) {
-    const assets = await this.prisma.asset.findMany({ where: { organizationId } });
-    
+    const assets = await this.prisma.asset.findMany({
+      where: { organizationId },
+    });
+
     const totalValuation = assets.reduce((sum, a) => sum + (a.value || 0), 0);
-    const inUse = assets.filter(a => a.status === 'In Use').length;
-    const maintenance = assets.filter(a => a.status === 'Maintenance').length;
+    const inUse = assets.filter((a) => a.status === 'In Use').length;
+    const maintenance = assets.filter((a) => a.status === 'Maintenance').length;
 
     return { total: assets.length, totalValuation, inUse, maintenance };
   }

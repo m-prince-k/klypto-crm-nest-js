@@ -1,7 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { RecruitmentService } from './recruitment.service';
-import { CreateJobPostingDto, UpdateJobPostingDto, CreateCandidateDto, UpdateCandidateDto } from './dto/recruitment.dto';
+import {
+  CreateJobPostingDto,
+  UpdateJobPostingDto,
+  CreateCandidateDto,
+  UpdateCandidateDto,
+} from './dto/recruitment.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 
@@ -22,7 +38,10 @@ export class RecruitmentController {
 
   @Post('jobs')
   @ApiOperation({ summary: 'Create a new job posting' })
-  async createJob(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateJobPostingDto) {
+  async createJob(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreateJobPostingDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
     return this.recruitmentService.createJob(orgId, dto);
@@ -40,6 +59,17 @@ export class RecruitmentController {
     return this.recruitmentService.updateJob(orgId, id, dto);
   }
 
+  @Delete('jobs/:id')
+  @ApiOperation({ summary: 'Delete a job posting' })
+  async removeJob(
+    @Req() req: { user?: { sub?: string } },
+    @Param('id') id: string,
+  ) {
+    if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
+    const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
+    return this.recruitmentService.deleteJob(orgId, id);
+  }
+
   @Get('candidates')
   @ApiOperation({ summary: 'Get all candidates' })
   async findAllCandidates(@Req() req: { user?: { sub?: string } }) {
@@ -50,7 +80,10 @@ export class RecruitmentController {
 
   @Post('candidates')
   @ApiOperation({ summary: 'Create a new candidate' })
-  async createCandidate(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateCandidateDto) {
+  async createCandidate(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreateCandidateDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
     return this.recruitmentService.createCandidate(orgId, dto);
@@ -70,7 +103,10 @@ export class RecruitmentController {
 
   @Delete('candidates/:id')
   @ApiOperation({ summary: 'Delete a candidate' })
-  async removeCandidate(@Req() req: { user?: { sub?: string } }, @Param('id') id: string) {
+  async removeCandidate(
+    @Req() req: { user?: { sub?: string } },
+    @Param('id') id: string,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.recruitmentService.getOrganizationId(req.user.sub);
     return this.recruitmentService.deleteCandidate(orgId, id);

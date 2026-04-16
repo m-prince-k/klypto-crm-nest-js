@@ -16,6 +16,7 @@ const DEFAULT_DASHBOARD_MODULES = [
   'dashboard',
   'leads',
   'erp',
+  'projects',
   'recruitment',
   'grievances',
   'payroll',
@@ -29,26 +30,13 @@ const DEFAULT_DASHBOARD_MODULES = [
 // Modules available per role (mirrors frontend access.js)
 const ROLE_MODULES: Record<string, string[]> = {
   SUPER_ADMIN: DEFAULT_DASHBOARD_MODULES,
-  ADMIN: [
-    'dashboard',
-    'leads',
-    'erp',
-    'recruitment',
-    'grievances',
-    'payroll',
-    'hrms',
-    'leave',
-    'employees',
-    'settings',
-    'users',
-  ],
   MANAGER: [
     'dashboard',
     'leads',
-    'erp',
+    'projects',
     'recruitment',
     'grievances',
-    'leave',
+    'employees',
     'settings',
   ],
   HR: [
@@ -75,6 +63,13 @@ export class AuthService {
 
   /** One-time org bootstrap — only called from the /signup page */
   async signup(signupDto: SignupDto) {
+    const orgCount = await this.prisma.organization.count();
+    if (orgCount > 0) {
+      throw new ConflictException(
+        'Organization is already initialized. Signup can only be used once.',
+      );
+    }
+
     const existingUser = await this.usersService.findOneByEmail(
       signupDto.email,
     );
@@ -127,7 +122,7 @@ export class AuthService {
     };
   }
 
-  /** SuperAdmin / Admin / HR creates a new employee account */
+  /** SuperAdmin / HR creates a new employee account */
   async createUser(adminUserId: string, dto: CreateUserDto) {
     // 1. Verify the caller exists and has rights
     const adminUser = await this.usersService.findOneById(adminUserId);
@@ -138,14 +133,25 @@ export class AuthService {
     );
     const canCreate =
       adminRoles.includes(SystemRole.SUPER_ADMIN) ||
-      adminRoles.includes(SystemRole.ADMIN) ||
       adminRoles.includes(SystemRole.HR);
     if (!canCreate)
       throw new ForbiddenException(
-        'Only super admins, admins, or HR can create user accounts',
+        'Only super admins or HR can create user accounts',
       );
 
     const createdRole = String(dto.role || '').toUpperCase();
+    if (createdRole === SystemRole.SUPER_ADMIN) {
+      throw new ForbiddenException(
+        'Super Admin can only be created during first-time signup.',
+      );
+    }
+
+    if (createdRole === SystemRole.ADMIN) {
+      throw new ForbiddenException(
+        'ADMIN role is deprecated and cannot be assigned',
+      );
+    }
+
     const isHrOnlyCreator =
       adminRoles.includes(SystemRole.HR) &&
       !adminRoles.includes(SystemRole.SUPER_ADMIN) &&
@@ -243,11 +249,10 @@ export class AuthService {
     );
     if (
       !adminRoles.includes(SystemRole.SUPER_ADMIN) &&
-      !adminRoles.includes(SystemRole.ADMIN) &&
       !adminRoles.includes(SystemRole.HR)
     ) {
       throw new ForbiddenException(
-        'Only super admins, admins, or HR can modify user status',
+        'Only super admins or HR can modify user status',
       );
     }
 
@@ -289,6 +294,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    await this.syncSystemRoleModules();
+    await this.enforceSingleSuperAdmin();
     await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
     const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
     const tokens = await this.getTokens(user.id, user.email, roles);
@@ -312,6 +319,8 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
+    await this.syncSystemRoleModules();
+    await this.enforceSingleSuperAdmin();
     await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
     const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
 
@@ -357,6 +366,8 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied');
     }
 
+    await this.syncSystemRoleModules();
+    await this.enforceSingleSuperAdmin();
     await this.ensureUserHasDefaultRole(user.id, user.roleAssignments.length);
     const { roles, dashboardModules } = await this.getUserRoleAccess(user.id);
     const tokens = await this.getTokens(user.id, user.email, roles);
@@ -448,7 +459,6 @@ export class AuthService {
   private buildAccessFromRoles(roles: string[], dashboardModules: string[]) {
     const roleSet = new Set(roles.map((role) => role.toUpperCase()));
     const hasSuperAdmin = roleSet.has(SystemRole.SUPER_ADMIN);
-    const hasAdmin = roleSet.has(SystemRole.ADMIN);
     const roleDefaultModules = hasSuperAdmin
       ? DEFAULT_DASHBOARD_MODULES
       : roles.flatMap((role) => ROLE_MODULES[String(role).toUpperCase()] || []);
@@ -458,7 +468,7 @@ export class AuthService {
 
     return {
       isSuperAdmin: hasSuperAdmin,
-      canManageUsers: hasSuperAdmin || hasAdmin,
+      canManageUsers: hasSuperAdmin,
       canManageRbac: hasSuperAdmin,
       canViewDashboard: hasSuperAdmin || effectiveModules.length > 0,
       dashboardModules: effectiveModules,
@@ -472,5 +482,38 @@ export class AuthService {
     if (existingRoleCount > 0) return;
     await this.ensureRole(SystemRole.EMPLOYEE, ROLE_MODULES.EMPLOYEE);
     await this.assignRole(userId, SystemRole.EMPLOYEE);
+  }
+
+  private async syncSystemRoleModules() {
+    await Promise.all([
+      this.ensureRole(SystemRole.SUPER_ADMIN, ROLE_MODULES.SUPER_ADMIN),
+      this.ensureRole(SystemRole.MANAGER, ROLE_MODULES.MANAGER),
+      this.ensureRole(SystemRole.HR, ROLE_MODULES.HR),
+      this.ensureRole(SystemRole.EMPLOYEE, ROLE_MODULES.EMPLOYEE),
+    ]);
+  }
+
+  private async enforceSingleSuperAdmin() {
+    const superAdminRole = await this.prisma.role.findUnique({
+      where: { name: SystemRole.SUPER_ADMIN },
+      select: { id: true },
+    });
+
+    if (!superAdminRole) return;
+
+    const assignments = await this.prisma.userRole.findMany({
+      where: { roleId: superAdminRole.id },
+      orderBy: { createdAt: 'asc' },
+      select: { id: true },
+    });
+
+    if (assignments.length <= 1) return;
+
+    const assignmentsToRemove = assignments.slice(1).map((entry) => entry.id);
+    await this.prisma.userRole.deleteMany({
+      where: {
+        id: { in: assignmentsToRemove },
+      },
+    });
   }
 }

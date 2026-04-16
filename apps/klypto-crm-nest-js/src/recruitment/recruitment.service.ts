@@ -1,6 +1,15 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateJobPostingDto, UpdateJobPostingDto, CreateCandidateDto, UpdateCandidateDto } from './dto/recruitment.dto';
+import {
+  CreateJobPostingDto,
+  UpdateJobPostingDto,
+  CreateCandidateDto,
+  UpdateCandidateDto,
+} from './dto/recruitment.dto';
 
 @Injectable()
 export class RecruitmentService {
@@ -32,10 +41,32 @@ export class RecruitmentService {
     });
   }
 
-  async updateJob(organizationId: string, id: string, dto: UpdateJobPostingDto) {
-    const job = await this.prisma.jobPosting.findFirst({ where: { id, organizationId } });
+  async updateJob(
+    organizationId: string,
+    id: string,
+    dto: UpdateJobPostingDto,
+  ) {
+    const job = await this.prisma.jobPosting.findFirst({
+      where: { id, organizationId },
+    });
     if (!job) throw new NotFoundException('Job posting not found');
     return this.prisma.jobPosting.update({ where: { id }, data: dto });
+  }
+
+  async deleteJob(organizationId: string, id: string) {
+    const job = await this.prisma.jobPosting.findFirst({
+      where: { id, organizationId },
+    });
+    if (!job) throw new NotFoundException('Job posting not found');
+
+    await this.prisma.$transaction([
+      this.prisma.candidate.deleteMany({
+        where: { organizationId, jobId: id },
+      }),
+      this.prisma.jobPosting.delete({ where: { id } }),
+    ]);
+
+    return { message: 'Job posting deleted successfully' };
   }
 
   // Candidates
@@ -54,8 +85,14 @@ export class RecruitmentService {
     });
   }
 
-  async updateCandidate(organizationId: string, id: string, dto: UpdateCandidateDto) {
-    const candidate = await this.prisma.candidate.findFirst({ where: { id, organizationId } });
+  async updateCandidate(
+    organizationId: string,
+    id: string,
+    dto: UpdateCandidateDto,
+  ) {
+    const candidate = await this.prisma.candidate.findFirst({
+      where: { id, organizationId },
+    });
     if (!candidate) throw new NotFoundException('Candidate not found');
 
     const updatedCandidate = await this.prisma.candidate.update({
@@ -75,10 +112,10 @@ export class RecruitmentService {
   private async onboardCandidate(organizationId: string, candidate: any) {
     // Generate a simple employee code if not present
     const code = `EMP-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-    
+
     // Check if employee already exists to prevent duplicates
     const existing = await this.prisma.employee.findFirst({
-      where: { name: candidate.name, organizationId }
+      where: { name: candidate.name, organizationId },
     });
 
     if (!existing) {
@@ -90,13 +127,15 @@ export class RecruitmentService {
           code,
           status: 'Active',
           organizationId,
-        }
+        },
       });
     }
   }
 
   async deleteCandidate(organizationId: string, id: string) {
-    const candidate = await this.prisma.candidate.findFirst({ where: { id, organizationId } });
+    const candidate = await this.prisma.candidate.findFirst({
+      where: { id, organizationId },
+    });
     if (!candidate) throw new NotFoundException('Candidate not found');
     return this.prisma.candidate.delete({ where: { id } });
   }

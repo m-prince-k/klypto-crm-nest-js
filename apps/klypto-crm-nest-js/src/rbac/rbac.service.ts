@@ -17,6 +17,7 @@ const DEFAULT_DASHBOARD_MODULES = [
   'dashboard',
   'leads',
   'erp',
+  'projects',
   'recruitment',
   'grievances',
   'payroll',
@@ -31,6 +32,7 @@ const DASHBOARD_MODULE_LABELS: Record<string, string> = {
   dashboard: 'Dashboard',
   leads: 'Leads',
   erp: 'ERP Portal',
+  projects: 'Projects',
   recruitment: 'Recruitment',
   grievances: 'Grievances',
   payroll: 'Payroll',
@@ -47,6 +49,12 @@ export class RbacService {
 
   async createRole(dto: CreateRoleDto) {
     const roleName = dto.name.trim().toUpperCase();
+    if (roleName === SystemRole.ADMIN) {
+      throw new ConflictException(
+        'ADMIN role is deprecated and cannot be used',
+      );
+    }
+
     const dashboardModules = this.normalizeDashboardModules(
       dto.dashboardModules,
     );
@@ -71,6 +79,11 @@ export class RbacService {
 
   async listRoles() {
     const roles = await this.prisma.role.findMany({
+      where: {
+        name: {
+          not: SystemRole.ADMIN,
+        },
+      },
       orderBy: { createdAt: 'asc' },
       include: {
         _count: {
@@ -122,6 +135,12 @@ export class RbacService {
     const nextName = hasNameUpdate
       ? dto.name!.trim().toUpperCase()
       : existingRole.name;
+
+    if (nextName === SystemRole.ADMIN) {
+      throw new ConflictException(
+        'ADMIN role is deprecated and cannot be used',
+      );
+    }
 
     if (
       existingRole.isSystem &&
@@ -204,6 +223,32 @@ export class RbacService {
 
   async assignRole(dto: AssignRoleDto, assignedById: string) {
     const roleName = dto.roleName.trim().toUpperCase();
+
+    if (roleName === SystemRole.ADMIN) {
+      throw new ConflictException(
+        'ADMIN role is deprecated and cannot be assigned',
+      );
+    }
+
+    if (roleName === SystemRole.SUPER_ADMIN) {
+      const existingSuperAdminAssignment = await this.prisma.userRole.findFirst(
+        {
+          where: {
+            role: { name: SystemRole.SUPER_ADMIN },
+          },
+          select: { userId: true },
+        },
+      );
+
+      if (
+        existingSuperAdminAssignment &&
+        existingSuperAdminAssignment.userId !== dto.userId
+      ) {
+        throw new ConflictException(
+          'A Super Admin already exists. Only one Super Admin is allowed.',
+        );
+      }
+    }
 
     const user = await this.prisma.user.findUnique({
       where: { id: dto.userId },
@@ -323,7 +368,6 @@ export class RbacService {
         (assignment) => assignment.role.name,
       );
       const hasSuperAdmin = roles.includes(SystemRole.SUPER_ADMIN);
-      const hasAdmin = roles.includes(SystemRole.ADMIN);
 
       return {
         id: user.id,
@@ -342,7 +386,7 @@ export class RbacService {
         ],
         access: {
           isSuperAdmin: hasSuperAdmin,
-          canManageUsers: hasSuperAdmin || hasAdmin,
+          canManageUsers: hasSuperAdmin,
           canManageRbac: hasSuperAdmin,
           canViewDashboard: hasSuperAdmin || roles.length > 0,
           dashboardModules: [

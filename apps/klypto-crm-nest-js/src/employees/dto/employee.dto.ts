@@ -2,7 +2,10 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateEmployeeDto {
-  @ApiProperty({ example: 'John Doe', description: 'Full name of the employee' })
+  @ApiProperty({
+    example: 'John Doe',
+    description: 'Full name of the employee',
+  })
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -21,6 +24,24 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   @IsString()
   department: string;
+
+  @ApiProperty({
+    example: 'clxyz...',
+    description: 'Department entity ID for hierarchy mapping',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
+
+  @ApiProperty({
+    example: 'clxyz...',
+    description: 'Branch entity ID for hierarchy mapping',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  branchId?: string;
 
   @ApiProperty({
     example: 'Active',
@@ -64,6 +85,12 @@ export class EmployeeResponseDto {
 
   @ApiProperty({ example: 'People Ops' })
   department: string;
+
+  @ApiProperty({ example: 'clxyz...', required: false })
+  departmentId?: string;
+
+  @ApiProperty({ example: 'clxyz...', required: false })
+  branchId?: string;
 
   @ApiProperty({ example: 'Active' })
   status: string;
