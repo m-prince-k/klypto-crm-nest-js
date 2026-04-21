@@ -90,6 +90,7 @@ const entities_module_1 = __webpack_require__(/*! ./entities/entities.module */ 
 const organizations_module_1 = __webpack_require__(/*! ./organizations/organizations.module */ "./apps/klypto-crm-nest-js/src/organizations/organizations.module.ts");
 const approvals_module_1 = __webpack_require__(/*! ./approvals/approvals.module */ "./apps/klypto-crm-nest-js/src/approvals/approvals.module.ts");
 const erp_overview_module_1 = __webpack_require__(/*! ./erp-overview/erp-overview.module */ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.module.ts");
+const policies_module_1 = __webpack_require__(/*! ./policies/policies.module */ "./apps/klypto-crm-nest-js/src/policies/policies.module.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -121,6 +122,7 @@ exports.AppModule = AppModule = __decorate([
             organizations_module_1.OrganizationsModule,
             approvals_module_1.ApprovalsModule,
             erp_overview_module_1.ErpOverviewModule,
+            policies_module_1.PoliciesModule,
             mail_module_1.MailModule,
             mailer_1.MailerModule.forRoot({
                 transport: {
@@ -6996,6 +6998,325 @@ exports.PerformanceService = PerformanceService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
 ], PerformanceService);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/policies/dto/policy.dto.ts"
+/*!****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/policies/dto/policy.dto.ts ***!
+  \****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdatePolicyDto = exports.CreatePolicyDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreatePolicyDto {
+    title;
+    content;
+    category;
+}
+exports.CreatePolicyDto = CreatePolicyDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Internet Usage Policy' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePolicyDto.prototype, "title", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Employees must use internet for business purposes...' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePolicyDto.prototype, "content", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'IT' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePolicyDto.prototype, "category", void 0);
+class UpdatePolicyDto extends (0, swagger_1.PartialType)(CreatePolicyDto) {
+}
+exports.UpdatePolicyDto = UpdatePolicyDto;
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/policies/policies.controller.ts"
+/*!*********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/policies/policies.controller.ts ***!
+  \*********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PoliciesController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const policies_service_1 = __webpack_require__(/*! ./policies.service */ "./apps/klypto-crm-nest-js/src/policies/policies.service.ts");
+const policy_dto_1 = __webpack_require__(/*! ./dto/policy.dto */ "./apps/klypto-crm-nest-js/src/policies/dto/policy.dto.ts");
+const access_token_guard_1 = __webpack_require__(/*! ../auth/guards/access-token.guard */ "./apps/klypto-crm-nest-js/src/auth/guards/access-token.guard.ts");
+const roles_guard_1 = __webpack_require__(/*! ../auth/roles/roles.guard */ "./apps/klypto-crm-nest-js/src/auth/roles/roles.guard.ts");
+let PoliciesController = class PoliciesController {
+    policiesService;
+    constructor(policiesService) {
+        this.policiesService = policiesService;
+    }
+    getNormalizedRoles(roles = []) {
+        return roles.map((role) => String(role).toUpperCase());
+    }
+    canManagePolicies(roles) {
+        return ['SUPER_ADMIN', 'HR'].some((role) => roles.includes(role));
+    }
+    async findAll(req) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.policiesService.getOrganizationId(req.user.sub);
+        return this.policiesService.findAll(orgId);
+    }
+    async findOne(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const orgId = await this.policiesService.getOrganizationId(req.user.sub);
+        return this.policiesService.findOne(orgId, id);
+    }
+    async create(req, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const roles = this.getNormalizedRoles(req.user.roles || []);
+        if (!this.canManagePolicies(roles)) {
+            throw new common_1.ForbiddenException('You do not have permission to create policies');
+        }
+        const orgId = await this.policiesService.getOrganizationId(req.user.sub);
+        return this.policiesService.create(orgId, dto);
+    }
+    async update(req, id, dto) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const roles = this.getNormalizedRoles(req.user.roles || []);
+        if (!this.canManagePolicies(roles)) {
+            throw new common_1.ForbiddenException('You do not have permission to update policies');
+        }
+        const orgId = await this.policiesService.getOrganizationId(req.user.sub);
+        return this.policiesService.update(orgId, id, dto);
+    }
+    async remove(req, id) {
+        if (!req.user?.sub)
+            throw new common_1.UnauthorizedException('Invalid user context');
+        const roles = this.getNormalizedRoles(req.user.roles || []);
+        if (!this.canManagePolicies(roles)) {
+            throw new common_1.ForbiddenException('You do not have permission to delete policies');
+        }
+        const orgId = await this.policiesService.getOrganizationId(req.user.sub);
+        return this.policiesService.remove(orgId, id);
+    }
+};
+exports.PoliciesController = PoliciesController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all organization policies' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PoliciesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get policy details' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], PoliciesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new policy' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof policy_dto_1.CreatePolicyDto !== "undefined" && policy_dto_1.CreatePolicyDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], PoliciesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update an existing policy' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, typeof (_c = typeof policy_dto_1.UpdatePolicyDto !== "undefined" && policy_dto_1.UpdatePolicyDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], PoliciesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a policy' }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], PoliciesController.prototype, "remove", null);
+exports.PoliciesController = PoliciesController = __decorate([
+    (0, swagger_1.ApiTags)('Policies'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(access_token_guard_1.AccessTokenGuard, roles_guard_1.RolesGuard),
+    (0, common_1.Controller)('policies'),
+    __metadata("design:paramtypes", [typeof (_a = typeof policies_service_1.PoliciesService !== "undefined" && policies_service_1.PoliciesService) === "function" ? _a : Object])
+], PoliciesController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/policies/policies.module.ts"
+/*!*****************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/policies/policies.module.ts ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PoliciesModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const policies_service_1 = __webpack_require__(/*! ./policies.service */ "./apps/klypto-crm-nest-js/src/policies/policies.service.ts");
+const policies_controller_1 = __webpack_require__(/*! ./policies.controller */ "./apps/klypto-crm-nest-js/src/policies/policies.controller.ts");
+const prisma_module_1 = __webpack_require__(/*! ../prisma/prisma.module */ "./apps/klypto-crm-nest-js/src/prisma/prisma.module.ts");
+let PoliciesModule = class PoliciesModule {
+};
+exports.PoliciesModule = PoliciesModule;
+exports.PoliciesModule = PoliciesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
+        controllers: [policies_controller_1.PoliciesController],
+        providers: [policies_service_1.PoliciesService],
+        exports: [policies_service_1.PoliciesService],
+    })
+], PoliciesModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/policies/policies.service.ts"
+/*!******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/policies/policies.service.ts ***!
+  \******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PoliciesService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+let PoliciesService = class PoliciesService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async getOrganizationId(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { organizationId: true },
+        });
+        if (!user || !user.organizationId) {
+            throw new common_1.UnauthorizedException('Invalid user context');
+        }
+        return user.organizationId;
+    }
+    async findAll(organizationId) {
+        return this.prisma.policy.findMany({
+            where: { organizationId },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async findOne(organizationId, id) {
+        const policy = await this.prisma.policy.findFirst({
+            where: { id, organizationId },
+        });
+        if (!policy)
+            throw new common_1.NotFoundException('Policy not found');
+        return policy;
+    }
+    async create(organizationId, dto) {
+        return this.prisma.policy.create({
+            data: {
+                title: dto.title,
+                content: dto.content,
+                category: dto.category || 'General',
+                organization: { connect: { id: organizationId } },
+            },
+        });
+    }
+    async update(organizationId, id, dto) {
+        const policy = await this.prisma.policy.findFirst({
+            where: { id, organizationId },
+        });
+        if (!policy)
+            throw new common_1.NotFoundException('Policy not found');
+        return this.prisma.policy.update({
+            where: { id },
+            data: {
+                ...(dto.title !== undefined ? { title: dto.title } : {}),
+                ...(dto.content !== undefined ? { content: dto.content } : {}),
+                ...(dto.category !== undefined ? { category: dto.category } : {}),
+            },
+        });
+    }
+    async remove(organizationId, id) {
+        const policy = await this.prisma.policy.findFirst({
+            where: { id, organizationId },
+        });
+        if (!policy)
+            throw new common_1.NotFoundException('Policy not found');
+        return this.prisma.policy.delete({
+            where: { id },
+        });
+    }
+};
+exports.PoliciesService = PoliciesService;
+exports.PoliciesService = PoliciesService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], PoliciesService);
 
 
 /***/ },
