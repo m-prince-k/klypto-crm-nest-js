@@ -7496,9 +7496,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProjectTaskDto.prototype, "assigneeId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'project-clx...id' }),
+    (0, swagger_1.ApiProperty)({ example: 'project-clx...id', required: false }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProjectTaskDto.prototype, "projectId", void 0);
 class UpdateProjectTaskDto extends (0, swagger_1.PartialType)(CreateProjectTaskDto) {
@@ -7589,10 +7589,12 @@ let ProjectsController = class ProjectsController {
         const roles = this.normalizeRoles(req.user.roles || []);
         const orgId = await this.projectsService.getOrganizationId(req.user.sub);
         if (!this.hasProjectManageAccess(roles)) {
-            const myProjects = await this.projectsService.findAllProjects(orgId, req.user.sub);
-            const canCreateInProject = myProjects.some((project) => String(project.id) === String(dto.projectId));
-            if (!canCreateInProject) {
-                throw new common_1.ForbiddenException('You can only create tasks in projects assigned to you');
+            if (dto.projectId) {
+                const myProjects = await this.projectsService.findAllProjects(orgId, req.user.sub);
+                const canCreateInProject = myProjects.some((project) => String(project.id) === String(dto.projectId));
+                if (!canCreateInProject) {
+                    throw new common_1.ForbiddenException('You can only create tasks in projects assigned to you');
+                }
             }
             if (dto.assigneeId && dto.assigneeId !== req.user.sub) {
                 throw new common_1.ForbiddenException('You can only create tasks assigned to yourself');
@@ -7616,12 +7618,6 @@ let ProjectsController = class ProjectsController {
                 throw new common_1.NotFoundException('Task not found');
             if (existingTask.assigneeId !== req.user.sub) {
                 throw new common_1.ForbiddenException('You can only update your assigned tasks');
-            }
-            const allowedStatuses = ['inprogress', 'review', 'done'];
-            const requestedKeys = Object.keys(dto || {});
-            const onlyStatusChange = requestedKeys.length === 1 && requestedKeys[0] === 'status';
-            if (!onlyStatusChange || !allowedStatuses.includes(String(dto.status))) {
-                throw new common_1.ForbiddenException('You can only move your task status to in progress, review, or done');
             }
         }
         return this.projectsService.updateTask(orgId, id, dto);

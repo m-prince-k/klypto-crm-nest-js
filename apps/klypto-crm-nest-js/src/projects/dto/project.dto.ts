@@ -72,10 +72,10 @@ export class CreateProjectTaskDto {
   @IsOptional()
   assigneeId?: string;
 
-  @ApiProperty({ example: 'project-clx...id' })
+  @ApiProperty({ example: 'project-clx...id', required: false })
   @IsString()
-  @IsNotEmpty()
-  projectId: string;
+  @IsOptional()
+  projectId?: string;
 }
 
 export class UpdateProjectTaskDto extends PartialType(CreateProjectTaskDto) {}

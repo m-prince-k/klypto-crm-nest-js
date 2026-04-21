@@ -119,18 +119,20 @@ export class ProjectsController {
     const orgId = await this.projectsService.getOrganizationId(req.user.sub);
 
     if (!this.hasProjectManageAccess(roles)) {
-      const myProjects = await this.projectsService.findAllProjects(
-        orgId,
-        req.user.sub,
-      );
-      const canCreateInProject = myProjects.some(
-        (project) => String(project.id) === String(dto.projectId),
-      );
-
-      if (!canCreateInProject) {
-        throw new ForbiddenException(
-          'You can only create tasks in projects assigned to you',
+      if (dto.projectId) {
+        const myProjects = await this.projectsService.findAllProjects(
+          orgId,
+          req.user.sub,
         );
+        const canCreateInProject = myProjects.some(
+          (project) => String(project.id) === String(dto.projectId),
+        );
+
+        if (!canCreateInProject) {
+          throw new ForbiddenException(
+            'You can only create tasks in projects assigned to you',
+          );
+        }
       }
 
       if (dto.assigneeId && dto.assigneeId !== req.user.sub) {
@@ -165,16 +167,6 @@ export class ProjectsController {
       if (!existingTask) throw new NotFoundException('Task not found');
       if (existingTask.assigneeId !== req.user.sub) {
         throw new ForbiddenException('You can only update your assigned tasks');
-      }
-
-      const allowedStatuses = ['inprogress', 'review', 'done'];
-      const requestedKeys = Object.keys(dto || {});
-      const onlyStatusChange =
-        requestedKeys.length === 1 && requestedKeys[0] === 'status';
-      if (!onlyStatusChange || !allowedStatuses.includes(String(dto.status))) {
-        throw new ForbiddenException(
-          'You can only move your task status to in progress, review, or done',
-        );
       }
     }
 
