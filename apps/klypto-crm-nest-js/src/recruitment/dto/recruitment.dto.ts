@@ -1,5 +1,12 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEmail, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  IsOptional,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateJobPostingDto {
   @ApiProperty({ example: 'Senior React Developer' })
@@ -11,6 +18,28 @@ export class CreateJobPostingDto {
   @IsString()
   @IsNotEmpty()
   department: string;
+
+  @ApiProperty({ example: 'Build and maintain React apps.' })
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @ApiProperty({ example: 600000 })
+  @IsNumber()
+  ctcMin: number;
+
+  @ApiProperty({ example: 1200000 })
+  @IsNumber()
+  ctcMax: number;
+
+  @ApiProperty({ example: 'Full-time', enum: ['Full-time', 'Intern'] })
+  @IsEnum(['Full-time', 'Intern'])
+  jobType: string;
+
+  @ApiProperty({ example: 'Bangalore, India' })
+  @IsString()
+  @IsNotEmpty()
+  location: string;
 
   @ApiProperty({ example: 'Active', enum: ['Active', 'Paused', 'Closed'] })
   @IsEnum(['Active', 'Paused', 'Closed'])
@@ -51,8 +80,27 @@ export class CreateCandidateDto {
   @IsOptional()
   score?: number;
 
-  @ApiProperty({ example: 'Applied', enum: ['Applied', 'Screening', 'Technical', 'Interview', 'Offered', 'Hired', 'Rejected'] })
-  @IsEnum(['Applied', 'Screening', 'Technical', 'Interview', 'Offered', 'Hired', 'Rejected'])
+  @ApiProperty({
+    example: 'Applied',
+    enum: [
+      'Applied',
+      'Screening',
+      'Technical',
+      'Interview',
+      'Offered',
+      'Hired',
+      'Rejected',
+    ],
+  })
+  @IsEnum([
+    'Applied',
+    'Screening',
+    'Technical',
+    'Interview',
+    'Offered',
+    'Hired',
+    'Rejected',
+  ])
   @IsOptional()
   stage?: string;
 }

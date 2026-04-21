@@ -217,6 +217,11 @@ model JobPosting {
   id             String       @id @default(cuid())
   title          String
   department     String
+  description    String
+  ctcMin         Int
+  ctcMax         Int
+  jobType        String       @default("Full-time") // Full-time, Intern
+  location       String
   status         String       @default("Active") // Active, Paused, Closed
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
