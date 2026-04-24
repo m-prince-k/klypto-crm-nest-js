@@ -28,6 +28,7 @@ import { ApprovalsModule } from './approvals/approvals.module';
 import { ErpOverviewModule } from './erp-overview/erp-overview.module';
 import { PoliciesModule } from './policies/policies.module';
 import { BiometricModule } from './biometric/biometric.module';
+import { UploadModule } from './common/upload/upload.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { BiometricModule } from './biometric/biometric.module';
     ErpOverviewModule,
     PoliciesModule,
     BiometricModule,
+    UploadModule,
     MailModule,
     MailerModule.forRoot({
       transport: {

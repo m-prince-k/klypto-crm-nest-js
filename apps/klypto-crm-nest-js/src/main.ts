@@ -3,11 +3,16 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
   });
+
+  // Serve static files from the uploads directory
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
   
   const isProduction = process.env.NODE_ENV === 'production';
 
