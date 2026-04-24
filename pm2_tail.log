@@ -1,0 +1,35 @@
+[TAILING] Tailing last 15 lines for [klypto-biometric] process (change the value with --lines option)
+/home/khush-ramgaria/.pm2/logs/klypto-biometric-error.log last 15 lines:
+0|klypto-b |                ^
+0|klypto-b | 
+0|klypto-b | Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+0|klypto-b |     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+0|klypto-b |     at listenInCluster (node:net:1997:12)
+0|klypto-b |     at node:net:2206:7
+0|klypto-b |     at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+0|klypto-b |   code: 'EADDRINUSE',
+0|klypto-b |   errno: -98,
+0|klypto-b |   syscall: 'listen',
+0|klypto-b |   address: '0.0.0.0',
+0|klypto-b |   port: 3000
+0|klypto-b | }
+0|klypto-b | 
+0|klypto-b | Node.js v22.20.0
+
+/home/khush-ramgaria/.pm2/logs/klypto-biometric-out.log last 15 lines:
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mErpOverviewController {/api/erp-overview}:[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/erp-overview/stats, GET} route[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPoliciesController {/api/policies}:[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/policies, GET} route[39m[38;5;3m +1ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/policies/:id, GET} route[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/policies, POST} route[39m[38;5;3m +1ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/policies/:id, PATCH} route[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/policies/:id, DELETE} route[39m[38;5;3m +1ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mBiometricController {/api/iclock}:[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/iclock/cdata, GET} route[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/iclock/cdata, POST} route[39m[38;5;3m +1ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/iclock/getrequest, GET} route[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:29 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/iclock/devicecmd, POST} route[39m[38;5;3m +0ms[39m
+0|klypto-b | [32m[Nest] 99806  - [39m04/23/2026, 6:12:32 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +2505ms[39m
+0|klypto-b | No typescript errors found.
+

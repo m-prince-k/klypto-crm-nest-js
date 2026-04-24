@@ -13,7 +13,13 @@ async function bootstrap() {
     .addTag('Admin')
     .addServer(`http://localhost:3001`, 'Local Environment')
     .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', name: 'JWT', in: 'header' },
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        in: 'header',
+      },
       'JWT-auth',
     )
     .build();

@@ -1,5 +1,12 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEmail, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  IsOptional,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateLeadDto {
   @ApiProperty({ example: 'John Doe' })
@@ -27,9 +34,9 @@ export class CreateLeadDto {
   @IsOptional()
   priority?: string;
 
-  @ApiProperty({ 
-    example: 'New', 
-    enum: ['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost'] 
+  @ApiProperty({
+    example: 'New',
+    enum: ['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost'],
   })
   @IsEnum(['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost'])
   @IsOptional()

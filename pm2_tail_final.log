@@ -1,0 +1,104 @@
+[TAILING] Tailing last 100 lines for [klypto-biometric] process (change the value with --lines option)
+/home/khush-ramgaria/.pm2/logs/klypto-biometric-error.log last 100 lines:
+/home/khush-ramgaria/.pm2/logs/klypto-biometric-out.log last 100 lines:
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:39 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:14, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:39 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:14.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:39 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: cmob04yvc0001cqeil8gkn8mj[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:15, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:15.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:40 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:41 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:41 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:41 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:16, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:41 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:16.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:41 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:41 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:17, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:17.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:19, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:19.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:42 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:43 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:43 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:43 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:43 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:23, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:43 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:23.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:43 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:44 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:44 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:44 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:44 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:25, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:44 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:25.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:44 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mProcessed attendance for Tejaswini (2) at 2026-02-04 11:59:53[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=6, timestamp=2026-02-04 12:01:06, status=4[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-04T06:31:06.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:26, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:26.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 6 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=2, timestamp=2026-02-04 12:01:25, status=4[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-04T06:31:25.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:27, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:27.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:46 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:47 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:47 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:47 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:29, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:47 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:29.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:47 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:47 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: cmob04yvc0001cqeil8gkn8mj[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:47 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:48 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:48 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:48 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=1, timestamp=2026-02-03 18:59:30, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:48 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:29:30.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:48 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:48 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:49 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: null[39m
+0|klypto-b | [33m[Nest] 105706  - [39m04/23/2026, 6:44:49 PM [33m   WARN[39m [38;5;3m[BiometricService] [39m[33mEmployee with code 1 not found in CRM.[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:49 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=3, timestamp=2026-02-03 19:00:37, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:49 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:30:37.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:49 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:49 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:50 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: cmob04ze10003cqeiz9py6lqf[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:51 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mProcessed attendance for Tejaswini (2) at 2026-02-04 12:01:25[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:51 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=2, timestamp=2026-02-04 12:01:54, status=4[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:51 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-04T06:31:54.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:51 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:51 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:52 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: cmob04yvc0001cqeil8gkn8mj[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:53 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mProcessed attendance for Aditya (3) at 2026-02-03 19:00:37[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:53 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=3, timestamp=2026-02-03 19:04:40, status=0[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:53 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-03T13:34:40.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:53 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:53 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mBiometric log saved. Finding employee...[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:54 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mEmployee lookup returned: cmob04ze10003cqeiz9py6lqf[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:55 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mProcessed attendance for Tejaswini (2) at 2026-02-04 12:01:54[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:55 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mParsed line: userId=7, timestamp=2026-02-04 12:03:48, status=4[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:55 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mCalculated punch time: 2026-02-04T06:33:48.000Z[39m
+0|klypto-b | [32m[Nest] 105706  - [39m04/23/2026, 6:44:55 PM [32m    LOG[39m [38;5;3m[BiometricService] [39m[32mSaving biometric log...[39m
+

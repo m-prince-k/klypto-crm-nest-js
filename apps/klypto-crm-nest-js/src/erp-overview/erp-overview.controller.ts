@@ -1,4 +1,10 @@
-import { Controller, Get, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Req,
+  UseGuards,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ErpOverviewService } from './erp-overview.service';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';

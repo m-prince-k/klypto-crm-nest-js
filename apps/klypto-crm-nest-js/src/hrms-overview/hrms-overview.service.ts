@@ -17,10 +17,20 @@ export class HrmsOverviewService {
   }
 
   async getStats(organizationId: string) {
-    const [totalEmployees, pendingLeaves, activeEmployees, structuresCount, attendanceToday] = await Promise.all([
+    const [
+      totalEmployees,
+      pendingLeaves,
+      activeEmployees,
+      structuresCount,
+      attendanceToday,
+    ] = await Promise.all([
       this.prisma.employee.count({ where: { organizationId } }),
-      this.prisma.leaveRequest.count({ where: { organizationId, status: 'Pending' } }),
-      this.prisma.employee.count({ where: { organizationId, status: { in: ['Active', 'Onboarding'] } } }),
+      this.prisma.leaveRequest.count({
+        where: { organizationId, status: 'Pending' },
+      }),
+      this.prisma.employee.count({
+        where: { organizationId, status: { in: ['Active', 'Onboarding'] } },
+      }),
       this.prisma.salaryStructure.count({ where: { organizationId } }),
       this.prisma.attendanceRecord.count({
         where: {
@@ -34,8 +44,10 @@ export class HrmsOverviewService {
       }),
     ]);
 
-    const attendanceRate = activeEmployees > 0 ? (attendanceToday / activeEmployees) * 100 : 0;
-    const payrollReady = totalEmployees > 0 ? (structuresCount / totalEmployees) * 100 : 0;
+    const attendanceRate =
+      activeEmployees > 0 ? (attendanceToday / activeEmployees) * 100 : 0;
+    const payrollReady =
+      totalEmployees > 0 ? (structuresCount / totalEmployees) * 100 : 0;
 
     return {
       totalEmployees,

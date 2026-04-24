@@ -1,5 +1,11 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateGrievanceDto {
   @ApiProperty({ example: 'Unfair treatment in project allocation' })
@@ -12,12 +18,18 @@ export class CreateGrievanceDto {
   @IsNotEmpty()
   category: string;
 
-  @ApiProperty({ example: 'I have been consistently denied opportunities for high-impact projects despite performance.' })
+  @ApiProperty({
+    example:
+      'I have been consistently denied opportunities for high-impact projects despite performance.',
+  })
   @IsString()
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ example: 'Medium', enum: ['Low', 'Medium', 'High', 'Critical'] })
+  @ApiProperty({
+    example: 'Medium',
+    enum: ['Low', 'Medium', 'High', 'Critical'],
+  })
   @IsEnum(['Low', 'Medium', 'High', 'Critical'])
   @IsOptional()
   severity?: string;
@@ -34,7 +46,10 @@ export class CreateGrievanceDto {
 }
 
 export class UpdateGrievanceDto extends PartialType(CreateGrievanceDto) {
-  @ApiProperty({ example: 'In Review', enum: ['Open', 'In Review', 'Escalated', 'Resolved'] })
+  @ApiProperty({
+    example: 'In Review',
+    enum: ['Open', 'In Review', 'Escalated', 'Resolved'],
+  })
   @IsEnum(['Open', 'In Review', 'Escalated', 'Resolved'])
   @IsOptional()
   status?: string;

@@ -1,6 +1,13 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePerformanceReviewDto, UpdatePerformanceReviewDto } from './dto/performance.dto';
+import {
+  CreatePerformanceReviewDto,
+  UpdatePerformanceReviewDto,
+} from './dto/performance.dto';
 
 @Injectable()
 export class PerformanceService {
@@ -35,7 +42,11 @@ export class PerformanceService {
     });
   }
 
-  async update(organizationId: string, id: string, dto: UpdatePerformanceReviewDto) {
+  async update(
+    organizationId: string,
+    id: string,
+    dto: UpdatePerformanceReviewDto,
+  ) {
     const review = await this.prisma.performanceReview.findFirst({
       where: { id, organizationId },
     });

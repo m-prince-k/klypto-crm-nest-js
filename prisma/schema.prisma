@@ -10,33 +10,33 @@ datasource db {
 model Organization {
   id                 String                 @id @default(cuid())
   name               String
-  users              User[]
-  employees          Employee[]
-  attendanceRecords  AttendanceRecord[]
-  leaveRequests      LeaveRequest[]
-  salaryStructures   SalaryStructure[]
-  payrollRecords     PayrollRecord[]
-  performanceReviews PerformanceReview[]
-  leads              Lead[]
-  jobPostings        JobPosting[]
-  candidates         Candidate[]
-  grievances         Grievance[]
-  projects           Project[]
-  projectTasks       ProjectTask[]
-  assets             Asset[]
-  partners           Partner[]
-  branches           Branch[]
-  departments        Department[]
-  transactions       FinancialTransaction[]
-  registrationNumber String?
-  policies           Policy[]
-  website            String?
-  primaryEmail       String?
-  phoneNumber        String?
-  taxId              String?
-  address            String?
   createdAt          DateTime               @default(now())
   updatedAt          DateTime               @updatedAt
+  address            String?
+  phoneNumber        String?
+  primaryEmail       String?
+  registrationNumber String?
+  taxId              String?
+  website            String?
+  assets             Asset[]
+  attendanceRecords  AttendanceRecord[]
+  branches           Branch[]
+  candidates         Candidate[]
+  departments        Department[]
+  employees          Employee[]
+  transactions       FinancialTransaction[]
+  grievances         Grievance[]
+  jobPostings        JobPosting[]
+  leads              Lead[]
+  leaveRequests      LeaveRequest[]
+  partners           Partner[]
+  payrollRecords     PayrollRecord[]
+  performanceReviews PerformanceReview[]
+  policies           Policy[]
+  projects           Project[]
+  projectTasks       ProjectTask[]
+  salaryStructures   SalaryStructure[]
+  users              User[]
 }
 
 model User {
@@ -47,16 +47,16 @@ model User {
   fullName                String
   isActive                Boolean       @default(true)
   organizationId          String
-  organization            Organization  @relation(fields: [organizationId], references: [id])
-  roleAssignments         UserRole[]    @relation("UserRoleAssignments")
-  assignedRoleAssignments UserRole[]    @relation("RoleAssignedBy")
-  employee                Employee?
-  assignedLeads           Lead[]        @relation("LeadAssignee")
-  assignedTasks           ProjectTask[]
-  managedProjects         Project[]     @relation("ProjectManager")
-  createdProjects         Project[]     @relation("ProjectCreator")
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
+  employee                Employee?
+  assignedLeads           Lead[]        @relation("LeadAssignee")
+  createdProjects         Project[]     @relation("ProjectCreator")
+  managedProjects         Project[]     @relation("ProjectManager")
+  assignedTasks           ProjectTask[]
+  organization            Organization  @relation(fields: [organizationId], references: [id])
+  assignedRoleAssignments UserRole[]    @relation("RoleAssignedBy")
+  roleAssignments         UserRole[]    @relation("UserRoleAssignments")
 }
 
 model Role {
@@ -64,10 +64,10 @@ model Role {
   name             String     @unique
   description      String?
   isSystem         Boolean    @default(false)
-  dashboardModules String[]   @default([])
-  assignments      UserRole[]
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
+  dashboardModules String[]   @default([])
+  assignments      UserRole[]
 }
 
 model UserRole {
@@ -75,11 +75,11 @@ model UserRole {
   userId       String
   roleId       String
   assignedById String?
-  user         User     @relation("UserRoleAssignments", fields: [userId], references: [id])
-  role         Role     @relation(fields: [roleId], references: [id])
-  assignedBy   User?    @relation("RoleAssignedBy", fields: [assignedById], references: [id])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  assignedBy   User?    @relation("RoleAssignedBy", fields: [assignedById], references: [id])
+  role         Role     @relation(fields: [roleId], references: [id])
+  user         User     @relation("UserRoleAssignments", fields: [userId], references: [id])
 
   @@unique([userId, roleId])
 }
@@ -90,26 +90,26 @@ model Employee {
   code               String              @unique
   role               String
   department         String
-  departmentId       String?
-  dept               Department?         @relation(fields: [departmentId], references: [id])
-  branchId           String?
-  branch             Branch?             @relation(fields: [branchId], references: [id])
   status             String              @default("Active")
   organizationId     String
-  organization       Organization        @relation(fields: [organizationId], references: [id])
   userId             String?             @unique
-  user               User?               @relation(fields: [userId], references: [id])
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
-  attendanceRecords  AttendanceRecord[]
-  leaveRequests      LeaveRequest[]
-  salaryStructure    SalaryStructure?
-  payrollRecords     PayrollRecord[]
-  performanceReviews PerformanceReview[]
-  grievances         Grievance[]
+  branchId           String?
+  departmentId       String?
   assignedAssets     Asset[]
+  attendanceRecords  AttendanceRecord[]
   managedBranches    Branch[]            @relation("BranchHead")
   managedDepartments Department[]        @relation("DeptHead")
+  branch             Branch?             @relation(fields: [branchId], references: [id])
+  dept               Department?         @relation(fields: [departmentId], references: [id])
+  organization       Organization        @relation(fields: [organizationId], references: [id])
+  user               User?               @relation(fields: [userId], references: [id])
+  grievances         Grievance[]
+  leaveRequests      LeaveRequest[]
+  payrollRecords     PayrollRecord[]
+  performanceReviews PerformanceReview[]
+  salaryStructure    SalaryStructure?
 }
 
 model AttendanceRecord {
@@ -119,56 +119,56 @@ model AttendanceRecord {
   checkOut       DateTime?
   status         String       @default("Present")
   employeeId     String
-  employee       Employee     @relation(fields: [employeeId], references: [id])
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   @@unique([employeeId, date])
 }
 
 model LeaveRequest {
   id             String       @id @default(cuid())
-  type           String // Annual, Sick, Casual, etc.
+  type           String
   startDate      DateTime
   endDate        DateTime
-  status         String       @default("Pending") // Pending, Approved, Rejected
+  status         String       @default("Pending")
   reason         String?
   employeeId     String
-  employee       Employee     @relation(fields: [employeeId], references: [id])
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model SalaryStructure {
   id             String       @id @default(cuid())
   employeeId     String       @unique
-  employee       Employee     @relation(fields: [employeeId], references: [id])
   basicSalary    Float        @default(0)
   hra            Float        @default(0)
   allowances     Float        @default(0)
   deductions     Float        @default(0)
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model PayrollRecord {
   id             String       @id @default(cuid())
   employeeId     String
-  employee       Employee     @relation(fields: [employeeId], references: [id])
   month          Int
   year           Int
   netPay         Float
-  status         String       @default("Paid") // Draft, Paid
+  status         String       @default("Paid")
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   @@unique([employeeId, month, year])
 }
@@ -176,15 +176,15 @@ model PayrollRecord {
 model PerformanceReview {
   id             String       @id @default(cuid())
   employeeId     String
-  employee       Employee     @relation(fields: [employeeId], references: [id])
-  cycle          String // e.g., Q1 2026
+  cycle          String
   rating         Float
   feedback       String?
-  status         String       @default("Complete") // In review, Complete
+  status         String       @default("Complete")
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Lead {
@@ -193,42 +193,42 @@ model Lead {
   email          String?
   phone          String?
   company        String?
-  priority       String       @default("Medium") // High, Medium, Low
-  status         String       @default("New") // New, Discovery, Proposal, Negotiation, Won, Lost
+  priority       String       @default("Medium")
+  status         String       @default("New")
   value          Float?       @default(0)
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   assigneeId     String?
-  assignee       User?        @relation("LeadAssignee", fields: [assigneeId], references: [id])
-  notes          LeadNote[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  assignee       User?        @relation("LeadAssignee", fields: [assigneeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  notes          LeadNote[]
 }
 
 model LeadNote {
   id        String   @id @default(cuid())
   content   String
   leadId    String
-  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 }
 
 model JobPosting {
   id             String       @id @default(cuid())
   title          String
   department     String
-  description    String
-  ctcMin         Int
-  ctcMax         Int
-  jobType        String       @default("Full-time") // Full-time, Intern
-  location       String
-  status         String       @default("Active") // Active, Paused, Closed
+  status         String       @default("Active")
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  candidates     Candidate[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  ctcMax         Int
+  ctcMin         Int
+  description    String
+  jobType        String       @default("Full-time")
+  location       String
+  candidates     Candidate[]
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Candidate {
@@ -236,15 +236,15 @@ model Candidate {
   name           String
   email          String?
   phone          String?
-  role           String // Job Title
-  stage          String       @default("Applied") // Applied, Screening, Technical, Interview, Offered, Hired, Rejected
+  role           String
+  stage          String       @default("Applied")
   score          Int          @default(0)
   jobId          String?
-  job            JobPosting?  @relation(fields: [jobId], references: [id])
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  job            JobPosting?  @relation(fields: [jobId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Grievance {
@@ -252,48 +252,48 @@ model Grievance {
   subject        String
   category       String
   description    String
-  severity       String       @default("Medium") // Low, Medium, High, Critical
-  status         String       @default("Open") // Open, In Review, Escalated, Resolved
+  severity       String       @default("Medium")
+  status         String       @default("Open")
   isAnonymous    Boolean      @default(false)
   employeeId     String?
-  employee       Employee?    @relation(fields: [employeeId], references: [id])
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  employee       Employee?    @relation(fields: [employeeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Project {
   id             String        @id @default(cuid())
   name           String
   description    String?
-  status         String        @default("Active") // Active, Completed
+  status         String        @default("Active")
   organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id])
-  managerId      String?
-  manager        User?         @relation("ProjectManager", fields: [managerId], references: [id])
-  createdById    String?
-  createdBy      User?         @relation("ProjectCreator", fields: [createdById], references: [id])
-  tasks          ProjectTask[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  createdById    String?
+  managerId      String?
+  createdBy      User?         @relation("ProjectCreator", fields: [createdById], references: [id])
+  manager        User?         @relation("ProjectManager", fields: [managerId], references: [id])
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  tasks          ProjectTask[]
 }
 
 model ProjectTask {
   id             String       @id @default(cuid())
   title          String
   description    String?
-  priority       String       @default("Medium") // Low, Medium, High, Critical
-  status         String       @default("todo") // todo, inprogress, review, done
+  priority       String       @default("Medium")
+  status         String       @default("todo")
   dueDate        DateTime?
   assigneeId     String?
-  assignee       User?        @relation(fields: [assigneeId], references: [id])
   projectId      String?
-  project        Project?     @relation(fields: [projectId], references: [id])
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  assignee       User?        @relation(fields: [assigneeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  project        Project?     @relation(fields: [projectId], references: [id])
 }
 
 model Asset {
@@ -302,82 +302,93 @@ model Asset {
   category       String
   location       String
   value          Float        @default(0)
-  status         String       @default("In Storage") // In Use, In Storage, Maintenance, Disposed
+  status         String       @default("In Storage")
   employeeId     String?
-  employee       Employee?    @relation(fields: [employeeId], references: [id])
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  employee       Employee?    @relation(fields: [employeeId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Partner {
   id             String                 @id @default(cuid())
   name           String
-  type           String                 @default("CUSTOMER") // CUSTOMER, VENDOR
+  type           String                 @default("CUSTOMER")
   contactPerson  String
   email          String
   phone          String
-  status         String                 @default("Active") // Active, Inactive, Blocked
+  status         String                 @default("Active")
   category       String                 @default("General")
   creditLimit    Float                  @default(0)
   organizationId String
-  organization   Organization           @relation(fields: [organizationId], references: [id])
-  transactions   FinancialTransaction[]
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
+  transactions   FinancialTransaction[]
+  organization   Organization           @relation(fields: [organizationId], references: [id])
 }
 
 model Policy {
   id             String       @id @default(cuid())
   title          String
-  content        String       @db.Text
-  category       String       @default("General") // e.g., HR, IT, General
+  content        String
+  category       String       @default("General")
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model FinancialTransaction {
   id              String       @id @default(cuid())
   referenceNumber String
-  type            String // INVOICE, PURCHASE_ORDER
+  type            String
   amount          Float        @default(0)
   date            DateTime     @default(now())
-  status          String       @default("Pending") // Draft, Approved, Paid, Overdue, Fulfilled
+  status          String       @default("Pending")
   partnerId       String
-  partner         Partner      @relation(fields: [partnerId], references: [id])
   organizationId  String
-  organization    Organization @relation(fields: [organizationId], references: [id])
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  partner         Partner      @relation(fields: [partnerId], references: [id])
 }
 
 model Branch {
   id             String       @id @default(cuid())
   name           String
-  type           String       @default("Branch") // Main, Branch, International
+  type           String       @default("Branch")
   headId         String?
-  head           Employee?    @relation("BranchHead", fields: [headId], references: [id])
   organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  head           Employee?    @relation("BranchHead", fields: [headId], references: [id])
   organization   Organization @relation(fields: [organizationId], references: [id])
   departments    Department[]
   employees      Employee[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
 }
 
 model Department {
   id             String       @id @default(cuid())
   name           String
   headId         String?
-  head           Employee?    @relation("DeptHead", fields: [headId], references: [id])
   branchId       String
-  branch         Branch       @relation(fields: [branchId], references: [id])
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  employees      Employee[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  branch         Branch       @relation(fields: [branchId], references: [id])
+  head           Employee?    @relation("DeptHead", fields: [headId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  employees      Employee[]
+}
+
+model BiometricLog {
+  id        String   @id @default(cuid())
+  deviceSn  String
+  empCode   String
+  punchTime DateTime
+  punchType String?
+  rawLog    String
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

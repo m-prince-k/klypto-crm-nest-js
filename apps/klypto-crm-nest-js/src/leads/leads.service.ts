@@ -1,6 +1,14 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateLeadDto, UpdateLeadDto, CreateLeadNoteDto } from './dto/lead.dto';
+import {
+  CreateLeadDto,
+  UpdateLeadDto,
+  CreateLeadNoteDto,
+} from './dto/lead.dto';
 
 @Injectable()
 export class LeadsService {
@@ -20,13 +28,13 @@ export class LeadsService {
   async findAll(organizationId: string) {
     return this.prisma.lead.findMany({
       where: { organizationId },
-      include: { 
+      include: {
         assignee: {
-          select: { id: true, fullName: true, email: true }
+          select: { id: true, fullName: true, email: true },
         },
         _count: {
-          select: { notes: true }
-        }
+          select: { notes: true },
+        },
       },
       orderBy: { updatedAt: 'desc' },
     });
@@ -35,13 +43,13 @@ export class LeadsService {
   async findOne(organizationId: string, id: string) {
     const lead = await this.prisma.lead.findFirst({
       where: { id, organizationId },
-      include: { 
+      include: {
         assignee: {
-          select: { id: true, fullName: true, email: true }
+          select: { id: true, fullName: true, email: true },
         },
         notes: {
-          orderBy: { createdAt: 'desc' }
-        }
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
     if (!lead) throw new NotFoundException('Lead not found');
@@ -74,7 +82,11 @@ export class LeadsService {
     });
   }
 
-  async addNote(organizationId: string, leadId: string, dto: CreateLeadNoteDto) {
+  async addNote(
+    organizationId: string,
+    leadId: string,
+    dto: CreateLeadNoteDto,
+  ) {
     await this.findOne(organizationId, leadId);
     return this.prisma.leadNote.create({
       data: {

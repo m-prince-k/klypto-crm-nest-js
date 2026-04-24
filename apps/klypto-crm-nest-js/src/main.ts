@@ -5,7 +5,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
+  
   const isProduction = process.env.NODE_ENV === 'production';
 
   const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
@@ -45,9 +48,11 @@ async function bootstrap() {
     optionsSuccessStatus: 200,
   });
 
-  // Set global prefix for all APIs
-  app.setGlobalPrefix('api');
-
+  // Set global prefix for all APIs, but specifically exclude ZKTeco ADMS routes
+  // because hardware devices are hardcoded to test the root `/iclock` paths.
+  app.setGlobalPrefix('api', {
+    exclude: ['iclock', 'iclock/(.*)'],
+  });
   // Enable global validation pipes
   app.useGlobalPipes(
     new ValidationPipe({

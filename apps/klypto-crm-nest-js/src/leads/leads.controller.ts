@@ -1,7 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { LeadsService } from './leads.service';
-import { CreateLeadDto, UpdateLeadDto, CreateLeadNoteDto } from './dto/lead.dto';
+import {
+  CreateLeadDto,
+  UpdateLeadDto,
+  CreateLeadNoteDto,
+} from './dto/lead.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 
@@ -22,7 +37,10 @@ export class LeadsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get lead details' })
-  async findOne(@Req() req: { user?: { sub?: string } }, @Param('id') id: string) {
+  async findOne(
+    @Req() req: { user?: { sub?: string } },
+    @Param('id') id: string,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.leadsService.getOrganizationId(req.user.sub);
     return this.leadsService.findOne(orgId, id);
@@ -30,7 +48,10 @@ export class LeadsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new lead' })
-  async create(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateLeadDto) {
+  async create(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreateLeadDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.leadsService.getOrganizationId(req.user.sub);
     return this.leadsService.create(orgId, dto);
@@ -50,7 +71,10 @@ export class LeadsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a lead' })
-  async remove(@Req() req: { user?: { sub?: string } }, @Param('id') id: string) {
+  async remove(
+    @Req() req: { user?: { sub?: string } },
+    @Param('id') id: string,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.leadsService.getOrganizationId(req.user.sub);
     return this.leadsService.delete(orgId, id);
@@ -70,7 +94,10 @@ export class LeadsController {
 
   @Get(':id/notes')
   @ApiOperation({ summary: 'Get notes for a lead' })
-  async getNotes(@Req() req: { user?: { sub?: string } }, @Param('id') id: string) {
+  async getNotes(
+    @Req() req: { user?: { sub?: string } },
+    @Param('id') id: string,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.leadsService.getOrganizationId(req.user.sub);
     return this.leadsService.getNotes(orgId, id);

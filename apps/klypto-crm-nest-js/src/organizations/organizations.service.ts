@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateOrganizationDto } from './dto/organization.dto';
 
@@ -19,7 +23,7 @@ export class OrganizationsService {
 
   async getProfile(organizationId: string) {
     const org = await this.prisma.organization.findUnique({
-      where: { id: organizationId }
+      where: { id: organizationId },
     });
     if (!org) throw new NotFoundException('Organization not found');
     return org;
@@ -28,27 +32,28 @@ export class OrganizationsService {
   async updateProfile(organizationId: string, dto: UpdateOrganizationDto) {
     return this.prisma.organization.update({
       where: { id: organizationId },
-      data: dto
+      data: dto,
     });
   }
 
   async getDetailedStats(organizationId: string) {
-    const [employees, departments, branches, assets, projects] = await Promise.all([
-      this.prisma.employee.count({ where: { organizationId } }),
-      this.prisma.department.count({ where: { organizationId } }),
-      this.prisma.branch.count({ where: { organizationId } }),
-      this.prisma.asset.count({ where: { organizationId } }),
-      this.prisma.project.count({ where: { organizationId } }),
-    ]);
+    const [employees, departments, branches, assets, projects] =
+      await Promise.all([
+        this.prisma.employee.count({ where: { organizationId } }),
+        this.prisma.department.count({ where: { organizationId } }),
+        this.prisma.branch.count({ where: { organizationId } }),
+        this.prisma.asset.count({ where: { organizationId } }),
+        this.prisma.project.count({ where: { organizationId } }),
+      ]);
 
-    return { 
-      employees, 
-      departments, 
-      branches, 
-      totalAssets: assets, 
+    return {
+      employees,
+      departments,
+      branches,
+      totalAssets: assets,
       totalProjects: projects,
       systemHealth: '100%',
-      securityIndex: '98.5%' 
+      securityIndex: '98.5%',
     };
   }
 }

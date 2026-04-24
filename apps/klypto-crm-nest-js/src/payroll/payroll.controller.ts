@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PayrollService } from './payroll.service';
 import { CreateSalaryStructureDto, ProcessPayrollDto } from './dto/payroll.dto';
@@ -29,8 +37,13 @@ export class PayrollController {
   }
 
   @Post('structures')
-  @ApiOperation({ summary: 'Create or update a salary structure for an employee' })
-  async upsertStructure(@Req() req: { user?: { sub?: string } }, @Body() dto: CreateSalaryStructureDto) {
+  @ApiOperation({
+    summary: 'Create or update a salary structure for an employee',
+  })
+  async upsertStructure(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreateSalaryStructureDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.payrollService.getOrganizationId(req.user.sub);
     return this.payrollService.upsertStructure(orgId, dto);
@@ -46,7 +59,10 @@ export class PayrollController {
 
   @Post('process')
   @ApiOperation({ summary: 'Process payroll for a given month and year' })
-  async processPayroll(@Req() req: { user?: { sub?: string } }, @Body() dto: ProcessPayrollDto) {
+  async processPayroll(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: ProcessPayrollDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.payrollService.getOrganizationId(req.user.sub);
     return this.payrollService.processPayroll(orgId, dto);

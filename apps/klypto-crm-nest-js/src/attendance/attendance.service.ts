@@ -21,9 +21,20 @@ export class AttendanceService {
     return user.organizationId;
   }
 
-  async findAll(organizationId: string, dateStr?: string) {
+  async findAll(organizationId: string, dateStr?: string, monthStr?: string, employeeId?: string) {
     let dateFilter: any = undefined;
-    if (dateStr) {
+
+    if (monthStr) {
+      // monthStr expected format: "YYYY-MM"
+      const [year, month] = monthStr.split('-').map(Number);
+      const startOfMonth = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+      const endOfMonth = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+      
+      dateFilter = {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      };
+    } else if (dateStr) {
       const date = new Date(dateStr);
       const startOfDay = new Date(date);
       startOfDay.setUTCHours(0, 0, 0, 0);
@@ -40,14 +51,15 @@ export class AttendanceService {
       where: {
         organizationId,
         ...(dateFilter && { date: dateFilter }),
+        ...(employeeId && { employeeId }),
       },
       include: {
         employee: true,
       },
       orderBy: {
         employee: {
-          name: 'asc'
-        }
+          name: 'asc',
+        },
       },
     });
     return records;
@@ -103,12 +115,26 @@ export class AttendanceService {
   }
 
   async update(organizationId: string, id: string, dto: UpdateAttendanceDto) {
-    await this.findOne(organizationId, id);
+    const existingRecord = await this.findOne(organizationId, id);
 
     const updateData: any = {};
     if (dto.status) updateData.status = dto.status;
-    if (dto.checkIn) updateData.checkIn = new Date(dto.checkIn);
-    if (dto.checkOut) updateData.checkOut = new Date(dto.checkOut);
+    
+    // First-In Logic: Only update Check-In if it doesn't exist, or if the new time is EARLIER
+    if (dto.checkIn) {
+      const newCheckIn = new Date(dto.checkIn);
+      if (!existingRecord.checkIn || newCheckIn < existingRecord.checkIn) {
+        updateData.checkIn = newCheckIn;
+      }
+    }
+    
+    // Last-Out Logic: Only update Check-Out if it doesn't exist, or if the new time is LATER
+    if (dto.checkOut) {
+      const newCheckOut = new Date(dto.checkOut);
+      if (!existingRecord.checkOut || newCheckOut > existingRecord.checkOut) {
+        updateData.checkOut = newCheckOut;
+      }
+    }
 
     return this.prisma.attendanceRecord.update({
       where: { id },

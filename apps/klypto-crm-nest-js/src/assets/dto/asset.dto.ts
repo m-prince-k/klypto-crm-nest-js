@@ -1,5 +1,11 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateAssetDto {
   @ApiProperty({ example: 'MacBook Pro M3 Max' })
@@ -22,7 +28,10 @@ export class CreateAssetDto {
   @IsOptional()
   value?: number;
 
-  @ApiProperty({ example: 'In Storage', enum: ['In Use', 'In Storage', 'Maintenance', 'Disposed'] })
+  @ApiProperty({
+    example: 'In Storage',
+    enum: ['In Use', 'In Storage', 'Maintenance', 'Disposed'],
+  })
   @IsEnum(['In Use', 'In Storage', 'Maintenance', 'Disposed'])
   @IsOptional()
   status?: string;

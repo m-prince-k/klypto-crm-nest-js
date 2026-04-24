@@ -91,6 +91,7 @@ const organizations_module_1 = __webpack_require__(/*! ./organizations/organizat
 const approvals_module_1 = __webpack_require__(/*! ./approvals/approvals.module */ "./apps/klypto-crm-nest-js/src/approvals/approvals.module.ts");
 const erp_overview_module_1 = __webpack_require__(/*! ./erp-overview/erp-overview.module */ "./apps/klypto-crm-nest-js/src/erp-overview/erp-overview.module.ts");
 const policies_module_1 = __webpack_require__(/*! ./policies/policies.module */ "./apps/klypto-crm-nest-js/src/policies/policies.module.ts");
+const biometric_module_1 = __webpack_require__(/*! ./biometric/biometric.module */ "./apps/klypto-crm-nest-js/src/biometric/biometric.module.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -123,6 +124,7 @@ exports.AppModule = AppModule = __decorate([
             approvals_module_1.ApprovalsModule,
             erp_overview_module_1.ErpOverviewModule,
             policies_module_1.PoliciesModule,
+            biometric_module_1.BiometricModule,
             mail_module_1.MailModule,
             mailer_1.MailerModule.forRoot({
                 transport: {
@@ -330,14 +332,14 @@ let ApprovalsService = class ApprovalsService {
             this.prisma.financialTransaction.findMany({
                 where: {
                     organizationId,
-                    status: { in: ['Pending', 'Draft'] }
+                    status: { in: ['Pending', 'Draft'] },
                 },
                 include: { partner: { select: { name: true } } },
                 orderBy: { date: 'desc' },
-            })
+            }),
         ]);
         const unified = [
-            ...leaves.map(l => ({
+            ...leaves.map((l) => ({
                 id: l.id,
                 type: 'LEAVE',
                 title: `${l.type} Leave Request`,
@@ -346,9 +348,9 @@ let ApprovalsService = class ApprovalsService {
                 date: l.createdAt,
                 priority: 'Medium',
                 description: `${l.reason || 'No reason provided'}. (From ${new Date(l.startDate).toLocaleDateString()} to ${new Date(l.endDate).toLocaleDateString()})`,
-                metadata: { startDate: l.startDate, endDate: l.endDate }
+                metadata: { startDate: l.startDate, endDate: l.endDate },
             })),
-            ...finances.map(f => ({
+            ...finances.map((f) => ({
                 id: f.id,
                 type: 'FINANCE',
                 title: f.type === 'PURCHASE_ORDER' ? 'Purchase Order' : 'Sales Invoice',
@@ -357,25 +359,39 @@ let ApprovalsService = class ApprovalsService {
                 date: f.date,
                 priority: f.amount > 5000 ? 'High' : 'Medium',
                 description: `Reference: ${f.referenceNumber}. Transaction amount: $${f.amount.toLocaleString()}.`,
-                metadata: { reference: f.referenceNumber }
-            }))
+                metadata: { reference: f.referenceNumber },
+            })),
         ];
         return unified.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }
     async processAction(organizationId, dto) {
         const { type, id, action } = dto;
-        const status = action === 'APPROVE' ? (type === 'FINANCE' ? 'Approved' : 'Approved') : 'Rejected';
+        const status = action === 'APPROVE'
+            ? type === 'FINANCE'
+                ? 'Approved'
+                : 'Approved'
+            : 'Rejected';
         if (type === 'LEAVE') {
-            const record = await this.prisma.leaveRequest.findFirst({ where: { id, organizationId } });
+            const record = await this.prisma.leaveRequest.findFirst({
+                where: { id, organizationId },
+            });
             if (!record)
                 throw new common_1.NotFoundException('Leave request not found');
-            return this.prisma.leaveRequest.update({ where: { id }, data: { status } });
+            return this.prisma.leaveRequest.update({
+                where: { id },
+                data: { status },
+            });
         }
         if (type === 'FINANCE') {
-            const record = await this.prisma.financialTransaction.findFirst({ where: { id, organizationId } });
+            const record = await this.prisma.financialTransaction.findFirst({
+                where: { id, organizationId },
+            });
             if (!record)
                 throw new common_1.NotFoundException('Financial transaction not found');
-            return this.prisma.financialTransaction.update({ where: { id }, data: { status } });
+            return this.prisma.financialTransaction.update({
+                where: { id },
+                data: { status },
+            });
         }
         throw new common_1.BadRequestException('Invalid approval type');
     }
@@ -735,7 +751,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateAssetDto.prototype, "value", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'In Storage', enum: ['In Use', 'In Storage', 'Maintenance', 'Disposed'] }),
+    (0, swagger_1.ApiProperty)({
+        example: 'In Storage',
+        enum: ['In Use', 'In Storage', 'Maintenance', 'Disposed'],
+    }),
     (0, class_validator_1.IsEnum)(['In Use', 'In Storage', 'Maintenance', 'Disposed']),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -792,11 +811,11 @@ let AttendanceController = class AttendanceController {
         const orgId = await this.attendanceService.getOrganizationId(req.user.sub);
         return this.attendanceService.create(orgId, createAttendanceDto);
     }
-    async findAll(req, date) {
+    async findAll(req, date, month, employeeId) {
         if (!req.user?.sub)
             throw new common_1.UnauthorizedException('Invalid user context');
         const orgId = await this.attendanceService.getOrganizationId(req.user.sub);
-        return this.attendanceService.findAll(orgId, date);
+        return this.attendanceService.findAll(orgId, date, month, employeeId);
     }
     async findOne(req, id) {
         if (!req.user?.sub)
@@ -826,8 +845,10 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get organization attendance' }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('date')),
+    __param(2, (0, common_1.Query)('month')),
+    __param(3, (0, common_1.Query)('employeeId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, String, String, String]),
     __metadata("design:returntype", Promise)
 ], AttendanceController.prototype, "findAll", null);
 __decorate([
@@ -930,9 +951,18 @@ let AttendanceService = class AttendanceService {
         }
         return user.organizationId;
     }
-    async findAll(organizationId, dateStr) {
+    async findAll(organizationId, dateStr, monthStr, employeeId) {
         let dateFilter = undefined;
-        if (dateStr) {
+        if (monthStr) {
+            const [year, month] = monthStr.split('-').map(Number);
+            const startOfMonth = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+            const endOfMonth = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+            dateFilter = {
+                gte: startOfMonth,
+                lte: endOfMonth,
+            };
+        }
+        else if (dateStr) {
             const date = new Date(dateStr);
             const startOfDay = new Date(date);
             startOfDay.setUTCHours(0, 0, 0, 0);
@@ -947,14 +977,15 @@ let AttendanceService = class AttendanceService {
             where: {
                 organizationId,
                 ...(dateFilter && { date: dateFilter }),
+                ...(employeeId && { employeeId }),
             },
             include: {
                 employee: true,
             },
             orderBy: {
                 employee: {
-                    name: 'asc'
-                }
+                    name: 'asc',
+                },
             },
         });
         return records;
@@ -1002,14 +1033,22 @@ let AttendanceService = class AttendanceService {
         });
     }
     async update(organizationId, id, dto) {
-        await this.findOne(organizationId, id);
+        const existingRecord = await this.findOne(organizationId, id);
         const updateData = {};
         if (dto.status)
             updateData.status = dto.status;
-        if (dto.checkIn)
-            updateData.checkIn = new Date(dto.checkIn);
-        if (dto.checkOut)
-            updateData.checkOut = new Date(dto.checkOut);
+        if (dto.checkIn) {
+            const newCheckIn = new Date(dto.checkIn);
+            if (!existingRecord.checkIn || newCheckIn < existingRecord.checkIn) {
+                updateData.checkIn = newCheckIn;
+            }
+        }
+        if (dto.checkOut) {
+            const newCheckOut = new Date(dto.checkOut);
+            if (!existingRecord.checkOut || newCheckOut > existingRecord.checkOut) {
+                updateData.checkOut = newCheckOut;
+            }
+        }
         return this.prisma.attendanceRecord.update({
             where: { id },
             data: updateData,
@@ -2463,6 +2502,239 @@ exports.RefreshTokenStrategy = RefreshTokenStrategy = __decorate([
 
 /***/ },
 
+/***/ "./apps/klypto-crm-nest-js/src/biometric/biometric.controller.ts"
+/*!***********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/biometric/biometric.controller.ts ***!
+  \***********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var BiometricController_1;
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BiometricController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const biometric_service_1 = __webpack_require__(/*! ./biometric.service */ "./apps/klypto-crm-nest-js/src/biometric/biometric.service.ts");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+let BiometricController = BiometricController_1 = class BiometricController {
+    biometricService;
+    logger = new common_1.Logger(BiometricController_1.name);
+    constructor(biometricService) {
+        this.biometricService = biometricService;
+    }
+    handshake(query, sn) {
+        this.logger.log(`HANDSHAKE DETECTED! Query params: ${JSON.stringify(query)}`);
+        return `GET OPTION FROM: ${sn}\r\nStamp=0\r\nOpStamp=0\r\nErrorDelay=300\r\nDelay=60\r\nTransTimes=00:00;23:59\r\nTransInterval=5\r\nTransFlag=1111000000\r\nRealtime=0\r\nEncrypt=0`;
+    }
+    async receiveData(sn, table, req) {
+        let rawData = '';
+        req.setEncoding('utf8');
+        for await (const chunk of req) {
+            rawData += chunk;
+        }
+        this.logger.log(`DATA PUSH DETECTED! SN: ${sn}, Table: ${table}, Body size: ${rawData.length} bytes`);
+        this.logger.log(`Raw Body Preview: ${rawData.substring(0, 100)}`);
+        return this.biometricService.processIncomingData(sn, table, rawData);
+    }
+    getRequests(sn) {
+        return this.biometricService.getRequests(sn);
+    }
+    deviceCmd(sn, body) {
+        this.logger.log(`Received command result from ${sn}: ${JSON.stringify(body)}`);
+        return 'OK';
+    }
+};
+exports.BiometricController = BiometricController;
+__decorate([
+    (0, common_1.Get)(['cdata', 'cdata.aspx', 'cdata.php', 'cdata.dll']),
+    (0, common_1.Header)('Content-Type', 'text/plain'),
+    (0, swagger_1.ApiOperation)({ summary: 'ADMS Options Handshake' }),
+    __param(0, (0, common_1.Query)()),
+    __param(1, (0, common_1.Query)('SN')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], BiometricController.prototype, "handshake", null);
+__decorate([
+    (0, common_1.Post)(['cdata', 'cdata.aspx', 'cdata.php', 'cdata.dll']),
+    (0, common_1.Header)('Content-Type', 'text/plain'),
+    (0, swagger_1.ApiOperation)({ summary: 'Receive Biometric Data (ATTLOG)' }),
+    __param(0, (0, common_1.Query)('SN')),
+    __param(1, (0, common_1.Query)('table')),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], BiometricController.prototype, "receiveData", null);
+__decorate([
+    (0, common_1.Get)(['getrequest', 'getrequest.aspx', 'getrequest.php', 'getrequest.dll']),
+    (0, swagger_1.ApiOperation)({ summary: 'Command Polling' }),
+    __param(0, (0, common_1.Query)('SN')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], BiometricController.prototype, "getRequests", null);
+__decorate([
+    (0, common_1.Post)('devicecmd'),
+    (0, swagger_1.ApiOperation)({ summary: 'Device Command Response' }),
+    __param(0, (0, common_1.Query)('SN')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], BiometricController.prototype, "deviceCmd", null);
+exports.BiometricController = BiometricController = BiometricController_1 = __decorate([
+    (0, swagger_1.ApiTags)('Biometric'),
+    (0, common_1.Controller)('iclock'),
+    __metadata("design:paramtypes", [typeof (_a = typeof biometric_service_1.BiometricService !== "undefined" && biometric_service_1.BiometricService) === "function" ? _a : Object])
+], BiometricController);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/biometric/biometric.module.ts"
+/*!*******************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/biometric/biometric.module.ts ***!
+  \*******************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BiometricModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const biometric_controller_1 = __webpack_require__(/*! ./biometric.controller */ "./apps/klypto-crm-nest-js/src/biometric/biometric.controller.ts");
+const biometric_service_1 = __webpack_require__(/*! ./biometric.service */ "./apps/klypto-crm-nest-js/src/biometric/biometric.service.ts");
+const attendance_module_1 = __webpack_require__(/*! ../attendance/attendance.module */ "./apps/klypto-crm-nest-js/src/attendance/attendance.module.ts");
+let BiometricModule = class BiometricModule {
+};
+exports.BiometricModule = BiometricModule;
+exports.BiometricModule = BiometricModule = __decorate([
+    (0, common_1.Module)({
+        imports: [attendance_module_1.AttendanceModule],
+        controllers: [biometric_controller_1.BiometricController],
+        providers: [biometric_service_1.BiometricService],
+    })
+], BiometricModule);
+
+
+/***/ },
+
+/***/ "./apps/klypto-crm-nest-js/src/biometric/biometric.service.ts"
+/*!********************************************************************!*\
+  !*** ./apps/klypto-crm-nest-js/src/biometric/biometric.service.ts ***!
+  \********************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var BiometricService_1;
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BiometricService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./apps/klypto-crm-nest-js/src/prisma/prisma.service.ts");
+const attendance_service_1 = __webpack_require__(/*! ../attendance/attendance.service */ "./apps/klypto-crm-nest-js/src/attendance/attendance.service.ts");
+let BiometricService = BiometricService_1 = class BiometricService {
+    prisma;
+    attendanceService;
+    logger = new common_1.Logger(BiometricService_1.name);
+    constructor(prisma, attendanceService) {
+        this.prisma = prisma;
+        this.attendanceService = attendanceService;
+    }
+    async processIncomingData(deviceSn, table, rawData) {
+        if (table !== 'ATTLOG') {
+            this.logger.log(`Received non-ATTLOG data for table: ${table}. Skipping processing.`);
+            return 'OK';
+        }
+        const lines = rawData.trim().split(/\r?\n/);
+        this.logger.log(`Processing ${lines.length} log entries from device ${deviceSn}`);
+        for (const line of lines) {
+            if (!line.trim())
+                continue;
+            const [userId, timestampStr, status] = line.split('\t');
+            if (timestampStr && timestampStr < '2026-04-23') {
+                continue;
+            }
+            this.logger.log(`Parsed line: userId=${userId}, timestamp=${timestampStr}, status=${status}`);
+            try {
+                const punchTime = new Date(timestampStr.replace(' ', 'T') + '+05:30');
+                this.logger.log(`Calculated punch time: ${punchTime.toISOString()}`);
+                this.logger.log(`Saving biometric log...`);
+                await this.prisma.biometricLog.create({
+                    data: {
+                        deviceSn,
+                        empCode: userId,
+                        punchTime,
+                        punchType: status,
+                        rawLog: line,
+                    },
+                });
+                this.logger.log(`Biometric log saved. Finding employee...`);
+                const employee = await this.prisma.employee.findUnique({
+                    where: { code: userId },
+                    include: { organization: true },
+                });
+                this.logger.log(`Employee lookup returned: ${employee ? employee.id : 'null'}`);
+                if (!employee) {
+                    this.logger.warn(`Employee with code ${userId} not found in CRM.`);
+                    continue;
+                }
+                const attendanceDto = {
+                    employeeId: employee.id,
+                    date: punchTime.toISOString().split('T')[0],
+                    status: 'Present',
+                    checkIn: punchTime.toISOString(),
+                    checkOut: punchTime.toISOString(),
+                };
+                await this.attendanceService.create(employee.organizationId, attendanceDto);
+                this.logger.log(`Processed attendance for ${employee.name} (${userId}) at ${timestampStr}`);
+            }
+            catch (error) {
+                this.logger.error(`Error processing line: ${line}`, error.stack);
+            }
+        }
+        return 'OK';
+    }
+    async getRequests(deviceSn) {
+        return 'OK';
+    }
+};
+exports.BiometricService = BiometricService;
+exports.BiometricService = BiometricService = BiometricService_1 = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof attendance_service_1.AttendanceService !== "undefined" && attendance_service_1.AttendanceService) === "function" ? _b : Object])
+], BiometricService);
+
+
+/***/ },
+
 /***/ "./apps/klypto-crm-nest-js/src/common/filters/prisma-exception.filter.ts"
 /*!*******************************************************************************!*\
   !*** ./apps/klypto-crm-nest-js/src/common/filters/prisma-exception.filter.ts ***!
@@ -2684,21 +2956,21 @@ let CrmOverviewService = class CrmOverviewService {
             this.prisma.lead.count({
                 where: {
                     organizationId,
-                    status: { in: ['Discovery', 'Proposal', 'Negotiation'] }
-                }
+                    status: { in: ['Discovery', 'Proposal', 'Negotiation'] },
+                },
             }),
             this.prisma.lead.aggregate({
                 where: { organizationId },
-                _sum: { value: true }
+                _sum: { value: true },
             }),
-            this.prisma.lead.count({ where: { organizationId, status: 'Won' } })
+            this.prisma.lead.count({ where: { organizationId, status: 'Won' } }),
         ]);
         const conversionRate = totalLeads > 0 ? (wonLeads / totalLeads) * 100 : 0;
         return {
             totalLeads,
             activeDeals,
             totalRevenue: `$${(totalValue._sum.value || 0).toLocaleString()}`,
-            conversionRate: `${conversionRate.toFixed(1)}%`
+            conversionRate: `${conversionRate.toFixed(1)}%`,
         };
     }
     async getRecentLeads(organizationId) {
@@ -2712,8 +2984,8 @@ let CrmOverviewService = class CrmOverviewService {
                 company: true,
                 value: true,
                 status: true,
-                createdAt: true
-            }
+                createdAt: true,
+            },
         });
     }
 };
@@ -3805,7 +4077,11 @@ let ErpOverviewService = class ErpOverviewService {
                 where: { organizationId, type: 'INVOICE', date: { gte: sixMonthsAgo } },
             }),
             this.prisma.financialTransaction.findMany({
-                where: { organizationId, type: 'PURCHASE_ORDER', date: { gte: sixMonthsAgo } },
+                where: {
+                    organizationId,
+                    type: 'PURCHASE_ORDER',
+                    date: { gte: sixMonthsAgo },
+                },
             }),
             this.prisma.payrollRecord.findMany({
                 where: { organizationId, createdAt: { gte: sixMonthsAgo } },
@@ -3815,7 +4091,8 @@ let ErpOverviewService = class ErpOverviewService {
             }),
         ]);
         const totalSales = invoices.reduce((sum, i) => sum + i.amount, 0);
-        const operationalCost = purchases.reduce((sum, p) => sum + p.amount, 0) + payrolls.reduce((sum, pay) => sum + pay.netPay, 0);
+        const operationalCost = purchases.reduce((sum, p) => sum + p.amount, 0) +
+            payrolls.reduce((sum, pay) => sum + pay.netPay, 0);
         const netProfit = totalSales - operationalCost;
         const assetValuation = assets.reduce((sum, a) => sum + (a.value || 0), 0);
         const months = [];
@@ -3826,23 +4103,28 @@ let ErpOverviewService = class ErpOverviewService {
             const mYear = d.getFullYear();
             const mMonth = d.getMonth();
             const mSales = invoices
-                .filter(inv => {
+                .filter((inv) => {
                 const idate = new Date(inv.date);
                 return idate.getMonth() === mMonth && idate.getFullYear() === mYear;
             })
                 .reduce((sum, inv) => sum + inv.amount, 0);
             const mCost = purchases
-                .filter(p => {
+                .filter((p) => {
                 const pdate = new Date(p.date);
                 return pdate.getMonth() === mMonth && pdate.getFullYear() === mYear;
             })
                 .reduce((sum, p) => sum + p.amount, 0) +
                 payrolls
-                    .filter(pay => {
+                    .filter((pay) => {
                     return pay.month === mMonth + 1 && pay.year === mYear;
                 })
                     .reduce((sum, pay) => sum + pay.netPay, 0);
-            months.push({ label: mLabel, sales: mSales, cost: mCost, profit: mSales - mCost });
+            months.push({
+                label: mLabel,
+                sales: mSales,
+                cost: mCost,
+                profit: mSales - mCost,
+            });
         }
         const breakdown = [
             { label: 'Procurement', val: purchases.length },
@@ -3851,10 +4133,10 @@ let ErpOverviewService = class ErpOverviewService {
             { label: 'Invoices', val: invoices.length },
         ];
         const totalCount = breakdown.reduce((sum, b) => sum + b.val, 0) || 1;
-        const normalizedBreakdown = breakdown.map(b => ({
+        const normalizedBreakdown = breakdown.map((b) => ({
             label: b.label,
             val: Math.round((b.val / totalCount) * 100),
-            count: b.val
+            count: b.val,
         }));
         return {
             totalSales,
@@ -3917,7 +4199,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateFinanceDto.prototype, "type", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 4200.50 }),
+    (0, swagger_1.ApiProperty)({ example: 4200.5 }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
@@ -3929,7 +4211,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateFinanceDto.prototype, "date", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Pending', enum: ['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled'] }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Pending',
+        enum: ['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled'],
+    }),
     (0, class_validator_1.IsEnum)(['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled']),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -4243,13 +4528,18 @@ __decorate([
     __metadata("design:type", String)
 ], CreateGrievanceDto.prototype, "category", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'I have been consistently denied opportunities for high-impact projects despite performance.' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'I have been consistently denied opportunities for high-impact projects despite performance.',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateGrievanceDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Medium', enum: ['Low', 'Medium', 'High', 'Critical'] }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Medium',
+        enum: ['Low', 'Medium', 'High', 'Critical'],
+    }),
     (0, class_validator_1.IsEnum)(['Low', 'Medium', 'High', 'Critical']),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -4271,7 +4561,10 @@ class UpdateGrievanceDto extends (0, swagger_1.PartialType)(CreateGrievanceDto) 
 }
 exports.UpdateGrievanceDto = UpdateGrievanceDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'In Review', enum: ['Open', 'In Review', 'Escalated', 'Resolved'] }),
+    (0, swagger_1.ApiProperty)({
+        example: 'In Review',
+        enum: ['Open', 'In Review', 'Escalated', 'Resolved'],
+    }),
     (0, class_validator_1.IsEnum)(['Open', 'In Review', 'Escalated', 'Resolved']),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -4729,10 +5022,14 @@ let HrmsOverviewService = class HrmsOverviewService {
         return user.organizationId;
     }
     async getStats(organizationId) {
-        const [totalEmployees, pendingLeaves, activeEmployees, structuresCount, attendanceToday] = await Promise.all([
+        const [totalEmployees, pendingLeaves, activeEmployees, structuresCount, attendanceToday,] = await Promise.all([
             this.prisma.employee.count({ where: { organizationId } }),
-            this.prisma.leaveRequest.count({ where: { organizationId, status: 'Pending' } }),
-            this.prisma.employee.count({ where: { organizationId, status: { in: ['Active', 'Onboarding'] } } }),
+            this.prisma.leaveRequest.count({
+                where: { organizationId, status: 'Pending' },
+            }),
+            this.prisma.employee.count({
+                where: { organizationId, status: { in: ['Active', 'Onboarding'] } },
+            }),
             this.prisma.salaryStructure.count({ where: { organizationId } }),
             this.prisma.attendanceRecord.count({
                 where: {
@@ -4828,7 +5125,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'New',
-        enum: ['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost']
+        enum: ['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost'],
     }),
     (0, class_validator_1.IsEnum)(['New', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost']),
     (0, class_validator_1.IsOptional)(),
@@ -5090,11 +5387,11 @@ let LeadsService = class LeadsService {
             where: { organizationId },
             include: {
                 assignee: {
-                    select: { id: true, fullName: true, email: true }
+                    select: { id: true, fullName: true, email: true },
                 },
                 _count: {
-                    select: { notes: true }
-                }
+                    select: { notes: true },
+                },
             },
             orderBy: { updatedAt: 'desc' },
         });
@@ -5104,11 +5401,11 @@ let LeadsService = class LeadsService {
             where: { id, organizationId },
             include: {
                 assignee: {
-                    select: { id: true, fullName: true, email: true }
+                    select: { id: true, fullName: true, email: true },
                 },
                 notes: {
-                    orderBy: { createdAt: 'desc' }
-                }
+                    orderBy: { createdAt: 'desc' },
+                },
             },
         });
         if (!lead)
@@ -5996,7 +6293,7 @@ let OrganizationsService = class OrganizationsService {
     }
     async getProfile(organizationId) {
         const org = await this.prisma.organization.findUnique({
-            where: { id: organizationId }
+            where: { id: organizationId },
         });
         if (!org)
             throw new common_1.NotFoundException('Organization not found');
@@ -6005,7 +6302,7 @@ let OrganizationsService = class OrganizationsService {
     async updateProfile(organizationId, dto) {
         return this.prisma.organization.update({
             where: { id: organizationId },
-            data: dto
+            data: dto,
         });
     }
     async getDetailedStats(organizationId) {
@@ -6023,7 +6320,7 @@ let OrganizationsService = class OrganizationsService {
             totalAssets: assets,
             totalProjects: projects,
             systemHealth: '100%',
-            securityIndex: '98.5%'
+            securityIndex: '98.5%',
         };
     }
 };
@@ -6528,7 +6825,9 @@ __decorate([
 ], PayrollController.prototype, "findStructures", null);
 __decorate([
     (0, common_1.Post)('structures'),
-    (0, swagger_1.ApiOperation)({ summary: 'Create or update a salary structure for an employee' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Create or update a salary structure for an employee',
+    }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -6662,7 +6961,17 @@ let PayrollService = class PayrollService {
     async findStructures(organizationId) {
         return this.prisma.salaryStructure.findMany({
             where: { organizationId },
-            include: { employee: { select: { id: true, name: true, code: true, department: true, role: true } } },
+            include: {
+                employee: {
+                    select: {
+                        id: true,
+                        name: true,
+                        code: true,
+                        department: true,
+                        role: true,
+                    },
+                },
+            },
             orderBy: { createdAt: 'desc' },
         });
     }
@@ -6683,13 +6992,27 @@ let PayrollService = class PayrollService {
                 allowances: dto.allowances,
                 deductions: dto.deductions,
             },
-            include: { employee: { select: { id: true, name: true, code: true, department: true, role: true } } },
+            include: {
+                employee: {
+                    select: {
+                        id: true,
+                        name: true,
+                        code: true,
+                        department: true,
+                        role: true,
+                    },
+                },
+            },
         });
     }
     async findAllRecords(organizationId) {
         return this.prisma.payrollRecord.findMany({
             where: { organizationId },
-            include: { employee: { select: { id: true, name: true, code: true, department: true } } },
+            include: {
+                employee: {
+                    select: { id: true, name: true, code: true, department: true },
+                },
+            },
             orderBy: [{ year: 'desc' }, { month: 'desc' }],
         });
     }
@@ -7035,7 +7358,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePolicyDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Employees must use internet for business purposes...' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Employees must use internet for business purposes...',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -9757,7 +10082,9 @@ const app_module_1 = __webpack_require__(/*! ./app.module */ "./apps/klypto-crm-
 const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
 const prisma_exception_filter_1 = __webpack_require__(/*! ./common/filters/prisma-exception.filter */ "./apps/klypto-crm-nest-js/src/common/filters/prisma-exception.filter.ts");
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, {
+        rawBody: true,
+    });
     const isProduction = process.env.NODE_ENV === 'production';
     const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
         .split(',')
@@ -9785,7 +10112,9 @@ async function bootstrap() {
         allowedHeaders: ['Content-Type', 'Authorization'],
         optionsSuccessStatus: 200,
     });
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('api', {
+        exclude: ['iclock', 'iclock/(.*)'],
+    });
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,

@@ -1,5 +1,12 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateFinanceDto {
   @ApiProperty({ example: 'INV-2024-001' })
@@ -12,7 +19,7 @@ export class CreateFinanceDto {
   @IsNotEmpty()
   type: string;
 
-  @ApiProperty({ example: 4200.50 })
+  @ApiProperty({ example: 4200.5 })
   @IsNumber()
   @IsNotEmpty()
   amount: number;
@@ -22,7 +29,10 @@ export class CreateFinanceDto {
   @IsOptional()
   date?: string;
 
-  @ApiProperty({ example: 'Pending', enum: ['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled'] })
+  @ApiProperty({
+    example: 'Pending',
+    enum: ['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled'],
+  })
   @IsEnum(['Draft', 'Approved', 'Paid', 'Overdue', 'Fulfilled'])
   @IsOptional()
   status?: string;

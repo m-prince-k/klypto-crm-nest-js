@@ -12,11 +12,7 @@ import {
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto, UpdateAttendanceDto } from './dto/attendance.dto';
-import {
-  ApiBearerAuth,
-  ApiTags,
-  ApiOperation,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 
@@ -43,10 +39,12 @@ export class AttendanceController {
   async findAll(
     @Req() req: { user?: { sub?: string } },
     @Query('date') date?: string,
+    @Query('month') month?: string,
+    @Query('employeeId') employeeId?: string,
   ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.attendanceService.getOrganizationId(req.user.sub);
-    return this.attendanceService.findAll(orgId, date);
+    return this.attendanceService.findAll(orgId, date, month, employeeId);
   }
 
   @Get(':id')

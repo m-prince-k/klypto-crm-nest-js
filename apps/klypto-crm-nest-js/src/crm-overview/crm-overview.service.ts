@@ -19,17 +19,17 @@ export class CrmOverviewService {
   async getStats(organizationId: string) {
     const [totalLeads, activeDeals, totalValue, wonLeads] = await Promise.all([
       this.prisma.lead.count({ where: { organizationId } }),
-      this.prisma.lead.count({ 
-        where: { 
-          organizationId, 
-          status: { in: ['Discovery', 'Proposal', 'Negotiation'] } 
-        } 
+      this.prisma.lead.count({
+        where: {
+          organizationId,
+          status: { in: ['Discovery', 'Proposal', 'Negotiation'] },
+        },
       }),
       this.prisma.lead.aggregate({
         where: { organizationId },
-        _sum: { value: true }
+        _sum: { value: true },
       }),
-      this.prisma.lead.count({ where: { organizationId, status: 'Won' } })
+      this.prisma.lead.count({ where: { organizationId, status: 'Won' } }),
     ]);
 
     const conversionRate = totalLeads > 0 ? (wonLeads / totalLeads) * 100 : 0;
@@ -38,7 +38,7 @@ export class CrmOverviewService {
       totalLeads,
       activeDeals,
       totalRevenue: `$${(totalValue._sum.value || 0).toLocaleString()}`,
-      conversionRate: `${conversionRate.toFixed(1)}%`
+      conversionRate: `${conversionRate.toFixed(1)}%`,
     };
   }
 
@@ -53,8 +53,8 @@ export class CrmOverviewService {
         company: true,
         value: true,
         status: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
   }
 }

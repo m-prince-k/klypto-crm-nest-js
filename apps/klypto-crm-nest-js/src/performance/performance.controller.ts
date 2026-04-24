@@ -1,7 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PerformanceService } from './performance.service';
-import { CreatePerformanceReviewDto, UpdatePerformanceReviewDto } from './dto/performance.dto';
+import {
+  CreatePerformanceReviewDto,
+  UpdatePerformanceReviewDto,
+} from './dto/performance.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 
@@ -22,7 +35,10 @@ export class PerformanceController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new performance review' })
-  async create(@Req() req: { user?: { sub?: string } }, @Body() dto: CreatePerformanceReviewDto) {
+  async create(
+    @Req() req: { user?: { sub?: string } },
+    @Body() dto: CreatePerformanceReviewDto,
+  ) {
     if (!req.user?.sub) throw new UnauthorizedException('Invalid user context');
     const orgId = await this.performanceService.getOrganizationId(req.user.sub);
     return this.performanceService.create(orgId, dto);

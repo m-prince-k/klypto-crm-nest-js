@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSalaryStructureDto, ProcessPayrollDto } from './dto/payroll.dto';
 
@@ -34,7 +38,9 @@ export class PayrollService {
     ]);
 
     const totalNetPay = recordsThisMonth.reduce((sum, r) => sum + r.netPay, 0);
-    const paidCount = recordsThisMonth.filter((r) => r.status === 'Paid').length;
+    const paidCount = recordsThisMonth.filter(
+      (r) => r.status === 'Paid',
+    ).length;
 
     return {
       employeesOnPayroll: structures,
@@ -50,7 +56,17 @@ export class PayrollService {
   async findStructures(organizationId: string) {
     return this.prisma.salaryStructure.findMany({
       where: { organizationId },
-      include: { employee: { select: { id: true, name: true, code: true, department: true, role: true } } },
+      include: {
+        employee: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            department: true,
+            role: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -72,14 +88,28 @@ export class PayrollService {
         allowances: dto.allowances,
         deductions: dto.deductions,
       },
-      include: { employee: { select: { id: true, name: true, code: true, department: true, role: true } } },
+      include: {
+        employee: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            department: true,
+            role: true,
+          },
+        },
+      },
     });
   }
 
   async findAllRecords(organizationId: string) {
     return this.prisma.payrollRecord.findMany({
       where: { organizationId },
-      include: { employee: { select: { id: true, name: true, code: true, department: true } } },
+      include: {
+        employee: {
+          select: { id: true, name: true, code: true, department: true },
+        },
+      },
       orderBy: [{ year: 'desc' }, { month: 'desc' }],
     });
   }
@@ -96,7 +126,8 @@ export class PayrollService {
 
     const records = [];
     for (const struct of structures) {
-      const netPay = struct.basicSalary + struct.hra + struct.allowances - struct.deductions;
+      const netPay =
+        struct.basicSalary + struct.hra + struct.allowances - struct.deductions;
 
       const record = await this.prisma.payrollRecord.upsert({
         where: {

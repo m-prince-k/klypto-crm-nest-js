@@ -7,7 +7,9 @@ export class CreatePolicyDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Employees must use internet for business purposes...' })
+  @ApiProperty({
+    example: 'Employees must use internet for business purposes...',
+  })
   @IsString()
   @IsNotEmpty()
   content: string;

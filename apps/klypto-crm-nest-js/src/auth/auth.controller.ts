@@ -197,7 +197,7 @@ export class AuthController {
     try {
       payload = this.jwtService.verify(token, {
         secret: process.env.JWT_ACCESS_SECRET || 'access-secret',
-      }) as { sub?: string };
+      });
     } catch {
       throw new UnauthorizedException('Invalid access token');
     }

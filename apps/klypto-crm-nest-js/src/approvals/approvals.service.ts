@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ApprovalActionDto } from './dto/approval.dto';
 
@@ -25,18 +30,18 @@ export class ApprovalsService {
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.financialTransaction.findMany({
-        where: { 
-          organizationId, 
-          status: { in: ['Pending', 'Draft'] } 
+        where: {
+          organizationId,
+          status: { in: ['Pending', 'Draft'] },
         },
         include: { partner: { select: { name: true } } },
         orderBy: { date: 'desc' },
-      })
+      }),
     ]);
 
     // Transform into a unified "Approval" format
     const unified = [
-      ...leaves.map(l => ({
+      ...leaves.map((l) => ({
         id: l.id,
         type: 'LEAVE',
         title: `${l.type} Leave Request`,
@@ -45,9 +50,9 @@ export class ApprovalsService {
         date: l.createdAt,
         priority: 'Medium',
         description: `${l.reason || 'No reason provided'}. (From ${new Date(l.startDate).toLocaleDateString()} to ${new Date(l.endDate).toLocaleDateString()})`,
-        metadata: { startDate: l.startDate, endDate: l.endDate }
+        metadata: { startDate: l.startDate, endDate: l.endDate },
       })),
-      ...finances.map(f => ({
+      ...finances.map((f) => ({
         id: f.id,
         type: 'FINANCE',
         title: f.type === 'PURCHASE_ORDER' ? 'Purchase Order' : 'Sales Invoice',
@@ -56,27 +61,45 @@ export class ApprovalsService {
         date: f.date,
         priority: f.amount > 5000 ? 'High' : 'Medium',
         description: `Reference: ${f.referenceNumber}. Transaction amount: $${f.amount.toLocaleString()}.`,
-        metadata: { reference: f.referenceNumber }
-      }))
+        metadata: { reference: f.referenceNumber },
+      })),
     ];
 
-    return unified.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return unified.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
   }
 
   async processAction(organizationId: string, dto: ApprovalActionDto) {
     const { type, id, action } = dto;
-    const status = action === 'APPROVE' ? (type === 'FINANCE' ? 'Approved' : 'Approved') : 'Rejected';
+    const status =
+      action === 'APPROVE'
+        ? type === 'FINANCE'
+          ? 'Approved'
+          : 'Approved'
+        : 'Rejected';
 
     if (type === 'LEAVE') {
-      const record = await this.prisma.leaveRequest.findFirst({ where: { id, organizationId } });
+      const record = await this.prisma.leaveRequest.findFirst({
+        where: { id, organizationId },
+      });
       if (!record) throw new NotFoundException('Leave request not found');
-      return this.prisma.leaveRequest.update({ where: { id }, data: { status } });
+      return this.prisma.leaveRequest.update({
+        where: { id },
+        data: { status },
+      });
     }
 
     if (type === 'FINANCE') {
-      const record = await this.prisma.financialTransaction.findFirst({ where: { id, organizationId } });
-      if (!record) throw new NotFoundException('Financial transaction not found');
-      return this.prisma.financialTransaction.update({ where: { id }, data: { status } });
+      const record = await this.prisma.financialTransaction.findFirst({
+        where: { id, organizationId },
+      });
+      if (!record)
+        throw new NotFoundException('Financial transaction not found');
+      return this.prisma.financialTransaction.update({
+        where: { id },
+        data: { status },
+      });
     }
 
     throw new BadRequestException('Invalid approval type');

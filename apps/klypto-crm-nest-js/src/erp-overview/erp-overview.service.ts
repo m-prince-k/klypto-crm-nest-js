@@ -27,7 +27,11 @@ export class ErpOverviewService {
         where: { organizationId, type: 'INVOICE', date: { gte: sixMonthsAgo } },
       }),
       this.prisma.financialTransaction.findMany({
-        where: { organizationId, type: 'PURCHASE_ORDER', date: { gte: sixMonthsAgo } },
+        where: {
+          organizationId,
+          type: 'PURCHASE_ORDER',
+          date: { gte: sixMonthsAgo },
+        },
       }),
       this.prisma.payrollRecord.findMany({
         where: { organizationId, createdAt: { gte: sixMonthsAgo } }, // Using createdAt as a proxy for run time
@@ -39,7 +43,9 @@ export class ErpOverviewService {
 
     // Calculate current totals
     const totalSales = invoices.reduce((sum, i) => sum + i.amount, 0);
-    const operationalCost = purchases.reduce((sum, p) => sum + p.amount, 0) + payrolls.reduce((sum, pay) => sum + pay.netPay, 0);
+    const operationalCost =
+      purchases.reduce((sum, p) => sum + p.amount, 0) +
+      payrolls.reduce((sum, pay) => sum + pay.netPay, 0);
     const netProfit = totalSales - operationalCost;
     const assetValuation = assets.reduce((sum, a) => sum + (a.value || 0), 0);
 
@@ -53,26 +59,32 @@ export class ErpOverviewService {
       const mMonth = d.getMonth();
 
       const mSales = invoices
-        .filter(inv => {
+        .filter((inv) => {
           const idate = new Date(inv.date);
           return idate.getMonth() === mMonth && idate.getFullYear() === mYear;
         })
         .reduce((sum, inv) => sum + inv.amount, 0);
 
-      const mCost = purchases
-        .filter(p => {
-          const pdate = new Date(p.date);
-          return pdate.getMonth() === mMonth && pdate.getFullYear() === mYear;
-        })
-        .reduce((sum, p) => sum + p.amount, 0) + 
+      const mCost =
+        purchases
+          .filter((p) => {
+            const pdate = new Date(p.date);
+            return pdate.getMonth() === mMonth && pdate.getFullYear() === mYear;
+          })
+          .reduce((sum, p) => sum + p.amount, 0) +
         payrolls
-        .filter(pay => {
-          // Payroll records have month/year fields
-          return pay.month === mMonth + 1 && pay.year === mYear;
-        })
-        .reduce((sum, pay) => sum + pay.netPay, 0);
+          .filter((pay) => {
+            // Payroll records have month/year fields
+            return pay.month === mMonth + 1 && pay.year === mYear;
+          })
+          .reduce((sum, pay) => sum + pay.netPay, 0);
 
-      months.push({ label: mLabel, sales: mSales, cost: mCost, profit: mSales - mCost });
+      months.push({
+        label: mLabel,
+        sales: mSales,
+        cost: mCost,
+        profit: mSales - mCost,
+      });
     }
 
     // Operational Breakdown
@@ -83,10 +95,10 @@ export class ErpOverviewService {
       { label: 'Invoices', val: invoices.length },
     ];
     const totalCount = breakdown.reduce((sum, b) => sum + b.val, 0) || 1;
-    const normalizedBreakdown = breakdown.map(b => ({
+    const normalizedBreakdown = breakdown.map((b) => ({
       label: b.label,
       val: Math.round((b.val / totalCount) * 100),
-      count: b.val
+      count: b.val,
     }));
 
     return {

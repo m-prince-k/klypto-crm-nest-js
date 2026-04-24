@@ -1,5 +1,12 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class CreatePerformanceReviewDto {
   @ApiProperty({ example: 'clx...employeeId' })
@@ -29,4 +36,6 @@ export class CreatePerformanceReviewDto {
   status?: string;
 }
 
-export class UpdatePerformanceReviewDto extends PartialType(CreatePerformanceReviewDto) {}
+export class UpdatePerformanceReviewDto extends PartialType(
+  CreatePerformanceReviewDto,
+) {}
