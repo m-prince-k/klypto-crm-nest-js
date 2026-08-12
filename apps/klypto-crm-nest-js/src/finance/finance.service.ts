@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFinanceDto, UpdateFinanceDto } from './dto/finance.dto';
-import { CreateReimbursementDto, UpdateReimbursementStatusDto } from './dto/reimbursement.dto';
+import {
+  CreateReimbursementDto,
+  UpdateReimbursementStatusDto,
+} from './dto/reimbursement.dto';
 
 @Injectable()
 export class FinanceService {
@@ -88,7 +91,10 @@ export class FinanceService {
 
   // --- REIMBURSEMENT METHODS ---
 
-  async createReimbursement(organizationId: string, dto: CreateReimbursementDto) {
+  async createReimbursement(
+    organizationId: string,
+    dto: CreateReimbursementDto,
+  ) {
     return this.prisma.reimbursement.create({
       data: {
         ...dto,
@@ -107,11 +113,16 @@ export class FinanceService {
     });
   }
 
-  async updateReimbursementStatus(organizationId: string, id: string, dto: UpdateReimbursementStatusDto) {
+  async updateReimbursementStatus(
+    organizationId: string,
+    id: string,
+    dto: UpdateReimbursementStatusDto,
+  ) {
     const reimbursement = await this.prisma.reimbursement.findFirst({
       where: { id, organizationId },
     });
-    if (!reimbursement) throw new NotFoundException('Reimbursement request not found');
+    if (!reimbursement)
+      throw new NotFoundException('Reimbursement request not found');
 
     return this.prisma.reimbursement.update({
       where: { id },
@@ -124,12 +135,12 @@ export class FinanceService {
       where: { organizationId },
     });
 
-    const pending = reimbursements.filter(r => r.status === 'Pending');
-    const reimbursed = reimbursements.filter(r => r.status === 'Reimbursed');
+    const pending = reimbursements.filter((r) => r.status === 'Pending');
+    const reimbursed = reimbursements.filter((r) => r.status === 'Reimbursed');
 
     return {
-      pendingExpenses: pending.reduce((sum: number, r: any) => sum + r.amount, 0),
-      totalReimbursed: reimbursed.reduce((sum: number, r: any) => sum + r.amount, 0),
+      pendingExpenses: pending.reduce((sum, r) => sum + r.amount, 0),
+      totalReimbursed: reimbursed.reduce((sum, r) => sum + r.amount, 0),
       count: reimbursements.length,
     };
   }

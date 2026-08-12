@@ -1,4 +1,11 @@
-import { IsString, IsInt, IsOptional, IsDateString, IsEnum, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsOptional,
+  IsDateString,
+  IsEnum,
+  IsBoolean,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum ResignationStatus {
@@ -15,7 +22,10 @@ export enum FNFStatus {
 }
 
 export class CreateResignationDto {
-  @ApiProperty({ example: '2026-05-24T10:00:00Z', description: 'Proposed last working day' })
+  @ApiProperty({
+    example: '2026-05-24T10:00:00Z',
+    description: 'Proposed last working day',
+  })
   @IsDateString()
   proposedLastWorkingDay: string;
 
@@ -24,16 +34,25 @@ export class CreateResignationDto {
   @IsOptional()
   noticePeriod?: number = 30;
 
-  @ApiProperty({ example: 'Found a better opportunity', description: 'Reason for resignation' })
+  @ApiProperty({
+    example: 'Found a better opportunity',
+    description: 'Reason for resignation',
+  })
   @IsString()
   reason: string;
 
-  @ApiPropertyOptional({ example: 'Handed over all projects to John', description: 'Handover plan' })
+  @ApiPropertyOptional({
+    example: 'Handed over all projects to John',
+    description: 'Handover plan',
+  })
   @IsString()
   @IsOptional()
   handoverPlan?: string;
 
-  @ApiPropertyOptional({ example: false, description: 'Whether company assets were handed over' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Whether company assets were handed over',
+  })
   @IsBoolean()
   @IsOptional()
   companyAssetsHandover?: boolean = false;
@@ -54,7 +73,10 @@ export class UpdateResignationStatusDto {
   @IsOptional()
   fnfStatus?: FNFStatus;
 
-  @ApiPropertyOptional({ example: true, description: 'Whether company assets were handed over' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Whether company assets were handed over',
+  })
   @IsBoolean()
   @IsOptional()
   companyAssetsHandover?: boolean;

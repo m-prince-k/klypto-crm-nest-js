@@ -11,7 +11,10 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ResignationService } from './resignation.service';
-import { CreateResignationDto, UpdateResignationStatusDto } from './dto/resignation.dto';
+import {
+  CreateResignationDto,
+  UpdateResignationStatusDto,
+} from './dto/resignation.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 

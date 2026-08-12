@@ -3,6 +3,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
+import { isOriginAllowed } from './common/cors-origin.util';
 import * as express from 'express';
 import { join } from 'path';
 
@@ -13,16 +14,6 @@ async function bootstrap() {
 
   // Serve static files from the uploads directory
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
-  
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-
-  const localDevOriginPattern =
-    /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}|.*\.trycloudflare\.com)(:\d+)?$/;
 
   // Enable CORS for frontend communication
   app.enableCors({
@@ -30,22 +21,7 @@ async function bootstrap() {
       origin: string | undefined,
       callback: (error: Error | null, allow?: boolean) => void,
     ) => {
-      if (!origin) {
-        callback(null, true);
-        return;
-      }
-
-      if (corsOrigins.includes('*') || corsOrigins.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      if (!isProduction && localDevOriginPattern.test(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(null, false);
+      callback(null, isOriginAllowed(origin));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

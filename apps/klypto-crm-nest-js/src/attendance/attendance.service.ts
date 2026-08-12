@@ -5,10 +5,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAttendanceDto, UpdateAttendanceDto } from './dto/attendance.dto';
+import { AttendanceGateway } from '../realtime/attendance.gateway';
 
 @Injectable()
 export class AttendanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly attendanceGateway: AttendanceGateway,
+  ) {}
 
   async getOrganizationId(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
@@ -21,7 +25,12 @@ export class AttendanceService {
     return user.organizationId;
   }
 
-  async findAll(organizationId: string, dateStr?: string, monthStr?: string, employeeId?: string) {
+  async findAll(
+    organizationId: string,
+    dateStr?: string,
+    monthStr?: string,
+    employeeId?: string,
+  ) {
     let dateFilter: any = undefined;
 
     if (monthStr) {
@@ -29,7 +38,7 @@ export class AttendanceService {
       const [year, month] = monthStr.split('-').map(Number);
       const startOfMonth = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
       const endOfMonth = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
-      
+
       dateFilter = {
         gte: startOfMonth,
         lte: endOfMonth,
@@ -101,7 +110,7 @@ export class AttendanceService {
     const canonicalDate = new Date(date);
     canonicalDate.setUTCHours(12, 0, 0, 0);
 
-    return this.prisma.attendanceRecord.create({
+    const record = await this.prisma.attendanceRecord.create({
       data: {
         organizationId,
         employeeId: dto.employeeId,
@@ -112,6 +121,9 @@ export class AttendanceService {
       },
       include: { employee: true },
     });
+
+    this.attendanceGateway.emitAttendanceUpdated(organizationId, record);
+    return record;
   }
 
   async update(organizationId: string, id: string, dto: UpdateAttendanceDto) {
@@ -119,7 +131,7 @@ export class AttendanceService {
 
     const updateData: any = {};
     if (dto.status) updateData.status = dto.status;
-    
+
     // First-In Logic: Only update Check-In if it doesn't exist, or if the new time is EARLIER
     if (dto.checkIn) {
       const newCheckIn = new Date(dto.checkIn);
@@ -127,7 +139,7 @@ export class AttendanceService {
         updateData.checkIn = newCheckIn;
       }
     }
-    
+
     // Last-Out Logic: Only update Check-Out if it doesn't exist, or if the new time is LATER
     if (dto.checkOut) {
       const newCheckOut = new Date(dto.checkOut);
@@ -136,10 +148,13 @@ export class AttendanceService {
       }
     }
 
-    return this.prisma.attendanceRecord.update({
+    const record = await this.prisma.attendanceRecord.update({
       where: { id },
       data: updateData,
       include: { employee: true },
     });
+
+    this.attendanceGateway.emitAttendanceUpdated(organizationId, record);
+    return record;
   }
 }

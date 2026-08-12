@@ -28,22 +28,26 @@ export class BiometricService {
       if (!line.trim()) continue;
 
       const [userId, timestampStr, status] = line.split('\t');
-      
+
       // SKIP OLD RECORDS: Only process data from April 23rd, 2026 onwards
       if (timestampStr && timestampStr < '2026-04-23') {
-        continue; 
+        continue;
       }
-
-      this.logger.log(`Parsed line: userId=${userId}, timestamp=${timestampStr}, status=${status}`);
 
       try {
         // ZKTeco machine sends timestamps in its local time (IST).
-        // Appending +05:30 ensures Node.js parses it accurately without timezone drift.
-        const punchTime = new Date(timestampStr.replace(' ', 'T') + '+05:30'); 
-        this.logger.log(`Calculated punch time: ${punchTime.toISOString()}`);
+        const punchTime = new Date(timestampStr.replace(' ', 'T') + '+05:30');
 
-        // Save raw log first
-        this.logger.log(`Saving biometric log...`);
+        // Check for existing log to prevent duplicates
+        const existingLog = await this.prisma.biometricLog.findFirst({
+          where: { empCode: userId, punchTime },
+        });
+
+        if (existingLog) {
+          continue; // Move to next line immediately to save time
+        }
+
+        // Save raw log
         await this.prisma.biometricLog.create({
           data: {
             deviceSn,
@@ -53,24 +57,17 @@ export class BiometricService {
             rawLog: line,
           },
         });
-        this.logger.log(`Biometric log saved. Finding employee...`);
 
         // Find employee by code
         const employee = await this.prisma.employee.findUnique({
           where: { code: userId },
-          include: { organization: true },
         });
-        
-        this.logger.log(`Employee lookup returned: ${employee ? employee.id : 'null'}`);
 
         if (!employee) {
-          this.logger.warn(`Employee with code ${userId} not found in CRM.`);
           continue;
         }
 
-        // Smart Punch Logic: We pass the timestamp to both checkIn and checkOut.
-        // The attendance service's First-In, Last-Out logic will automatically
-        // preserve the earliest punch as the Check-In and the latest punch as the Check-Out.
+        // Create/Update attendance record
         const attendanceDto = {
           employeeId: employee.id,
           date: punchTime.toISOString().split('T')[0],
@@ -88,15 +85,16 @@ export class BiometricService {
           `Processed attendance for ${employee.name} (${userId}) at ${timestampStr}`,
         );
       } catch (error) {
-        this.logger.error(`Error processing line: ${line}`, error.stack);
+        const stack = error instanceof Error ? error.stack : undefined;
+        this.logger.error(`Error processing line: ${line}`, stack);
       }
     }
 
     return 'OK';
   }
 
-  async getRequests(deviceSn: string) {
-    // Standard ADMS heartbeat response
+  getRequests(deviceSn: string) {
+    this.logger.log(`Command poll from device ${deviceSn}`);
     return 'OK';
   }
 }

@@ -1,6 +1,14 @@
-import { Injectable, NotFoundException, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateResignationDto, UpdateResignationStatusDto } from './dto/resignation.dto';
+import {
+  CreateResignationDto,
+  UpdateResignationStatusDto,
+} from './dto/resignation.dto';
 
 @Injectable()
 export class ResignationService {
@@ -22,8 +30,14 @@ export class ResignationService {
       where: { employeeId: dto.employeeId },
     });
 
-    if (existing && existing.status !== 'Withdrawn' && existing.status !== 'Rejected') {
-      throw new ConflictException('A resignation request is already active for this employee.');
+    if (
+      existing &&
+      existing.status !== 'Withdrawn' &&
+      existing.status !== 'Rejected'
+    ) {
+      throw new ConflictException(
+        'A resignation request is already active for this employee.',
+      );
     }
 
     return this.prisma.resignation.upsert({
@@ -48,7 +62,11 @@ export class ResignationService {
   async findAll(organizationId: string) {
     return this.prisma.resignation.findMany({
       where: { organizationId },
-      include: { employee: { select: { name: true, code: true, department: true, role: true } } },
+      include: {
+        employee: {
+          select: { name: true, code: true, department: true, role: true },
+        },
+      },
       orderBy: { submissionDate: 'desc' },
     });
   }
@@ -59,22 +77,30 @@ export class ResignationService {
       include: { employee: { select: { name: true, code: true } } },
     });
 
-    if (!resignation) throw new NotFoundException('Resignation request not found');
+    if (!resignation)
+      throw new NotFoundException('Resignation request not found');
     return resignation;
   }
 
-  async updateStatus(organizationId: string, id: string, dto: UpdateResignationStatusDto) {
-    const resignation = await this.findOne(organizationId, id);
+  async updateStatus(
+    organizationId: string,
+    id: string,
+    dto: UpdateResignationStatusDto,
+  ) {
+    // Confirms the resignation exists and belongs to this organization.
+    await this.findOne(organizationId, id);
 
     const updated = await this.prisma.resignation.update({
       where: { id },
       data: {
         ...(dto.status && { status: dto.status }),
         ...(dto.fnfStatus && { fnfStatus: dto.fnfStatus }),
-        ...(dto.companyAssetsHandover !== undefined && { companyAssetsHandover: dto.companyAssetsHandover }),
+        ...(dto.companyAssetsHandover !== undefined && {
+          companyAssetsHandover: dto.companyAssetsHandover,
+        }),
       },
     });
-    
+
     return updated;
   }
 }

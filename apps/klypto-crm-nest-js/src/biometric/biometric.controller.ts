@@ -24,7 +24,9 @@ export class BiometricController {
   @Header('Content-Type', 'text/plain')
   @ApiOperation({ summary: 'ADMS Options Handshake' })
   handshake(@Query() query: any, @Query('SN') sn: string) {
-    this.logger.log(`HANDSHAKE DETECTED! Query params: ${JSON.stringify(query)}`);
+    this.logger.log(
+      `HANDSHAKE DETECTED! Query params: ${JSON.stringify(query)}`,
+    );
     return `GET OPTION FROM: ${sn}\r\nStamp=0\r\nOpStamp=0\r\nErrorDelay=300\r\nDelay=60\r\nTransTimes=00:00;23:59\r\nTransInterval=5\r\nTransFlag=1111000000\r\nRealtime=0\r\nEncrypt=0`;
   }
 
@@ -41,7 +43,9 @@ export class BiometricController {
     for await (const chunk of req) {
       rawData += chunk;
     }
-    this.logger.log(`DATA PUSH DETECTED! SN: ${sn}, Table: ${table}, Body size: ${rawData.length} bytes`);
+    this.logger.log(
+      `DATA PUSH DETECTED! SN: ${sn}, Table: ${table}, Body size: ${rawData.length} bytes`,
+    );
     this.logger.log(`Raw Body Preview: ${rawData.substring(0, 100)}`);
     return this.biometricService.processIncomingData(sn, table, rawData);
   }

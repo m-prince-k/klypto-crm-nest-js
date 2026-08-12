@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsOptional, IsDateString, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsDateString,
+  IsEnum,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum ReimbursementStatus {
@@ -13,16 +19,25 @@ export class CreateReimbursementDto {
   @IsNumber()
   amount: number;
 
-  @ApiProperty({ example: 'Travel expenses for client meeting', description: 'Reason for the expense' })
+  @ApiProperty({
+    example: 'Travel expenses for client meeting',
+    description: 'Reason for the expense',
+  })
   @IsString()
   reason: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/receipt.pdf', description: 'URL to the attached bill/receipt' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/receipt.pdf',
+    description: 'URL to the attached bill/receipt',
+  })
   @IsString()
   @IsOptional()
   attachmentUrl?: string;
 
-  @ApiPropertyOptional({ example: '2026-04-24T10:00:00Z', description: 'Date of the expense' })
+  @ApiPropertyOptional({
+    example: '2026-04-24T10:00:00Z',
+    description: 'Date of the expense',
+  })
   @IsDateString()
   @IsOptional()
   date?: string;
@@ -33,7 +48,10 @@ export class CreateReimbursementDto {
 }
 
 export class UpdateReimbursementStatusDto {
-  @ApiProperty({ enum: ReimbursementStatus, example: ReimbursementStatus.APPROVED })
+  @ApiProperty({
+    enum: ReimbursementStatus,
+    example: ReimbursementStatus.APPROVED,
+  })
   @IsEnum(ReimbursementStatus)
   status: ReimbursementStatus;
 }
